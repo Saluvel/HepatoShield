@@ -1103,6 +1103,23 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
     grid-template-columns: 1fr !important;
   }
 }
+/* ── Login cards: en teléfono → columna fija (sin scroll lateral) ── */
+@media(max-width:560px) {
+  .login-cards {
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    touch-action: pan-y;
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    box-sizing: border-box;
+  }
+  .login-card {
+    width: 100% !important;
+    max-width: 420px !important;
+  }
+}
 </style>
 <style id="critical-hide">
 #app-shell { display: none !important; }
@@ -1734,20 +1751,22 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
       <div class="field-row" style="grid-column:1/-1;">
         <div class="field-label">Nombre completo <span style="color:var(--red);">*</span></div>
-        <div class="field-input"><input type="text" id="c_nombre_nuevo" placeholder="Apellido, Nombre" style="width:100%;"></div>
+        <div class="field-input"><input type="text" id="c_nombre_nuevo" placeholder="Ej: Rodríguez Vega, Carlos" style="width:100%;min-width:0;font-size:0.93rem;padding:8px 10px;"></div>
       </div>
-      <div class="field-row">
-        <div class="field-label">RUT / ID</div>
-        <div class="field-input"><input type="text" id="c_rut_nuevo" placeholder="ej. 12.345.678-9" style="width:100%;" oninput="onRutInput(this)"></div>
-      </div>
-      <div class="field-row">
-        <div class="field-label">Previsión</div>
-        <div class="field-input">
-          <select id="c_prev_nuevo" style="width:100%;">
-            <option value="FONASA">FONASA</option>
-            <option value="ISAPRE">ISAPRE</option>
-            <option value="Otro">Otro</option>
-          </select>
+      <div class="field-row" style="grid-column:1/-1;display:grid;grid-template-columns:1.2fr 1fr;gap:8px;">
+        <div>
+          <div class="field-label">RUT / ID</div>
+          <div class="field-input"><input type="text" id="c_rut_nuevo" placeholder="ej. 12.345.678-9" style="width:100%;min-width:0;" oninput="onRutInput(this)"></div>
+        </div>
+        <div>
+          <div class="field-label">Previsión</div>
+          <div class="field-input">
+            <select id="c_prev_nuevo" style="width:100%;">
+              <option value="FONASA">FONASA</option>
+              <option value="ISAPRE">ISAPRE</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
@@ -1816,7 +1835,7 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
     Los campos en gris son opcionales. Los resultados se calcularán automáticamente al avanzar.
   </div>
   <div style="display:flex;justify-content:space-between;">
-    <button type="button" class="btn btn-outline" onclick="goConsultaStep(3)" style="font-size:0.82rem;">Omitir labs &#8594;</button>
+    <button type="button" class="btn btn-outline" onclick="cOmitirLabs()" style="font-size:0.82rem;">Omitir labs &#8594;</button>
     <button type="button" class="btn btn-primary" onclick="goConsultaStep(3)">Calcular &#8594;</button>
   </div>
 </div>
@@ -7299,12 +7318,16 @@ function skipSplash() {
   var splash = document.getElementById('splash-screen');
   var login  = document.getElementById('login-screen');
   if (!splash) return;
-  splash.style.transition = 'opacity 0.6s ease';
+  // Fijar fondo oscuro en body para evitar flash blanco durante transición
+  document.body.style.background = '#050d10';
+  splash.style.transition = 'opacity 0.35s ease';
   splash.style.opacity = '0';
   setTimeout(function() {
     splash.style.display = 'none';
     if (login) login.style.display = '';
-  }, 600);
+    // Restaurar fondo después de que la pantalla de login ya está visible
+    setTimeout(function(){ document.body.style.background = ''; }, 100);
+  }, 350);
 }
 
 // Auto-skip cuando termina el video
@@ -7372,9 +7395,10 @@ function validarRutChileno(rut) {
 function onRutInput(el) {
   var raw = el.value.replace(/\./g,'').replace(/-/g,'').toUpperCase();
   if (raw.length > 1) el.value = formatRutChileno(raw);
+  // Solo mostrar color cuando el RUT tiene al menos 8 caracteres (mínimo válido = 7 dígitos + DV)
   var valid = raw.length >= 8 && validarRutChileno(raw);
-  el.style.borderColor = raw.length < 7 ? '' : valid ? 'var(--teal)' : 'var(--red)';
-  el.title = raw.length < 7 ? '' : valid ? 'RUT válido' : 'RUT inválido';
+  el.style.borderColor = raw.length < 8 ? '' : valid ? 'var(--teal)' : 'var(--red)';
+  el.title = raw.length < 8 ? '' : valid ? 'RUT válido' : 'RUT inválido';
 }
 function saveDerDB(){ localStorage.setItem('hsi_v3_der', JSON.stringify(derivacionesDB)); }
 function loadDerDB(){ try{ derivacionesDB = JSON.parse(localStorage.getItem('hsi_v3_der')||'{}'); }catch(e){ derivacionesDB={}; } }
@@ -7415,14 +7439,14 @@ function renderColaAPS(){
     td.textContent='No hay derivaciones registradas.';
     tr.appendChild(td); tbody.appendChild(tr); return;
   }
-  var order={urgente:0,moderada:1,rutina:2};
+  var order={urgente:0,alta:1,moderada:2,rutina:3};
   var sorted=keys.sort(function(a,b){
-    var pa=order[derivacionesDB[a].prioridad]!==undefined?order[derivacionesDB[a].prioridad]:1;
-    var pb=order[derivacionesDB[b].prioridad]!==undefined?order[derivacionesDB[b].prioridad]:1;
+    var pa=order[derivacionesDB[a].prioridad]!==undefined?order[derivacionesDB[a].prioridad]:2;
+    var pb=order[derivacionesDB[b].prioridad]!==undefined?order[derivacionesDB[b].prioridad]:2;
     if(pa!==pb) return pa-pb;
     return new Date(derivacionesDB[b].fecha)-new Date(derivacionesDB[a].fecha);
   });
-  var badgeMap={urgente:'badge-red',moderada:'badge-amber',rutina:'badge-green'};
+  var badgeMap={urgente:'badge-red',alta:'badge-amber',moderada:'badge-amber',rutina:'badge-green'};
   sorted.forEach(function(id){
     var d=derivacionesDB[id];
     var tr=document.createElement('tr');
@@ -7795,6 +7819,55 @@ function navTo(viewId, mode, tab) {
     hcc:'si-hep-hcc',postrasplante:'si-hep-postrasplante',pretrasplante:'si-hep-pretrasplante',nutricion:'si-hep-nutricion'};
   var siId = hepSiMap[tab];
   if(siId){ var si=document.getElementById(siId); if(si) si.classList.add('active'); }
+
+  // BUG 4 — Pre-llenar calculadoras desde _labSession o último snapshot del paciente activo
+  if (tab === 'masld' || tab === 'fibrosis') {
+    setTimeout(function(){
+      var _pid = typeof activePatientId !== 'undefined' ? activePatientId : null;
+      var _lb = {};
+      if (_pid && patientDB[_pid]) {
+        var _snaps = patientDB[_pid].snapshots || [];
+        if (_snaps.length) _lb = _snaps[_snaps.length-1].labs || {};
+      }
+      var _setV = function(id, val){ var el = document.getElementById(id); if (el && val && !el.value) el.value = val; };
+      // NFS calculator (nfs_*)
+      if (_lb.ast)   _setV('nfs_ast', _lb.ast);
+      if (_lb.alt)   _setV('nfs_alt', _lb.alt);
+      if (_lb.plt)   _setV('nfs_plt', _lb.plt);
+      if (_lb.plaq)  _setV('nfs_plt', _lb.plaq);
+      if (_lb.alb)   _setV('nfs_alb', _lb.alb);
+      // Edad del paciente
+      if (_pid && patientDB[_pid] && patientDB[_pid].age) _setV('nfs_age', parseFloat(patientDB[_pid].age));
+      // IMC si está disponible
+      var _peso = _pid && patientDB[_pid] ? parseFloat(patientDB[_pid].peso) : NaN;
+      var _tall = _pid && patientDB[_pid] ? parseFloat(patientDB[_pid].talla) : NaN;
+      if (!isNaN(_peso) && !isNaN(_tall) && _tall > 0) {
+        _setV('nfs_imc', (_peso / Math.pow(_tall/100, 2)).toFixed(1));
+      }
+      // FIB-4 calculator en fibrosis
+      if (_lb.ast)  _setV('fib4_ast', _lb.ast);
+      if (_lb.alt)  _setV('fib4_alt', _lb.alt);
+      if (_lb.plt)  _setV('fib4_plt', _lb.plt);
+      if (_lb.plaq) _setV('fib4_plt', _lb.plaq);
+      if (_pid && patientDB[_pid] && patientDB[_pid].age) _setV('fib4_age', parseFloat(patientDB[_pid].age));
+    }, 200);
+  }
+  if (tab === 'cirrosis') {
+    setTimeout(function(){
+      var _pid = typeof activePatientId !== 'undefined' ? activePatientId : null;
+      var _lb = {};
+      if (_pid && patientDB[_pid]) {
+        var _snaps2 = patientDB[_pid].snapshots || [];
+        if (_snaps2.length) _lb = _snaps2[_snaps2.length-1].labs || {};
+      }
+      var _setV2 = function(id, val){ var el = document.getElementById(id); if (el && val && !el.value) el.value = val; };
+      _setV2('meld_bili', _lb.bili);
+      _setV2('meld_cr',   _lb.creat);
+      _setV2('meld_inr',  _lb.inr);
+      _setV2('meld_na',   _lb.na);
+      _setV2('meld_alb',  _lb.alb);
+    }, 200);
+  }
 
   window.scrollTo(0,0);
 }
@@ -8508,10 +8581,10 @@ function updateBanner() {
   document.getElementById('bn-dx').textContent=' · '+(p.dx||'');
   var pills='';
   if(last&&last.scores){
-    if(last.scores.meld) pills+='<span class="banner-score-pill">MELD '+last.scores.meld+'</span>';
-    if(last.scores.meldna) pills+='<span class="banner-score-pill">MELD-Na '+last.scores.meldna+'</span>';
-    if(last.scores.cp) pills+='<span class="banner-score-pill">Child '+last.scores.cp+'</span>';
-    if(last.scores.fib4) pills+='<span class="banner-score-pill">FIB-4 '+last.scores.fib4+'</span>';
+    if(last.scores.meld) pills+='<span class="banner-score-pill">MELD&thinsp;<strong>'+last.scores.meld+'</strong></span>';
+    if(last.scores.meldna) pills+='<span class="banner-score-pill">MELD-Na&thinsp;<strong>'+last.scores.meldna+'</strong></span>';
+    if(last.scores.cp) pills+='<span class="banner-score-pill">Child&thinsp;<strong>'+last.scores.cp+'</strong></span>';
+    if(last.scores.fib4) pills+='<span class="banner-score-pill">FIB&#8209;4&thinsp;<strong>'+last.scores.fib4+'</strong></span>';
   }
   document.getElementById('bn-scores').innerHTML=pills;
   banner.style.display='flex';
@@ -8682,11 +8755,56 @@ function renderPatientDetail(pid) {
       html += '<button onclick="copiarRespuestaAPS(\''+pid+'\',\''+cid+'\')" style="font-size:0.72rem;font-family:var(--font-mono);background:rgba(96,165,250,0.10);border:1px solid rgba(96,165,250,0.25);color:#60a5fa;padding:4px 12px;border-radius:6px;cursor:pointer;">Copiar texto</button>';
       html += '</div>';
     }
+    // BUG 14 — Panel de sugerencias guiadas para paciente derivado desde APS
+    if (derPac.length) {
+      var _lastSnapAPS = snaps.filter(function(s){ return s.eventType === 'consulta-aps'; });
+      var _hasFib4 = last && last.scores && last.scores.fib4;
+      var _meldMissing = !last || !last.scores || !last.scores.meld;
+      var _suggestions = [];
+      if (_meldMissing) _suggestions.push({ icon:'🧮', label:'Calcular MELD-Na', action:"preLlenarCalculadora('"+pid+"')", desc:'Valores de labs disponibles para pre-llenar' });
+      if (_hasFib4 && parseFloat(_hasFib4) >= 1.3) _suggestions.push({ icon:'📊', label:'Ver FIB-4 en calculadora fibrosis', action:"navTo('hep-calculadoras','hep','fibrosis')", desc:'FIB-4: '+parseFloat(_hasFib4).toFixed(2)+' — zona '+(parseFloat(_hasFib4)>=2.67?'roja':'amarilla') });
+      _suggestions.push({ icon:'🩺', label:'Calcular Child-Pugh', action:"navTo('hep-calculadoras','hep','cirrosis')", desc:'Estadificación de función hepática reserva' });
+      _suggestions.push({ icon:'💊', label:'Revisar hepatotoxicidad de fármacos', action:"showView('esp-hepatotox')", desc:'Verificar medicamentos del paciente' });
+      if (_suggestions.length) {
+        html += '<div style="background:rgba(0,212,160,0.06);border:1px solid rgba(0,212,160,0.25);border-radius:10px;padding:10px 14px;margin-bottom:0.85rem;">';
+        html += '<div style="font-size:0.64rem;font-family:var(--font-mono);color:#00d4a0;letter-spacing:0.1em;margin-bottom:8px;">⚡ GUÍA DE EVALUACIÓN — Próximos pasos sugeridos</div>';
+        html += '<div style="display:flex;flex-direction:column;gap:5px;">';
+        _suggestions.forEach(function(sg){
+          html += '<button onclick="'+sg.action+'" style="display:flex;align-items:center;gap:8px;background:rgba(0,212,160,0.05);border:1px solid rgba(0,212,160,0.20);border-radius:7px;padding:7px 10px;cursor:pointer;text-align:left;width:100%;">';
+          html += '<span style="font-size:1rem;flex-shrink:0;">'+sg.icon+'</span>';
+          html += '<div><div style="font-size:0.78rem;font-weight:700;color:#00d4a0;">'+sg.label+'</div>';
+          html += '<div style="font-size:0.68rem;color:var(--text-muted);">'+sg.desc+'</div></div>';
+          html += '</button>';
+        });
+        html += '</div></div>';
+      }
+    }
     // Agregar snapshot
     html+='<div style="font-size:0.86rem;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:0.08em;margin-bottom:0.6rem;">NUEVA ENTRADA</div>';
+    // Pre-llenar snap-inp desde último snapshot del paciente
+    var _snapPrefill = {};
+    if (last) {
+      var _sLabs = last.labs || {};
+      var _sSc   = last.scores || {};
+      if (_sSc.meld)   _snapPrefill['meld']    = _sSc.meld;
+      if (_sSc.meldna) _snapPrefill['meldna']  = _sSc.meldna;
+      if (_sSc.cp)     _snapPrefill['cp']       = _sSc.cp;
+      if (_sSc.fib4)   _snapPrefill['fib4']     = _sSc.fib4;
+      if (_sLabs.bili)  _snapPrefill['bili']    = _sLabs.bili;
+      if (_sLabs.creat) _snapPrefill['creat']   = _sLabs.creat;
+      if (_sLabs.alb)   _snapPrefill['alb']     = _sLabs.alb;
+      if (_sLabs.na)    _snapPrefill['na']       = _sLabs.na;
+      if (_sLabs.plt)   _snapPrefill['plt']     = _sLabs.plt;
+      if (_sLabs.ast)   _snapPrefill['gotast']  = _sLabs.ast;
+      if (_sLabs.alt)   _snapPrefill['gptalt']  = _sLabs.alt;
+      if (_sLabs.afp)   _snapPrefill['afp']     = _sLabs.afp;
+      if (_sLabs.lsm)   _snapPrefill['lsm']     = _sLabs.lsm;
+    }
     html+='<div class="inp-grid" style="grid-template-columns:repeat(auto-fit,minmax(110px,1fr));">';
     ['MELD','MELD-Na','MELD-3','Child','FIB-4','Bili','Creat','Alb','Na','PLT','GOT(AST)','GPT(ALT)','AFP','LSM'].forEach(function(f){
-      html+='<div class="inp-group"><div class="inp-label">'+f+'</div><input class="inp snap-inp" data-field="'+f.toLowerCase().replace('-','').replace('.','').replace('ó','o')+'" type="number" placeholder="—"></div>';
+      var _dataField = f.toLowerCase().replace(/-/g,'').replace('.','').replace('ó','o').replace('(','').replace(')','');
+      var _preVal = _snapPrefill[_dataField] || '';
+      html+='<div class="inp-group"><div class="inp-label">'+f+'</div><input class="inp snap-inp" data-field="'+_dataField+'" type="number" placeholder="—" value="'+_preVal+'"></div>';
     });
     html+='</div>';
     html+='<div class="inp-grid" style="grid-template-columns:1fr 1fr 1fr;">';
@@ -8717,9 +8835,10 @@ function renderPatientDetail(pid) {
       snaps.slice().reverse().forEach(function(s){
         var d=new Date(s.date).toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'2-digit'});
         var _et=s.eventType||'—';
-        var _etColor=_et==='intervencion-preventiva'?'#34d399':_et==='consulta-aps'?'#60a5fa':_et==='descompensacion'||_et==='descomp'?'#f87171':'';
+        var _etLabel=(typeof EVENT_LABELS !== 'undefined' && EVENT_LABELS[_et]) || _et;
+        var _etColor=(typeof EVENT_COLORS !== 'undefined' && EVENT_COLORS[_et]) || (_et==='intervencion-preventiva'?'#34d399':_et==='consulta-aps'?'#60a5fa':_et==='descompensacion'||_et==='descomp'?'#f87171':'');
         var _rowBg=_et==='intervencion-preventiva'?'background:rgba(52,211,153,0.05);':_et==='descompensacion'||_et==='descomp'?'background:rgba(248,113,113,0.05);':'';
-        html+='<tr style="'+_rowBg+'"><td>'+d+'</td><td style="font-size:0.75rem;'+(_etColor?'color:'+_etColor+';':'')+'">'+_et+'</td><td>'+(s.scores&&s.scores.meld?s.scores.meld:'—')+'</td><td>'+(s.scores&&s.scores.cp?s.scores.cp:'—')+'</td><td>'+(s.scores&&s.scores.fib4?parseFloat(s.scores.fib4).toFixed(2):'—')+'</td><td>'+(s.labs&&s.labs.bili?s.labs.bili:'—')+'</td><td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_esc(s.note||'—')+'</td></tr>';
+        html+='<tr style="'+_rowBg+'"><td>'+d+'</td><td style="font-size:0.75rem;'+(_etColor?'color:'+_etColor+';':'')+'">'+_etLabel+'</td><td>'+(s.scores&&s.scores.meld?s.scores.meld:'—')+'</td><td>'+(s.scores&&s.scores.cp?s.scores.cp:'—')+'</td><td>'+(s.scores&&s.scores.fib4?parseFloat(s.scores.fib4).toFixed(2):'—')+'</td><td>'+(s.labs&&s.labs.bili?s.labs.bili:'—')+'</td><td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_esc(s.note||'—')+'</td></tr>';
       });
       html+='</tbody></table></div>';
     }
@@ -13811,6 +13930,46 @@ el.style.borderColor=el.dataset.pid===pid?'var(--amber)':'var(--border)';
 });
 renderPatientDetail(pid);
 }
+// Etiquetas legibles para tipos de eventos clínicos
+var EVENT_LABELS = {
+  'consulta-aps':         'Consulta APS',
+  'intervencion-preventiva': 'Intervención Preventiva',
+  'control':              'Control Especialista',
+  'ingreso':              'Ingreso Hospitalario',
+  'alta':                 'Alta Hospitalaria',
+  'procedimiento':        'Procedimiento',
+  'inicio_tx':            'Inicio Tratamiento',
+  'descompensacion':      'Descompensación',
+  'descomp':              'Descompensación',
+  'pbe':                  'Peritonitis Bacteriana Espontánea',
+  'hda_variceal':         'Hemorragia Digestiva Variceal',
+  'eh':                   'Encefalopatía Hepática',
+  'aki':                  'Lesión Renal Aguda (AKI/SHR)',
+  'infeccion':            'Infección Bacteriana',
+  'hospitalizacion':      'Hospitalización',
+  'trasplante_eval':      'Evaluación Pre-trasplante',
+  'trasplante':           'Trasplante Hepático'
+};
+var EVENT_COLORS = {
+  'consulta-aps':         '#60a5fa',
+  'intervencion-preventiva': '#34d399',
+  'control':              '#00d4a0',
+  'ingreso':              '#f87171',
+  'alta':                 '#a78bfa',
+  'procedimiento':        '#fbbf24',
+  'inicio_tx':            '#34d399',
+  'descompensacion':      '#f87171',
+  'descomp':              '#f87171',
+  'pbe':                  '#fb923c',
+  'hda_variceal':         '#f87171',
+  'eh':                   '#fb923c',
+  'aki':                  '#f87171',
+  'infeccion':            '#fbbf24',
+  'hospitalizacion':      '#f87171',
+  'trasplante_eval':      '#a78bfa',
+  'trasplante':           '#a78bfa'
+};
+
 function renderTimeline(pid) {
 const p=patientDB[pid];
 const snaps=[...p.snapshots].reverse();
@@ -14701,19 +14860,31 @@ function preLlenarCalculadora(pid) {
   var lb = last.labs||{};
   var sc = last.scores||{};
   // Navigate to MELD calculator section
-  showView('esp-scores');
+  navTo('hep-calculadoras','hep','cirrosis');
   setTimeout(function(){
-    var setV = function(id,val){ var el=document.getElementById(id); if(el&&val) el.value=val; };
-    setV('bili_meld',    lb.bili);
-    setV('creat_meld',   lb.creat);
-    setV('inr_meld',     lb.inr);
-    setV('na_meld',      lb.na);
-    setV('bili_cp',      lb.bili);
-    setV('alb_cp',       lb.alb);
-    setV('inr_cp',       lb.inr);
-    // Trigger calculations
-    var calcMeld = document.getElementById('bili_meld');
-    if(calcMeld) calcMeld.dispatchEvent(new Event('input'));
+    var setV = function(id,val){ var el=document.getElementById(id); if(el&&val!==undefined&&val!==null) el.value=val; };
+    // MELD / MELD-Na / MELD-3 fields (correct IDs: meld_*)
+    setV('meld_bili',  lb.bili);
+    setV('meld_cr',    lb.creat);
+    setV('meld_inr',   lb.inr);
+    setV('meld_na',    lb.na);
+    setV('meld_alb',   lb.alb);
+    // Child-Pugh: pre-select radio buttons from numeric values
+    var _setRadio = function(name, val) {
+      if (!val) return;
+      var score = 1;
+      if (name === 'cp_bili')  score = val < 2 ? 1 : val <= 3 ? 2 : 3;
+      if (name === 'cp_alb')   score = val > 3.5 ? 1 : val >= 2.8 ? 2 : 3;
+      if (name === 'cp_inr')   score = val < 1.7 ? 1 : val <= 2.3 ? 2 : 3;
+      var radios = document.querySelectorAll('input[name="'+name+'"]');
+      radios.forEach(function(r){ if(parseInt(r.value)===score){ r.checked=true; r.dispatchEvent(new Event('change',{bubbles:true})); } });
+    };
+    _setRadio('cp_bili', lb.bili);
+    _setRadio('cp_alb',  lb.alb);
+    _setRadio('cp_inr',  lb.inr);
+    // Trigger MELD calculation
+    var meldBili = document.getElementById('meld_bili');
+    if(meldBili) meldBili.dispatchEvent(new Event('input',{bubbles:true}));
     showToast('Calculadora pre-llenada', 'Valores de '+p.name+' cargados. Revisa y confirma antes de calcular.');
   }, 350);
 }
@@ -15093,7 +15264,7 @@ function cCrearYContinuar() {
     var _talla   = document.getElementById('c_talla')   ? document.getElementById('c_talla').value   : '';
     var _cintura = document.getElementById('c_cintura') ? document.getElementById('c_cintura').value : '';
     patientDB[id] = {
-      id:id, name:nombre, dx:'Pendiente evaluación APS',
+      id:id, name:nombre, rut:rut, dx:'Pendiente evaluación APS',
       age:edad, sexo:_sexo, peso:_peso, talla:_talla, cintura:_cintura,
       prevision:prev, createdAt:new Date().toISOString(), snapshots:[]
     };
@@ -15224,15 +15395,13 @@ function cRenderLabs() {
       def.extra.forEach(function(id) { if (toShow.indexOf(id) < 0) toShow.push(id); });
     }
   });
-  // Build HTML preserving existing values
+  // Build HTML — no preserver valores previos (evitar contaminación entre pacientes)
   var html = '';
   toShow.forEach(function(id) {
     var def = allLabDefs[id];
     if (!def) return;
-    var existEl = document.getElementById(id);
-    var val = existEl ? existEl.value : '';
     html += '<div class="field-row"><div class="field-label">'+def.label+(def.unit?' <small>'+def.unit+'</small>':'')+'</div>'
-      +'<div class="field-input"><input type="number" id="'+id+'" min="'+(def.min||0)+'" max="'+(def.max||9999)+'" step="'+(def.step||'1')+'" placeholder="'+def.ph+'" value="'+val+'" oninput="cPreviewLab()"></div></div>';
+      +'<div class="field-input"><input type="number" id="'+id+'" min="'+(def.min||0)+'" max="'+(def.max||9999)+'" step="'+(def.step||'1')+'" placeholder="'+def.ph+'" oninput="cPreviewLab()"></div></div>';
   });
   container.innerHTML = html;
   container.style.gridTemplateColumns = toShow.length <= 4 ? '1fr 1fr' : '1fr 1fr 1fr';
@@ -15657,6 +15826,61 @@ var hepatotoxDB = {
       nota:'INR en cirrosis no refleja anticoagulación real (factores pro e anticoagulantes reducidos). Considerar HBPM o DOACs. Si necesario: consultar con hepatología.',
       fuente:'EASL CPG Cirrosis 2018 · Tripodi A. Hepatology 2011;53:2108 · LiverTox 2023',
       livertox:'Warfarin' },
+
+    { name:'Acenocumarol', aliases:['Sintrom','Neosintrom','acenocoumarol','acenocumarol'],
+      cat:'Anticoagulante oral (antagonista vitamina K)', dili:'D', riesgo:'bajo',
+      childA:'caution',childA_note:'INR basal alterado: monitorizar estrechamente',
+      childB:'caution',childB_note:'INR muy inestable; ajuste frecuente necesario',
+      childC:'avoid',  childC_note:'Evitar; preferir HBPM o DOACs bajo supervisión',
+      mecanismo:'Antagonista de vitamina K. Inhibe factores II, VII, IX, X y proteínas C/S. En cirrosis los factores de coagulación ya están reducidos, el INR no refleja el balance real pro/anticoagulante.',
+      latencia:'N/A', patron:'No hepatotóxico',
+      nota:'Más usado que warfarina en Chile. Vida media más corta (8-11h vs 35-45h warfarina) → ajuste más rápido pero mayor variabilidad. En hepatopatía: el INR no es fiable para guiar anticoagulación (mide deficiencia de factores de síntesis hepática). Considerar cambio a HBPM o DOAC si hay indicación válida.',
+      fuente:'Agencia Española del Medicamento · EASL Cirrosis 2018 · Tripodi A. Hepatology 2011',
+      livertox:'Acenocumarol' },
+
+    { name:'Apixabán (DOAC)', aliases:['Eliquis','Apixaban','apixabán'],
+      cat:'Anticoagulante oral directo — inhibidor factor Xa', dili:'D', riesgo:'bajo',
+      childA:'caution',childA_note:'Usar con precaución; menor experiencia en hepatopatía',
+      childB:'avoid',  childB_note:'Evitar — sin datos en Child B significativo',
+      childC:'avoid',  childC_note:'Contraindicado — hepatopatía grave con coagulopatía',
+      mecanismo:'Inhibidor directo del factor Xa. Metabolismo hepático (CYP3A4 ~25%). Eliminación mixta renal/fecal. En cirrosis avanzada puede acumularse.',
+      latencia:'N/A', patron:'Hepatotoxicidad idiosincrática muy rara (casos aislados)',
+      nota:'DOAC preferido en FA + MASLD/cirrosis compensada (Child A). Ventajas sobre warfarina: no requiere monitoreo de INR, menor variabilidad. Contraindicado en Child B–C (riesgo hemorrágico aumentado + acumulación). No usar en sangrado variceal activo. Revisar función renal antes de iniciar.',
+      fuente:'EASL Cirrosis 2018 · Intagliata NM. Hepatology 2018;68:1154 · LiverTox 2023',
+      livertox:'Apixaban' },
+
+    { name:'Rivaroxabán (DOAC)', aliases:['Xarelto','Rivaroxaban','rivaroxabán'],
+      cat:'Anticoagulante oral directo — inhibidor factor Xa', dili:'C', riesgo:'bajo',
+      childA:'caution',childA_note:'Posible en Child A; monitorizar función hepática',
+      childB:'avoid',  childB_note:'Evitar — metabolismo hepático significativo (~66%)',
+      childC:'avoid',  childC_note:'Contraindicado — AUC ↑127% en Child C',
+      mecanismo:'Inhibidor directo factor Xa. Alto metabolismo hepático (~66% CYP3A4/CYP2J2). Ficha técnica contraindica en Child B-C.',
+      latencia:'1-90 días', patron:'Hepatitis citolítica (DILI raro pero documentado)',
+      nota:'⚠ IMPORTANTE: Rivaroxabán tiene mayor metabolismo hepático que apixabán → mayor riesgo de acumulación en hepatopatía. EMA contraindica en Child B–C. Casos de elevación de transaminasas reportados. Preferir apixabán o dabigatrán en pacientes hepáticos si se requiere DOAC.',
+      fuente:'EMA EPAR Xarelto · Potze W. Eur J Haematol 2013 · LiverTox 2023',
+      livertox:'Rivaroxaban' },
+
+    { name:'Dabigatrán (DOAC)', aliases:['Pradaxa','Dabigatran','dabigatrán'],
+      cat:'Anticoagulante oral directo — inhibidor trombina (IIa)', dili:'D', riesgo:'bajo',
+      childA:'caution',childA_note:'Usar con precaución; mínimo metabolismo hepático',
+      childB:'caution',childB_note:'Probable en Child B leve; ajuste según ClCr',
+      childC:'avoid',  childC_note:'Evitar — datos insuficientes en Child C',
+      mecanismo:'Inhibidor directo de trombina. Profármaco dabigatrán etexilato activado por esterasas. Mínimo metabolismo hepático → ventaja en hepatopatía. Eliminación principalmente renal (80%).',
+      latencia:'N/A', patron:'Hepatotoxicidad muy rara',
+      nota:'Ventaja en hepatopatía: mínimo metabolismo hepático. Sin embargo, función renal crítica (contraindicado ClCr <30 mL/min). Requiere función renal normal o levemente reducida. Antídoto disponible: idarucizumab (Praxbind). Considerar si hepatopatía Child A-B sin disfunción renal significativa.',
+      fuente:'Potze W. Eur J Haematol 2013 · EASL 2018 · LiverTox 2023',
+      livertox:'Dabigatran' },
+
+    { name:'Edoxabán (DOAC)', aliases:['Lixiana','Savaysa','Edoxaban','edoxabán'],
+      cat:'Anticoagulante oral directo — inhibidor factor Xa', dili:'D', riesgo:'bajo',
+      childA:'caution',childA_note:'Posible en Child A; pocos datos',
+      childB:'avoid',  childB_note:'Evitar — datos limitados',
+      childC:'avoid',  childC_note:'Contraindicado',
+      mecanismo:'Inhibidor directo factor Xa. Metabolismo hepático parcial (~50% CYP3A4). Eliminación mixta renal/fecal/biliar.',
+      latencia:'N/A', patron:'Hepatotoxicidad muy rara',
+      nota:'Menor experiencia clínica en hepatopatía vs apixabán/rivaroxabán. Disponible en Chile. Pocos datos en cirrosis. Evitar en Child B-C. Si se requiere DOAC en hepatopatía Child A, preferir apixabán por mayor evidencia.',
+      fuente:'EASL 2018 · LiverTox 2023',
+      livertox:'Edoxaban' },
 
     // ── OTROS FRECUENTES ─────────────────────────────────────────────────
     { name:'Omeprazol / IBP', aliases:['Omeprazol','Esomeprazol','Pantoprazol','Lansoprazol','Nexium','Losec'],
@@ -17962,8 +18186,8 @@ function cRenderResultados() {
     html += '<div class="c-result-card yellow">'
       +'<div style="font-size:0.82rem;font-weight:700;color:#fbbf24;margin-bottom:4px;">Hepatitis Viral (VHB / VHC)</div>'
       +'<div style="font-size:0.75rem;color:var(--text-dim);">&#8594; Derivación a hepatología <strong>siempre indicada</strong>. Evaluar carga viral, genotipo y criterios de tratamiento.'
-      +'<br>&#8594; <strong>VHB (EASL 2017):</strong> Confirmar HBsAg + HBV-DNA + HBeAg. Riesgo de HCC <strong>incluso sin cirrosis</strong> → vigilancia ecografía + AFP semestral. Evaluar antiviral (TDF/TAF/ETV).'
-      +'<br>&#8594; <strong>VHC:</strong> Derivar para evaluar tratamiento con AAD (curación >95%). Carga viral + genotipo si disponible.</div></div>';
+      +'<br>&#8594; <strong>VHB (EASL 2017):</strong> En APS: solicitar HBsAg, HBV-DNA, HBeAg, perfil hepático + FIB-4. Riesgo de HCC <strong>incluso sin cirrosis</strong>. Derivar a hepatología — el especialista indicará vigilancia semestral (ecografía + AFP) e inicio de antiviral (TDF/TAF/ETV) según criterios.'
+      +'<br>&#8594; <strong>VHC:</strong> En APS: solicitar anti-VHC + RNA-VHC (carga viral) si disponible. Derivar a hepatología para tratamiento con AAD (curación >95%) — no iniciar sin especialista.</div></div>';
   }
 
   // ── 4b. Alcohol como motivo — consejería estructurada obligatoria ────
@@ -18013,7 +18237,7 @@ function cRenderResultados() {
       decisiones.push({ urgencia:'urgente', texto:'Ictericia moderada (Bili 3–9 o FA/GGT 3–7×VN) → hepatitis aguda / obstrucción parcial, derivar esta semana' });
       html += '<div class="c-result-card red">'
         +'<div style="font-size:0.82rem;font-weight:700;color:#fb923c;margin-bottom:3px;">Ictericia moderada / Colestasis significativa</div>'
-        +'<div style="font-size:0.75rem;color:var(--text-dim);">&#8594; Bili 3–9 mg/dL o FA/GGT elevadas. Solicitar ecografía biliopancreática + labs: hepatitis viral, ERCP si sospecha obstrucción. Derivar en ≤7 días.</div>'
+        +'<div style="font-size:0.75rem;color:var(--text-dim);">&#8594; Bili 3–9 mg/dL o FA/GGT elevadas. Solicitar ecografía biliopancreática + labs: hepatitis viral, perfil hepático completo, bilirrubina fraccionada. Derivar a gastroenterología/medicina interna en ≤7 días — el especialista evaluará necesidad de ERCP u otras intervenciones.</div>'
         +'</div>';
     } else {
       // Ictericia leve o sin labs → PREFERENTE
@@ -18063,21 +18287,30 @@ function cRenderResultados() {
   window._cMaxRisk = maxRisk;
   window._cDecisiones = decisiones;
 
-  // ── Perla clínica FIB-4 ─────────────────────────────────────
+  // ── Perla clínica FIB-4 — solo la perla edad >65 si el paciente tiene >65 ─
   if (fib4 !== null) {
-    var pearlKey = (fib4 >= (age > 65 ? 4.0 : 2.67)) ? 'fib4' : 'fib4-intermedio';
-    _evidenceService.getPearl(pearlKey).then(function(pearl) {
-      var cards = container.querySelectorAll('.c-result-card');
-      if (cards.length > 0 && pearl) {
-        var pearlDiv = document.createElement('div');
-        pearlDiv.innerHTML = _evidenceService.renderPearlHtml(pearl);
-        cards[0].appendChild(pearlDiv.firstElementChild);
-      }
-    });
+    var _f4cutHigh = age > 65 ? 4.0 : 2.67;
+    var _f4cutLow  = age > 65 ? 2.0 : 1.3;
+    var pearlKey = null;
+    if (age > 65 && fib4 >= _f4cutHigh) {
+      pearlKey = 'fib4'; // perla de ajuste por edad >65
+    } else if (fib4 >= _f4cutLow && fib4 < _f4cutHigh) {
+      pearlKey = 'fib4-intermedio'; // zona gris
+    }
+    if (pearlKey) {
+      _evidenceService.getPearl(pearlKey).then(function(pearl) {
+        var cards = container.querySelectorAll('.c-result-card');
+        if (cards.length > 0 && pearl) {
+          var pearlDiv = document.createElement('div');
+          pearlDiv.innerHTML = _evidenceService.renderPearlHtml(pearl);
+          cards[0].appendChild(pearlDiv.firstElementChild);
+        }
+      });
+    }
   }
 
-  // ── Perla clínica Transaminasas ──────────────────────────────
-  if (!isNaN(ast) || !isNaN(alt)) {
+  // ── Perla clínica Transaminasas — solo si ratio AST/ALT > 2 ─
+  if (!isNaN(ast) && !isNaN(alt) && alt > 0 && (ast/alt) > 2) {
     _evidenceService.getPearl('transaminasas').then(function(pearl) {
       var cards = container.querySelectorAll('.c-result-card');
       if (cards.length > 1 && pearl) {
@@ -18165,13 +18398,16 @@ function cRenderAcciones() {
     acciones.push({ id:'control_aps', label:'Control APS en 3 meses',
       desc:'Repetir FIB-4 y laboratorio para reevaluar', color:'#34d399' });
   } else {
+    // FIB-4 bajo riesgo o screening sin hallazgos — opciones preventivas
     acciones = [
-      { id:'control_aps', label:'Control APS en 6-12 meses',
-        desc:'Sin hallazgos urgentes. Manejo de factores de riesgo en APS', color:'#34d399' },
-      { id:'solicitar_examenes', label:'Solicitar Laboratorio Basico',
-        desc:'Perfil hepatico, glicemia, lipidos si no tiene reciente', color:'#60a5fa' },
-      { id:'vacunas', label:'Verificar Vacunacion',
-        desc:'Hepatitis A y B si no tiene inmunizacion previa', color:'#a78bfa' }
+      { id:'control_aps', label:'Control APS en 12 meses',
+        desc:'FIB-4 en rango bajo. Repetir evaluación anual con factores de riesgo', color:'#34d399' },
+      { id:'educacion', label:'Educación y Optimización de Factores de Riesgo',
+        desc:'Consejos de peso, dieta, actividad física, abstinencia de alcohol', color:'#34d399' },
+      { id:'solicitar_examenes', label:'Solicitar Ecografía + Laboratorio Preventivo',
+        desc:'Ecografía abdominal + perfil hepático + glicemia + lípidos (si no tiene reciente)', color:'#60a5fa' },
+      { id:'vacunas', label:'Verificar Vacunación Hepática',
+        desc:'Hepatitis A y B si no tiene inmunización previa documentada', color:'#a78bfa' }
     ];
   }
 
@@ -18204,7 +18440,8 @@ function _getFirmaDoc() {
 function _getPacienteDoc() {
   var p = _cPacienteId && patientDB[_cPacienteId] ? patientDB[_cPacienteId] : null;
   var nombre = p ? p.name : ((document.getElementById('c_nombre_nuevo')||{}).value||'Sin nombre');
-  var rut    = p ? (p.rut||'—')   : ((document.getElementById('c_rut_nuevo')||{}).value||'—');
+  var rut    = p ? (p.rut || (p.id && !p.id.startsWith('APS-') ? p.id : '—') || '—')
+                : ((document.getElementById('c_rut_nuevo')||{}).value||'—');
   var edad   = (document.getElementById('c_edad')||{}).value || (p ? p.age||'—' : '—');
   var sexo   = (document.getElementById('c_sexo')||{}).value === 'F' ? 'Femenino' : 'Masculino';
   var peso   = (document.getElementById('c_peso')||{}).value || '';
@@ -18230,8 +18467,22 @@ function _buildCartaDerivacion(urgencia) {
 
   var hallazgos = [];
   if (fib4 !== null) hallazgos.push('FIB-4: ' + parseFloat(fib4).toFixed(2) + (fib4>2.67?' (alto riesgo F3-F4)':fib4>1.3?' (riesgo intermedio)':' (bajo riesgo)'));
-  if (meld !== null) hallazgos.push('MELD: ' + meld);
-  if (pac.imc !== '—') hallazgos.push('IMC: ' + pac.imc + ' kg/m2');
+  if (meld !== null) hallazgos.push('MELD-Na: ' + meld + ' pts');
+  if (pac.imc !== '—') hallazgos.push('IMC: ' + pac.imc + ' kg/m²');
+  // Labs desde sesión activa
+  if (_labSession.ast)  hallazgos.push('GOT (AST): ' + _labSession.ast + ' U/L');
+  if (_labSession.alt)  hallazgos.push('GPT (ALT): ' + _labSession.alt + ' U/L');
+  if (_labSession.plt)  hallazgos.push('Plaquetas: ' + _labSession.plt + ' ×10³/µL');
+  if (_labSession.alb)  hallazgos.push('Albúmina: ' + _labSession.alb + ' g/dL');
+  if (_labSession.bili) hallazgos.push('Bilirrubina T.: ' + _labSession.bili + ' mg/dL');
+  if (_labSession.inr)  hallazgos.push('INR/TP: ' + _labSession.inr);
+  if (_labSession.cr)   hallazgos.push('Creatinina: ' + _labSession.cr + ' mg/dL');
+  if (_labSession.gli)  hallazgos.push('Glicemia ayuno: ' + _labSession.gli + ' mg/dL');
+  if (_labSession.tg)   hallazgos.push('Triglicéridos: ' + _labSession.tg + ' mg/dL');
+  if (_labSession.hdl)  hallazgos.push('HDL: ' + _labSession.hdl + ' mg/dL');
+  // Previsión del paciente
+  if (_cPacienteId && patientDB[_cPacienteId] && patientDB[_cPacienteId].prevision)
+    hallazgos.push('Previsión: ' + patientDB[_cPacienteId].prevision);
 
   var urgTxt = urgencia === 'urgente'    ? 'URGENTE — dentro de 48-72 horas'
              : urgencia === 'su'         ? 'DERIVACION A URGENCIA — hoy'
@@ -18245,7 +18496,7 @@ function _buildCartaDerivacion(urgencia) {
     fecha + '\n\n' +
     'Estimado/a colega:\n\n' +
     'Derivo a usted al/la paciente ' + pac.nombre +
-    ', ' + pac.edad + ' anos, ' + pac.sexo + ', RUT ' + pac.rut + ',\n' +
+    ', ' + pac.edad + ' años, ' + pac.sexo + ', RUT ' + pac.rut + ',\n' +
     'para evaluacion por Gastroenterologia/Hepatologia.\n\n' +
     'MOTIVO DE DERIVACION:\n' +
     motivos + '\n\n' +
@@ -18627,36 +18878,69 @@ function cGenerarResumen() {
   var imc = (peso && talla) ? (parseFloat(peso)/Math.pow(parseFloat(talla)/100,2)).toFixed(1) : 'N/D';
 
   var accionMap = {
-    derivar_urgente:    'DERIVAR HOY — Urgente (mismo día)',
-    derivar_preferente: 'DERIVAR PREFERENTE — ≤30 días',
-    derivar_su:         'ENVIAR A SERVICIO DE URGENCIA',
-    derivar_programado: 'DERIVAR PROGRAMADO (4–8 semanas)',
-    solicitar_elastografia: 'SOLICITAR ELASTOGRAFÍA HEPÁTICA (FibroScan)',
-    solicitar_examen:   'SOLICITAR EXÁMENES COMPLEMENTARIOS',
-    control_aps:        'CONTROL APS',
-    educacion:          'EDUCACIÓN AL PACIENTE',
-    vacunas:            'VERIFICAR VACUNACIÓN'
+    derivar_urgente:       'DERIVAR HOY — Urgente (mismo día)',
+    derivar_preferente:    'DERIVAR PREFERENTE — ≤30 días',
+    derivar_su:            'ENVIAR A SERVICIO DE URGENCIA',
+    derivar_programado:    'DERIVAR PROGRAMADO (4–8 semanas)',
+    solicitar_elastografia:'SOLICITAR ELASTOGRAFÍA HEPÁTICA (FibroScan)',
+    solicitar_examen:      'SOLICITAR EXÁMENES COMPLEMENTARIOS',
+    solicitar_examenes:    'SOLICITAR ECOGRAFÍA + LABORATORIO PREVENTIVO',
+    control_aps:           'CONTROL APS',
+    educacion:             'EDUCACIÓN Y OPTIMIZACIÓN DE FACTORES DE RIESGO',
+    vacunas:               'VERIFICAR VACUNACIÓN HEPÁTICA'
   };
-  var accionTexto = _cAccionSeleccionada ? (accionMap[_cAccionSeleccionada] || _cAccionSeleccionada) : 'No seleccionada';
+  var accionTexto = _cAccionSeleccionada ? (accionMap[_cAccionSeleccionada] || _cAccionSeleccionada) : null;
+
+  // BUG 9 — Acción requerida antes de generar resumen
+  if (!_cAccionSeleccionada) {
+    showToast('Acción requerida', 'Seleccione una acción clínica en el panel de arriba antes de generar el resumen.');
+    var accContainer = document.getElementById('c-acciones-sugeridas');
+    if (accContainer) {
+      accContainer.style.outline = '2px solid #f87171';
+      accContainer.style.borderRadius = '8px';
+      setTimeout(function(){ accContainer.style.outline = ''; }, 2000);
+    }
+    return;
+  }
 
   var resumen = 'EVALUACION HEPATOLOGICA APS — HepatoShield Institucional\n';
   resumen += '='.repeat(54)+'\n';
   resumen += 'Fecha          : '+fecha+'\n';
   resumen += 'Paciente       : '+(nombre||'No especificado')+'\n';
-  resumen += 'Edad / Sexo    : '+(edad||'--')+' anos / '+sexo+'\n';
-  resumen += 'IMC            : '+imc+' kg/m2\n';
+  resumen += 'Edad / Sexo    : '+(edad||'--')+' años / '+sexo+'\n';
+  resumen += 'IMC            : '+imc+' kg/m²\n';
   resumen += '─'.repeat(54)+'\n';
   resumen += 'MOTIVO         : '+motivosTexto+'\n';
   resumen += '─'.repeat(54)+'\n';
   if (fib4 !== null) resumen += 'FIB-4          : '+fib4.toFixed(2)+'\n';
   if (meld !== null) resumen += 'MELD-Na        : '+meld+' pts\n';
+  // BUG 8 — Incluir valores de laboratorio en el resumen
+  _syncLabSession();
+  var _labLines = [];
+  if (_labSession.ast)  _labLines.push('GOT (AST)      : '+_labSession.ast+' U/L');
+  if (_labSession.alt)  _labLines.push('GPT (ALT)      : '+_labSession.alt+' U/L');
+  if (_labSession.plt)  _labLines.push('Plaquetas      : '+_labSession.plt+' ×10³/µL');
+  if (_labSession.alb)  _labLines.push('Albúmina       : '+_labSession.alb+' g/dL');
+  if (_labSession.bili) _labLines.push('Bilirrubina T. : '+_labSession.bili+' mg/dL');
+  if (_labSession.inr)  _labLines.push('INR/TP         : '+_labSession.inr);
+  if (_labSession.cr)   _labLines.push('Creatinina     : '+_labSession.cr+' mg/dL');
+  if (_labSession.na)   _labLines.push('Sodio          : '+_labSession.na+' mEq/L');
+  if (_labSession.ggt)  _labLines.push('GGT            : '+_labSession.ggt+' U/L');
+  if (_labSession.gli)  _labLines.push('Glicemia ayuno : '+_labSession.gli+' mg/dL');
+  if (_labSession.tg)   _labLines.push('Triglicéridos  : '+_labSession.tg+' mg/dL');
+  if (_labSession.hdl)  _labLines.push('HDL            : '+_labSession.hdl+' mg/dL');
+  if (_labLines.length > 0) {
+    resumen += '─'.repeat(54)+'\n';
+    resumen += 'LABORATORIO:\n';
+    _labLines.forEach(function(l){ resumen += '  '+l+'\n'; });
+  }
   if (window._cDecisiones && window._cDecisiones.length > 0) {
     resumen += '─'.repeat(54)+'\n';
     resumen += 'HALLAZGOS:\n';
     window._cDecisiones.forEach(function(d){ resumen += '  • '+d.texto+'\n'; });
   }
   resumen += '─'.repeat(54)+'\n';
-  resumen += 'ACCION         : '+accionTexto+'\n';
+  resumen += 'ACCION         : '+(accionTexto||'No especificada')+'\n';
   if (notas) resumen += 'NOTAS          : '+notas+'\n';
   resumen += '='.repeat(54)+'\n';
   resumen += 'Generado por HepatoShield Institucional v3.0\n';
@@ -18674,7 +18958,7 @@ function cGenerarResumen() {
         eventType: _snap_et,
         scores: {},
         labs: {},
-        note: (_cAccionSeleccionada || '') + (notas ? ' | ' + notas.slice(0,200) : '')
+        note: (accionTexto || _cAccionSeleccionada || '') + (notas ? ' | ' + notas.slice(0,200) : '')
       };
       if (fib4 !== null) _snap.scores.fib4 = parseFloat(fib4.toFixed(2));
       if (meld !== null) _snap.scores.meld = meld;
@@ -18710,10 +18994,25 @@ function cGenerarResumen() {
   if (preEl) preEl.textContent = resumen;
   if (divEl) divEl.style.display = 'block';
 
+  // Guardar resumen en window para heredarlo al módulo Resumen/PDF
+  window._lastConsultaResumen = resumen;
+  window._lastConsultaNombre  = nombre || '';
+  window._lastConsultaMotivo  = motivosTexto || '';
+  window._lastConsultaFib4    = fib4;
+  window._lastConsultaAccion  = accionTexto || '';
+
   // Scroll al resumen
   setTimeout(function(){
     if (divEl) divEl.scrollIntoView({ behavior:'smooth', block:'nearest' });
   }, 100);
+}
+
+function cOmitirLabs() {
+  // Limpiar valores de laboratorio (conservar datos demográficos) y saltar al paso 3
+  ['ast','alt','plt','alb','bili','inr','cr','na','ggt','fa','gli','tg','hdl','pas'].forEach(function(k){ _labSession[k]=null; });
+  var lc = document.getElementById('c-labs-container');
+  if (lc) lc.innerHTML = '';
+  goConsultaStep(3);
 }
 
 function resetConsulta() {
@@ -18747,6 +19046,12 @@ function resetConsulta() {
   if (btn) { btn.disabled = true; btn.style.opacity = '0.45'; btn.style.cursor = 'not-allowed'; }
   // Resetear sesión de labs para evitar contaminación entre pacientes
   Object.keys(_labSession).forEach(function(k){ _labSession[k] = null; });
+  // Limpiar DOM del contenedor de labs para evitar contaminación entre pacientes
+  var _labsCont = document.getElementById('c-labs-container');
+  if (_labsCont) _labsCont.innerHTML = '';
+  // Limpiar banner paciente activo
+  activePatientId = null;
+  updateBanner();
   goConsultaStep(1);
 }
 
@@ -20059,6 +20364,34 @@ function openHepPreviewModal() {
 
 
 function buildApsResumen() {
+  var out = document.getElementById('aps-hresumen-output') || document.getElementById('hresumen-output');
+
+  // Si hay un resumen reciente de consulta, heredarlo directamente
+  if (window._lastConsultaResumen) {
+    if (out) out.textContent = window._lastConsultaResumen;
+    // Pre-poblar campos con datos de la última consulta
+    var ini = document.getElementById('aps_hres_initials');
+    var rea = document.getElementById('aps_hres_reason');
+    if (ini && !ini.value && window._lastConsultaNombre) {
+      // Generar iniciales desde nombre
+      var parts = (window._lastConsultaNombre||'').split(/\s+/);
+      ini.value = parts.map(function(p){ return p[0]||''; }).join('.').toUpperCase().slice(0,8) || 'P.';
+    }
+    if (rea && !rea.value && window._lastConsultaMotivo) {
+      rea.value = window._lastConsultaMotivo.slice(0,79);
+    }
+    // Seleccionar resultado screening según acción
+    var dxSel = document.getElementById('aps_hres_dx');
+    if (dxSel && window._lastConsultaAccion) {
+      var ac = window._lastConsultaAccion.toLowerCase();
+      if (ac.indexOf('urgente') >= 0 || ac.indexOf('su') >= 0) dxSel.value = 'Riesgo alto';
+      else if (ac.indexOf('preferente') >= 0 || ac.indexOf('programado') >= 0) dxSel.value = 'Riesgo alto';
+      else if (ac.indexOf('masld') >= 0) dxSel.value = 'Sospecha MASLD';
+    }
+    showToast('📋 Resumen heredado','Resumen de la última consulta cargado automáticamente.');
+    return;
+  }
+
   var initials = (document.getElementById('aps_hres_initials') || {}).value || 'Paciente';
   var dx       = (document.getElementById('aps_hres_dx')       || {}).value || 'Screening realizado';
   var reason   = (document.getElementById('aps_hres_reason')   || {}).value || 'Screening hepático';
@@ -20073,16 +20406,6 @@ function buildApsResumen() {
   texto += 'Paciente: ' + initials + '\n';
   texto += 'Motivo: ' + reason + '\n';
   texto += 'Resultado screening: ' + dx + '\n\n';
-
-  // Intentar heredar datos del wizard APS si están disponibles
-  var masld = document.getElementById('masld-score-val');
-  if (masld && masld.textContent) {
-    texto += 'HALLAZGOS SCREENING\n';
-    texto += '─'.repeat(40) + '\n';
-    var bmi = document.getElementById('bmi-val');
-    if (bmi) texto += '· IMC: ' + bmi.textContent + '\n';
-    texto += '· Score MASLD: ' + masld.textContent + '\n';
-  }
 
   texto += '\nCONCLUSIÓN\n';
   texto += '─'.repeat(40) + '\n';
@@ -20101,7 +20424,6 @@ function buildApsResumen() {
   texto += doctor + ' · ' + inst + '\n';
   texto += 'HepatoShield Institucional v3.0 · Saluvel SPA';
 
-  var out = document.getElementById('aps-hresumen-output') || document.getElementById('hresumen-output');
   if (out) out.textContent = texto;
 }
 
@@ -20353,11 +20675,11 @@ var _gesService = {
   mode: 'local',          // → 'remote' cuando backend activo
   apiBase: null,          // → 'https://api.hepatoshield.cl/v1'
   _localData: {
-    'vhb_vhc':          { codigo:'GES N°50/57', desc:'Hepatitis B y C crónica', cobertura:'Tratamiento antiviral (DAA/tenofovir) y seguimiento cubiertosPOR GES.', color:'#34d399' },
-    'hepatitis-c':      { codigo:'GES N°50',    desc:'Hepatitis C crónica',     cobertura:'Tratamiento con antivirales de acción directa (DAA) cubierto por GES.', color:'#34d399' },
-    'cirrosis-b':       { codigo:'GES N°77',    desc:'Cirrosis hepática compensada', cobertura:'Evaluación, manejo de complicaciones y seguimiento incluido en GES.', color:'#fbbf24' },
-    'cirrosis-c':       { codigo:'GES N°77',    desc:'Cirrosis hepática descompensada', cobertura:'Hospitalización, manejo de complicaciones y seguimiento urgente GES.', color:'#f87171' },
-    'hcc':              { codigo:'GES N°72',    desc:'Cáncer hepatocelular (HCC)', cobertura:'Estudio diagnóstico y tratamiento oncológico cubierto por GES.', color:'#f87171' }
+    'vhb_vhc':          { codigo:'GES N°50/57', desc:'Hepatitis B / C — Confirmar cronicidad', cobertura:'Si se confirma VHB o VHC crónica (>6 meses), el tratamiento antiviral (DAA/tenofovir) y seguimiento quedan cubiertos por GES. Derivar a hepatología para confirmación.', color:'#34d399' },
+    'hepatitis-c':      { codigo:'GES N°50',    desc:'Hepatitis C — Confirmar cronicidad',     cobertura:'Si se confirma VHC crónica (RNA+), el tratamiento con DAA (curación >95%) queda cubierto por GES. Derivar a hepatología.', color:'#34d399' },
+    'cirrosis-b':       { codigo:'GES N°77',    desc:'Cirrosis hepática compensada', cobertura:'Evaluación, manejo de complicaciones y seguimiento incluido en GES N°77. Derivar a gastroenterología/medicina interna.', color:'#fbbf24' },
+    'cirrosis-c':       { codigo:'GES N°77',    desc:'Cirrosis hepática descompensada', cobertura:'Hospitalización, manejo de complicaciones urgentes y seguimiento cubierto por GES N°77. Derivar HOY a hepatología o SU.', color:'#f87171' },
+    'hcc':              { codigo:'GES N°72',    desc:'Cáncer hepatocelular (HCC)', cobertura:'Estudio diagnóstico y tratamiento oncológico cubierto por GES N°72. Derivar a hepatología/oncología.', color:'#f87171' }
   },
   check: function(motivos, decisionTexts) {
     // Lego: mismo contrato local y remoto
@@ -20372,16 +20694,34 @@ var _gesService = {
   },
   _localCheck: function(motivos, texts) {
     var alerts = [];
-    var combined = (motivos||[]).join(' ') + ' ' + (texts||[]).join(' ');
-    combined = combined.toLowerCase();
-    if (combined.indexOf('vhb_vhc')!==-1 || combined.indexOf('hepatitis c')!==-1 || combined.indexOf('hepatitis b')!==-1)
+    var motivosArr = (motivos||[]).map(function(m){ return m.toLowerCase(); });
+    var textsStr   = (texts||[]).join(' ').toLowerCase();
+
+    // ── GES N°50/57: VHB / VHC ──────────────────────────────────
+    // Solo disparar si el médico seleccionó explícitamente el motivo vhb_vhc.
+    // NO buscar en textos: evita falso positivo por texto educativo que menciona VHB/VHC.
+    if (motivosArr.indexOf('vhb_vhc') !== -1)
       alerts.push(this._localData['vhb_vhc']);
-    if (combined.indexOf('cirrosis')!==-1 && combined.indexOf('child c')!==-1)
-      alerts.push(this._localData['cirrosis-c']);
-    else if (combined.indexOf('cirrosis')!==-1 && (combined.indexOf('child b')!==-1 || combined.indexOf('child a')!==-1))
-      alerts.push(this._localData['cirrosis-b']);
-    if (combined.indexOf('hcc')!==-1 || combined.indexOf('hepatocarcinoma')!==-1)
+
+    // ── GES N°77: Cirrosis ───────────────────────────────────────
+    // Dispara cuando el motivo es cirrosis conocida o descompensación aguda.
+    // Condición anterior (buscar 'child b/c' en textos) era código muerto — nunca se generaba.
+    // Ahora: severidad según presencia de motivo descompensacion o MELD urgente en textos.
+    var tieneCirrosis = motivosArr.indexOf('cirrosis') !== -1;
+    var tieneDescomp  = motivosArr.indexOf('descompensacion') !== -1;
+    if (tieneCirrosis || tieneDescomp) {
+      var esDescompensada = tieneDescomp ||
+        (textsStr.indexOf('meld') !== -1 &&
+         (textsStr.indexOf('urgente') !== -1 || textsStr.indexOf('su hoy') !== -1 || textsStr.indexOf('≥20') !== -1));
+      alerts.push(esDescompensada ? this._localData['cirrosis-c'] : this._localData['cirrosis-b']);
+    }
+
+    // ── GES N°72: HCC ────────────────────────────────────────────
+    // Solo si el motivo explícito es HCC/hepatocarcinoma (diagnóstico ya confirmado).
+    // NUNCA disparar por texto educativo que mencione HCC como riesgo.
+    if (motivosArr.indexOf('hcc') !== -1 || motivosArr.indexOf('hepatocarcinoma') !== -1)
       alerts.push(this._localData['hcc']);
+
     return alerts;
   }
 };
