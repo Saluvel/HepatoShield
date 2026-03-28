@@ -1504,7 +1504,7 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
   <button type="button" class="esp-nav-btn"         id="anb-hepatotox"    onclick="showView('aps-hepatotox')"><span class="dot" style="background:#fb923c;"></span>Hepatotox</button>
   <button type="button" class="esp-nav-btn"         id="anb-hep-dx"       onclick="showView('aps-hep-dx')"><span class="dot" style="background:#22d3ee;"></span>Dx&nbsp;Hepatitis</button>
   <button type="button" class="esp-nav-btn"         id="anb-ddi"          onclick="showView('aps-ddi')"><span class="dot" style="background:#c084fc;"></span>Interacciones</button>
-  <button type="button" class="esp-nav-btn"         id="anb-edu"          onclick="showView('aps-edu')"><span class="dot" style="background:#4ade80;"></span>Hoja&nbsp;Paciente</button>
+  <button type="button" class="esp-nav-btn"         id="anb-pacinfo"      onclick="showView('aps-pacinfo')"><span class="dot" style="background:#38bdf8;"></span>📚&nbsp;Info&nbsp;Paciente</button>
   <button type="button" class="esp-nav-btn"         id="anb-resumen"      onclick="showView('aps-resumen')"><span class="esp-nav-icon">📋</span>Resumen&nbsp;/&nbsp;PDF</button>
   <button type="button" class="esp-nav-btn"         id="anb-quickmode"    onclick="toggleQuickModeBar()" style="border-color:rgba(251,191,36,0.45);color:#fbbf24;"><span style="font-size:0.75rem;">⚡</span>&nbsp;Herramientas</button>
   </div>
@@ -1593,7 +1593,7 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
       <button type="button" class="sidebar-item" onclick="showView('aps-hepatotox')" id="si-aps-hepatotox"><span class="sidebar-icon">💊</span>Hepatotox · Seguridad</button>
       <button type="button" class="sidebar-item" onclick="showView('aps-hep-dx')" id="si-aps-hep-dx"><span class="sidebar-icon">🔬</span>Dx Hepatitis Aguda</button>
       <button type="button" class="sidebar-item" onclick="showView('aps-ddi')" id="si-aps-ddi"><span class="sidebar-icon">⚡</span>Interacciones Fármacos</button>
-      <button type="button" class="sidebar-item" onclick="showView('aps-edu')" id="si-aps-edu"><span class="sidebar-icon">📄</span>Hoja Paciente</button>
+      <button type="button" class="sidebar-item" onclick="showView('aps-pacinfo')" id="si-aps-pacinfo"><span class="sidebar-icon">📚</span>Info Paciente</button>
     </div>
     </div>
 <!-- ESPECIALISTA sidebar -->
@@ -1703,13 +1703,29 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
     <div class="cstep-dot" id="csdot-4" onclick="goConsultaStep(4)" title="Paso 4">4</div>
   </div>
   <div style="font-size:0.76rem;color:var(--teal);font-family:var(--font-mono);flex-shrink:0;" id="cstep-label">Datos del paciente</div>
-  <button type="button" onclick="resetConsulta()" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:3px 10px;border-radius:6px;font-size:0.70rem;font-family:var(--font-mono);cursor:pointer;flex-shrink:0;" title="Nueva consulta">&#10227; Reiniciar</button>
+  <button type="button" onclick="if(_cStep>1&&_cModo){if(!confirm('¿Reiniciar la consulta actual? Se perderán los datos no guardados.'))return;}resetConsulta();" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:3px 10px;border-radius:6px;font-size:0.70rem;font-family:var(--font-mono);cursor:pointer;flex-shrink:0;" title="Nueva consulta">&#10227; Reiniciar</button>
 </div>
 
 <div style="padding:0;max-width:900px;">
 
 <!-- ───── PASO 1: Datos del paciente ───────────────────────── -->
 <div id="consulta-step-1" class="consulta-step">
+
+  <!-- ── Barra de demo rápida ─────────────────────────────────── -->
+  <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;padding:8px 12px;background:rgba(167,139,250,0.06);border:1px dashed rgba(167,139,250,0.28);border-radius:8px;">
+    <span style="font-size:0.70rem;font-family:var(--font-mono);color:var(--text-muted);flex-shrink:0;">DEMO:</span>
+    <select id="consulta-demo-select" style="font-size:0.76rem;font-family:var(--font-mono);background:var(--bg2);border:1px solid var(--border);color:var(--text-dim);padding:3px 8px;border-radius:6px;cursor:pointer;flex:1;min-width:185px;">
+      <option value="">— Elegir caso demo —</option>
+      <option value="verde">🟢 Riesgo bajo · Preventivo (34a)</option>
+      <option value="amarillo">🟡 MASLD moderado (47a · DM2+HTA)</option>
+      <option value="rojo">🔴 Fibrosis avanzada (58a · FIB-4 alto)</option>
+      <option value="urgente">⚠️ Descompensación aguda (63a · urgente)</option>
+    </select>
+    <button onclick="loadDemoConsulta()" style="font-size:0.76rem;font-family:var(--font-mono);background:rgba(0,212,160,0.08);border:1px solid rgba(0,212,160,0.25);color:var(--teal);padding:3px 12px;border-radius:6px;cursor:pointer;white-space:nowrap;" onmouseover="this.style.background='rgba(0,212,160,0.18)'" onmouseout="this.style.background='rgba(0,212,160,0.08)'">&#9654; Cargar</button>
+    <div style="width:1px;height:18px;background:var(--border);flex-shrink:0;"></div>
+    <button onclick="loadDemoCompleto()" style="font-size:0.76rem;font-family:var(--font-mono);background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.35);color:#a78bfa;padding:3px 12px;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap;" onmouseover="this.style.background='rgba(167,139,250,0.20)'" onmouseout="this.style.background='rgba(167,139,250,0.10)'" title="Carga 15 pacientes de ejemplo en todos los módulos">Suite Demo &#9654;</button>
+  </div>
+
   <div style="margin-bottom:1rem;">
     <div style="font-size:1.05rem;font-weight:700;color:var(--white);margin-bottom:0.2rem;">Identificación del Paciente</div>
     <div style="font-size:0.78rem;color:var(--text-muted);">Seleccione un paciente registrado o cree uno nuevo para esta consulta.</div>
@@ -1854,7 +1870,10 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
   <!-- Semáforo de decisión -->
   <div id="c-semaforo" style="margin-bottom:1.25rem;"></div>
 
-  <div style="display:flex;justify-content:flex-end;">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+    <button type="button" onclick="showView('aps-pacinfo')" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:1px solid rgba(56,189,248,0.4);background:rgba(56,189,248,0.08);color:#38bdf8;font-size:0.78rem;cursor:pointer;" title="Abrir formatos educativos para entregar al paciente">
+      📚 Info para el paciente
+    </button>
     <button type="button" class="btn btn-primary" onclick="goConsultaStep(4)">Definir Acción &#8594;</button>
   </div>
 </div>
@@ -2154,12 +2173,42 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
     </table>
     <div class="guia-source">📚 MINSAL PNI Chile 2024 · ACIP Recommendations</div>
   </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <div class="card-header"><span>💉</span><div><div class="card-title">VACUNA HEPATITIS A</div></div></div>
+    <table class="tbl">
+      <thead><tr><th>Población</th><th>Esquema</th><th>Indicación</th></tr></thead>
+      <tbody>
+        <tr><td>Hepatopatía crónica (cualquier causa)</td><td>2 dosis (0 y 6–12 meses)</td><td><span class="badge badge-red">Prioritario</span></td></tr>
+        <tr><td>VHB o VHC confirmada</td><td>2 dosis (0 y 6–12 meses)</td><td><span class="badge badge-red">Obligatorio</span></td></tr>
+        <tr><td>Viajero a zona endémica</td><td>2 dosis (0 y 6–12 meses)</td><td><span class="badge badge-amber">Indicación clínica</span></td></tr>
+        <tr><td>Personal de salud / cuidadores</td><td>2 dosis (0 y 6–12 meses)</td><td><span class="badge badge-amber">Indicación laboral</span></td></tr>
+      </tbody>
+    </table>
+    <div class="alert alert-info" style="margin-top:0.75rem;font-size:0.83rem;">
+      ⚠️ En pacientes con cirrosis, la infección por VHA puede desencadenar <strong>insuficiencia hepática aguda sobre crónica (ACLF)</strong>. La vacuna es <strong>segura y altamente efectiva</strong> en este grupo; verificar serologías previas (anti-VHA IgG) antes de vacunar.
+    </div>
+    <div class="guia-source">📚 AASLD 2023 · MINSAL Chile · ACIP Hepatitis A Recommendations</div>
+  </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <div class="card-header"><span>⚠️</span><div><div class="card-title">OTRAS VACUNAS RECOMENDADAS EN HEPATOPATÍA CRÓNICA</div></div></div>
+    <div style="font-size:0.86rem;color:var(--text-dim);line-height:1.8;">
+      • <strong>Influenza:</strong> anual (riesgo de descompensación con infección respiratoria grave)<br>
+      • <strong>Neumocócica (PCV13 + PPSV23):</strong> única + refuerzo a los 5 años en cirrosis<br>
+      • <strong>COVID-19:</strong> esquema completo + refuerzo anual en inmunocomprometidos<br>
+      • <strong>Verificar cartola:</strong> toda hepatopatía crónica = inmunocompromiso relativo → revisar vacunas al día
+    </div>
+    <div class="guia-source">📚 AASLD 2023 · MINSAL PNI · CDC Immunization Schedule</div>
+  </div>
 </div>
 
 <!-- APS: Prevención -->
 <div id="view-aps-prevencion" class="view-panel" style="display:none;">
   <div class="section-title">🛡️ Prevención en APS</div>
   <div class="section-sub">Intervenciones preventivas de mayor impacto en hepatopatía crónica</div>
+  <!-- Plan preventivo personalizado según motivo de consulta activo -->
+  <div id="prev-personalizado" style="display:none;"></div>
   <div class="card">
     <div class="alert alert-info"><strong>La prevención primaria en APS es el pilar del programa GES.</strong> El médico de atención primaria puede evitar hasta el 60% de las cirrosis descompensadas con intervención temprana en factores de riesgo.</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;">
@@ -2167,7 +2216,7 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
         <div style="font-size:0.86rem;color:var(--text-dim);line-height:1.8;">• HbA1c &lt;7% en DM2<br>• PA &lt;130/80 mmHg<br>• LDL &lt;100 mg/dL (o &lt;70 en alto riesgo CV)<br>• Reducción peso ≥7% en sobrepeso/obesidad</div>
       </div>
       <div><div style="color:var(--amber);font-weight:700;margin-bottom:0.5rem;font-size:0.93rem;">Hábitos</div>
-        <div style="font-size:0.86rem;color:var(--text-dim);line-height:1.8;">• Abstinencia alcohólica total en hepatopatía<br>• Actividad física 150+ min/sem<br>• Dieta mediterránea o baja en fructosa<br>• Evitar hepatotóxicos (paracetamol &gt;2g/día, herbolaria)</div>
+        <div style="font-size:0.86rem;color:var(--text-dim);line-height:1.8;">• Abstinencia alcohólica total en hepatopatía<br>• Actividad física 150+ min/sem<br>• Dieta mediterránea o baja en fructosa<br>• Hepatotóxicos a evitar: paracetamol &gt;2g/día <em>en hepatopatía</em> (sanos: &lt;4g/día), AINEs en cirrosis, herbolaria no regulada</div>
       </div>
     </div>
   </div>
@@ -2175,15 +2224,30 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
 
 <!-- APS: Cola derivaciones -->
 <div id="view-aps-cola" class="view-panel" style="display:none;">
-  <div class="section-title">📤 Mis Derivaciones</div>
-  <div class="section-sub">Estado de derivaciones enviadas a especialidad</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.25rem;">
+    <div>
+      <div class="section-title">📤 Mis Derivaciones</div>
+      <div class="section-sub">Estado de derivaciones enviadas a especialidad · Ordenadas por riesgo</div>
+    </div>
+    <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+      <select id="cola-aps-filtro" onchange="renderColaAPS()" style="font-size:0.76rem;font-family:var(--font-mono);background:var(--bg2);border:1px solid var(--border);color:var(--text-dim);padding:3px 8px;border-radius:6px;">
+        <option value="todas">Todas</option>
+        <option value="pendiente">Solo pendientes</option>
+        <option value="urgente">Solo urgentes</option>
+        <option value="cirrosis">Cirrosis / descomp.</option>
+      </select>
+    </div>
+  </div>
   <div class="card">
     <table class="tbl">
-      <thead><tr><th>Paciente</th><th>Motivo</th><th>Fecha</th><th>Estado</th><th></th></tr></thead>
+      <thead><tr><th>Paciente</th><th>Motivo</th><th style="white-space:nowrap;">FIB-4 / MELD</th><th>Fecha</th><th>Estado</th><th></th></tr></thead>
       <tbody id="cola-aps-tabla-body">
       </tbody>
     </table>
-    <div class="btn-row"><button class="btn btn-teal" onclick="showToast('📤 Nueva derivación','Formulario de derivación disponible en la sección Screening · Resultado del paciente evaluado.')">+ Nueva derivación</button></div>
+    <div class="btn-row">
+      <button class="btn btn-teal" onclick="(function(){ if(activePatientId){ showView('aps-consulta'); setTimeout(function(){ goConsultaStep(4); },300); } else { showView('aps-consulta'); showToast('Seleccione un paciente','Inicie o seleccione una consulta activa para generar una derivación.'); } })()">+ Nueva derivación</button>
+      <button class="btn btn-outline" onclick="showView('aps-derivacion')" style="font-size:0.86rem;">Ver criterios &#8594;</button>
+    </div>
   </div>
 </div>
 
@@ -2594,15 +2658,347 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
   </div>
 </div>
 
+<!-- view-aps-edu fusionado en view-aps-pacinfo -->
+
 <!-- ════════════════════════════════════
-     HOJA DE EDUCACIÓN AL PACIENTE — APS
+     APS: INFORMACIÓN PARA PACIENTES
 ════════════════════════════════════ -->
-<div id="view-aps-edu" class="view-panel" style="display:none;">
-  <div class="section-title" style="margin-bottom:0.15rem;">📄 Hoja de Información para el Paciente</div>
-  <div class="section-sub" style="margin-bottom:0.85rem;">Documento educativo imprimible · Lenguaje accesible · Adaptado para Chile · Fuentes EASL · AASLD · MINSAL</div>
-  <div id="edu-form-aps"><!-- form injected by renderEduForm('aps') --></div>
-  <div id="edu-preview-aps" style="margin-top:0.75rem;"></div>
+<div id="view-aps-pacinfo" class="view-panel" style="display:none;">
+
+  <!-- Encabezado -->
+  <div style="margin-bottom:0.75rem;">
+    <div class="section-title" style="margin-bottom:0.1rem;">📚 Información para el Paciente</div>
+    <div class="section-sub">Formatos educativos · Hoja personalizada imprimible · Lenguaje simple · Adaptado a Chile · MINSAL · EASL · AASLD</div>
+  </div>
+
+  <!-- Sub-pestañas internas -->
+  <div style="display:flex;gap:0;margin-bottom:1rem;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:3px;">
+    <button id="pacinfo-tab-formatos" onclick="_pacinfoSubTab('formatos')"
+      style="flex:1;padding:7px 10px;border-radius:8px;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;transition:all 0.18s;background:var(--teal);color:#0a0f0d;">
+      📋 Formatos educativos
+    </button>
+    <button id="pacinfo-tab-hoja" onclick="_pacinfoSubTab('hoja')"
+      style="flex:1;padding:7px 10px;border-radius:8px;border:none;font-size:0.82rem;font-weight:400;cursor:pointer;transition:all 0.18s;background:transparent;color:var(--text-muted);">
+      📄 Hoja personalizada
+    </button>
+  </div>
+
+  <!-- Panel 1: Formatos educativos -->
+  <div id="pacinfo-panel-formatos">
+    <div id="pacinfo-tabs" style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);"></div>
+    <div id="pacinfo-body"></div>
+  </div>
+
+  <!-- Panel 2: Hoja personalizada (antes view-aps-edu) -->
+  <div id="pacinfo-panel-hoja" style="display:none;">
+    <div id="edu-form-aps"><!-- form injected by renderEduForm('aps') --></div>
+    <div id="edu-preview-aps" style="margin-top:0.75rem;"></div>
+  </div>
+
 </div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  MÓDULO: INFO PACIENTE — Formatos educativos APS
+// ═══════════════════════════════════════════════════════════
+var _pacinfoTopicos = [
+  {
+    id:'cirrosis', icon:'🫀', label:'¿Qué es la cirrosis?', color:'#f87171',
+    titulo:'¿Qué es la cirrosis hepática?',
+    subtitulo:'Guía para pacientes y familias — CESFAM / APS Chile',
+    secciones:[
+      { heading:'¿Qué le pasó a su hígado?', icon:'ℹ️', color:'#38bdf8', cuerpo:
+        'El hígado es un órgano que trabaja todo el día: limpia la sangre, fabrica proteínas, ayuda a digerir los alimentos y almacena energía. En la cirrosis, el tejido sano del hígado se ha ido reemplazando por cicatrices. Estas cicatrices no pueden realizar las funciones normales del hígado.\n\nHay dos etapas:\n• Cirrosis compensada: el hígado todavía cumple sus funciones básicas. Muchas personas viven años sin saberlo.\n• Cirrosis descompensada: aparecen complicaciones que necesitan atención médica urgente.'
+      },
+      { heading:'¿Por qué me ocurrió?', icon:'🔎', color:'#fbbf24', cuerpo:
+        'Las causas más frecuentes en Chile son:\n• Consumo excesivo de alcohol por muchos años\n• Hígado graso (MASLD) asociado a sobrepeso, diabetes o colesterol alto\n• Hepatitis viral crónica (Hepatitis B o C)\n\nA veces se combinan varias causas. Lo importante ahora es cuidarse para que el hígado que queda funcione lo mejor posible.'
+      },
+      { heading:'Complicaciones que puede tener', icon:'⚠️', color:'#fb923c', cuerpo:
+        '• Ascitis: acumulación de líquido en el abdomen. El abdomen se ve hinchado y puede doler.\n• Várices esofágicas: venas dilatadas en el esófago o estómago que pueden sangrar gravemente.\n• Encefalopatía hepática: el hígado no elimina ciertas toxinas y esto afecta el cerebro — puede causar confusión, pérdida de orientación o cambios de conducta.\n• Ictericia: coloración amarilla de la piel y los ojos porque el hígado no procesa bien la bilirrubina.\n• Infecciones: el sistema inmune se debilita, aumentando el riesgo de infecciones graves.\n\nEstas complicaciones tienen tratamiento. Por eso los controles regulares son fundamentales.'
+      },
+      { heading:'¿Qué puedo hacer yo?', icon:'✅', color:'#34d399', cuerpo:
+        '• Asistir a todos sus controles médicos sin faltarlos\n• Tomar sus medicamentos exactamente como se los indicaron\n• No consumir NADA de alcohol (cero, ni vino, ni cerveza, ni "en fiestas")\n• Comer bien: proteínas suficientes, poca sal si tiene líquido en el abdomen\n• Hacer ejercicio suave: caminar 30 minutos la mayoría de los días\n• Avisar de inmediato si aparece alguna señal de alarma'
+      },
+      { heading:'🔴 SEÑALES DE ALARMA — Vaya a urgencias de inmediato', icon:'🚨', color:'#f87171', cuerpo:
+        'Vaya a urgencias o llame al SAMU (131) si presenta:\n\n• Vómito con sangre (rojo brillante o como "posos de café")\n• Deposiciones negras como alquitrán\n• Abdomen muy hinchado, duro y doloroso con fiebre\n• Confusión mental, no reconocer a familiares, desorientación\n• Piel y ojos muy amarillos de aparición rápida\n• Desmayo o pérdida de conocimiento\n• Falta de aire intensa sin causa clara\n\nNúmero SAMU: 131\nNo espere la próxima consulta — estas señales son urgencias.'
+      }
+    ]
+  },
+  {
+    id:'nutricion', icon:'🥗', label:'Nutrición en cirrosis', color:'#34d399',
+    titulo:'Alimentación para pacientes con cirrosis hepática',
+    subtitulo:'Guía nutricional adaptada a Chile · MINSAL · EASL 2019',
+    secciones:[
+      { heading:'¿Por qué importa lo que como?', icon:'ℹ️', color:'#38bdf8', cuerpo:
+        'En la cirrosis, el hígado tiene menos energía para hacer su trabajo. Una buena alimentación le da al cuerpo los materiales que necesita para mantener el músculo, el sistema inmune y la energía. La desnutrición es muy frecuente en pacientes con cirrosis y empeora el pronóstico — pero se puede prevenir comiendo bien.'
+      },
+      { heading:'Proteínas: lo más importante', icon:'💪', color:'#a78bfa', cuerpo:
+        'Necesita más proteínas que una persona sana. El hígado las necesita para reparar tejidos y el músculo para mantenerse fuerte.\n\nBuenas fuentes de proteína en Chile:\n✅ Pescado: merluza, jurel, reineta, congrio — 2 a 3 veces por semana\n✅ Pollo o pavo sin piel — 2 a 3 veces por semana\n✅ Huevos: 1 a 2 por día está bien\n✅ Legumbres: porotos, lentejas, garbanzos, arvejas — al menos 3 veces por semana\n✅ Lácteos bajos en grasa: leche, yogur sin azúcar, quesillo\n⚠️ Carne de vacuno: puede comer, elija cortes magros (cazuela, malaya, posta)\n❌ Cecinas y embutidos (longanizas, vienesas, mortadela): muy poco o nada — tienen mucha sal y grasa mala'
+      },
+      { heading:'Snack nocturno — MUY IMPORTANTE', icon:'🌙', color:'#fbbf24', cuerpo:
+        'Las personas con cirrosis queman energía mientras duermen, más que una persona sana. Comer algo antes de acostarse ayuda a mantener el músculo y la energía.\n\nOpciones antes de dormir (una de estas):\n• 1 vaso de leche o yogur sin azúcar\n• 1 tostada integral con quesillo o palta\n• 1 fruta mediana con un puñado de nueces o almendras\n• 1 taza de avena cocida con leche\n\nNo se vaya a dormir con hambre.'
+      },
+      { heading:'Sal: ¿cuánto puedo usar?', icon:'🧂', color:'#fb923c', cuerpo:
+        'Si tiene líquido en el abdomen (ascitis), debe reducir MUCHO la sal:\n• Máximo 2 gramos de sal al día (aproximadamente 1 cucharadita de té al día en total, contando todo lo que come)\n\nAlimentos con mucha sal que debe evitar:\n❌ Sopas de sobre (Knorr, Maggi)\n❌ Salsa de soja, salsa de tomate en tarro, mostaza\n❌ Galletas saladas, papas fritas de bolsa\n❌ Conservas (atún en salmuera, aceitunas, alcaparras)\n❌ Alimentos ahumados o en salmuera\n\n¿Cómo dar sabor sin sal?\n✅ Limón, ajo, cebolla, orégano, comino, merkén, perejil, cilantro\n✅ Aceite de oliva en pequeñas cantidades\n✅ Vinagre'
+      },
+      { heading:'Alcohol: CERO', icon:'🚫', color:'#f87171', cuerpo:
+        'No existe una cantidad segura de alcohol para una persona con cirrosis.\nNi vino, ni cerveza, ni chicha, ni pisco — ninguno.\n\nEl alcohol daña directamente las células del hígado que aún quedan sanas. Incluso pequeñas cantidades pueden desencadenar una descompensación grave.\n\nSi le cuesta dejar el alcohol, dígaselo a su médico sin vergüenza. Existen programas de apoyo gratuitos en todos los CESFAM de Chile.'
+      },
+      { heading:'Hidratación y café', icon:'☕', color:'#38bdf8', cuerpo:
+        'Agua: tome 6 a 8 vasos al día. Si tiene mucho líquido en el abdomen, su médico le indicará cuánto tomar.\n\nCafé: ¡buena noticia! Varios estudios muestran que el café (sin azúcar, sin crema) puede proteger el hígado. 1 a 2 tazas al día está bien si no tiene contraindicaciones.\n\nEvite:\n❌ Bebidas gaseosas y jugos con azúcar\n❌ Bebidas energizantes\n❌ Jugos naturales con mucha fruta de una vez (tienen mucha fructosa)'
+      }
+    ]
+  },
+  {
+    id:'ejercicio', icon:'🏃', label:'Ejercicio y cirrosis', color:'#a78bfa',
+    titulo:'Ejercicio físico para pacientes con cirrosis hepática',
+    subtitulo:'Actividad física segura y adaptada · EASL 2019 · Adaptado Chile',
+    secciones:[
+      { heading:'¿Puedo hacer ejercicio?', icon:'✅', color:'#34d399', cuerpo:
+        'Sí. Durante mucho tiempo se creyó que los pacientes con cirrosis debían descansar completamente. Hoy sabemos que eso es un error. El ejercicio moderado y adaptado es beneficioso y seguro para la mayoría de los pacientes con cirrosis compensada.\n\nEl ejercicio ayuda a:\n• Mantener y recuperar la masa muscular (la sarcopenia o pérdida de músculo es muy frecuente en cirrosis y empeora el pronóstico)\n• Mejorar el ánimo y reducir el cansancio crónico\n• Controlar el peso y el hígado graso\n• Mejorar la calidad de vida\n• Fortalecer el corazón y los pulmones'
+      },
+      { heading:'¿Qué ejercicio puedo hacer?', icon:'🏃', color:'#38bdf8', cuerpo:
+        'Ejercicios recomendados (comience con poco y vaya aumentando):\n\n✅ CAMINAR: el mejor ejercicio para empezar. 30 minutos, 5 días a la semana, a paso cómodo. Si no puede 30 minutos seguidos, haga 3 bloques de 10 minutos.\n\n✅ BICICLETA ESTÁTICA: excelente porque no hay riesgo de caídas y la intensidad se controla fácilmente.\n\n✅ NATACIÓN O EJERCICIOS EN EL AGUA: muy recomendables, suaves para las articulaciones.\n\n✅ PILATES O YOGA SUAVE: ayudan con el equilibrio, la respiración y la flexibilidad.\n\n✅ EJERCICIOS CON BANDAS ELÁSTICAS: para mantener el músculo de brazos y piernas sin sobrecargar.\n\n⚠️ DEPORTES DE EQUIPO: consulte a su médico si tiene várices conocidas.\n❌ DEPORTES DE CONTACTO: evitar si tiene riesgo de sangrado (várices, plaquetas bajas).\n❌ EJERCICIO MUY INTENSO: no es necesario ni conveniente — el objetivo es movimiento constante, no rendimiento.'
+      },
+      { heading:'¿Cómo empezar?', icon:'🚶', color:'#fbbf24', cuerpo:
+        'Si lleva mucho tiempo sin hacer ejercicio, empiece MUY de a poco:\n\nSemana 1-2: Camine 10 minutos al día, al ritmo que pueda.\nSemana 3-4: Aumente a 20 minutos.\nSemana 5 en adelante: Intente 30 minutos, 5 días a la semana.\n\nNo se compare con lo que hacía antes. Lo importante es moverse todos los días, aunque sea poco.\n\nCuando su cuerpo se adapte, puede agregar ejercicios suaves de fuerza (sentadillas apoyado, bandas elásticas).'
+      },
+      { heading:'Señales para detenerse', icon:'⚠️', color:'#f87171', cuerpo:
+        'Pare el ejercicio y descanse si siente:\n• Falta de aire más de lo normal\n• Mareos o sensación de que "se va"\n• Dolor en el pecho\n• Cansancio extremo (más del habitual)\n• Palpitaciones rápidas o irregulares\n\nConsulte a su médico antes de empezar si:\n• Tiene el abdomen muy hinchado (ascitis importante)\n• Ha tenido sangrado reciente\n• Tiene encefalopatía (confusión)\n• No ha sido evaluado recientemente'
+      },
+      { heading:'El músculo es medicina', icon:'💪', color:'#a78bfa', cuerpo:
+        'La cirrosis hace que el cuerpo consuma músculo. Esto se llama sarcopenia y hace que el pronóstico sea peor. La única forma de detener y revertir la sarcopenia es:\n1. Comer suficientes proteínas (ver guía de nutrición)\n2. Hacer ejercicio de fuerza y aeróbico regularmente\n\nNo existe pastilla que reemplace al ejercicio. Incluso 20 minutos de caminata al día hacen una diferencia real en su salud.'
+      }
+    ]
+  },
+  {
+    id:'masld', icon:'⚖️', label:'Hígado graso (MASLD)', color:'#fbbf24',
+    titulo:'Hígado graso: qué es y cómo mejorar',
+    subtitulo:'MASLD / NAFLD · Información para pacientes · APS Chile',
+    secciones:[
+      { heading:'¿Qué es el hígado graso?', icon:'ℹ️', color:'#38bdf8', cuerpo:
+        'El hígado graso (también llamado MASLD o NAFLD) es la acumulación de grasa dentro del hígado, más de lo que es normal. Es la enfermedad hepática más frecuente en Chile — se estima que afecta a 1 de cada 3 adultos.\n\nEl hígado graso solo es una señal de que el hígado está recibiendo más grasa y azúcar de la que puede procesar. En la mayoría de los casos, se puede revertir cambiando los hábitos.\n\nEtapas:\n1. Esteatosis simple: solo hay grasa. Con cambios de hábitos, se puede revertir completamente.\n2. Esteatohepatitis (MASH): inflamación + grasa. Requiere más esfuerzo para mejorar.\n3. Fibrosis / Cirrosis: cicatrices en el hígado. Más difícil de revertir, pero los hábitos siguen siendo fundamentales.'
+      },
+      { heading:'La buena noticia', icon:'🌟', color:'#34d399', cuerpo:
+        '¡El hígado graso en etapas iniciales se puede revertir!\n\nBajar entre el 7% y el 10% de su peso actual mejora enormemente el hígado. Por ejemplo:\n• Si pesa 90 kg → bajar 6 a 9 kg ya hace una diferencia visible en la ecografía.\n• Si pesa 100 kg → bajar 7 a 10 kg mejora la inflamación del hígado.\n\nNo necesita llegar a su "peso ideal" para ver mejoras. Cada kilo que baja ayuda.'
+      },
+      { heading:'¿Qué debo comer?', icon:'🥗', color:'#34d399', cuerpo:
+        '✅ RECOMENDADO:\n• Verduras y frutas de colores: tomate, zanahoria, palta, espinaca, brócoli, manzana, naranja\n• Legumbres: porotos, lentejas, garbanzos — mínimo 3 veces por semana\n• Pescado: merluza, jurel, reineta, salmón\n• Aceite de oliva (en poca cantidad: 1 a 2 cucharadas al día)\n• Café sin azúcar: estudios muestran que protege el hígado (1-2 tazas al día)\n• Agua, aguas sin azúcar, té sin azúcar\n\n❌ REDUCIR MUCHO O ELIMINAR:\n• Bebidas azucaradas: Coca-Cola, Fanta, jugos de cajita — son el peor enemigo del hígado graso\n• Alcohol: aunque tenga "solo hígado graso", el alcohol lo empeora\n• Pan blanco, arroz blanco, papas fritas — en exceso\n• Dulces, pasteles, galletas con relleno de crema\n• Comida rápida: hamburguesas, sopaipillas, empanadas fritas, completos\n• Helados de crema, cremas batidas'
+      },
+      { heading:'Ejercicio: fundamental', icon:'🏃', color:'#a78bfa', cuerpo:
+        'El ejercicio es tan importante como la dieta para el hígado graso. No puede elegir solo uno.\n\nObjetivo: 150 minutos por semana de actividad moderada.\nEsto equivale a: caminar 30 minutos, 5 días a la semana.\n\nSi le cuesta empezar: comience con 10 minutos de caminata después de cada comida (el paseo después de comer mejora el azúcar en la sangre y ayuda al hígado).\n\nTambién ayuda:\n• Subir escaleras en vez del ascensor\n• Bajarse una parada antes del bus\n• Bailar, andar en bicicleta, nadar'
+      },
+      { heading:'Diabetes y colesterol', icon:'💉', color:'#fb923c', cuerpo:
+        'Si tiene diabetes tipo 2 o colesterol alto, controlarlos es fundamental para el hígado:\n• Tome sus medicamentos para la diabetes según indicación\n• Controle su azúcar en ayunas regularmente\n• Si tiene colesterol alto, una dieta con menos grasas saturadas (carnes rojas, mantequilla, crema) ayuda tanto al hígado como al corazón\n\nSu médico de cabecera coordinará estos controles.'
+      }
+    ]
+  },
+  {
+    id:'vhb', icon:'🦠', label:'Hepatitis B', color:'#38bdf8',
+    titulo:'Hepatitis B: lo que usted necesita saber',
+    subtitulo:'Información para pacientes y familias · GES N°57 · MINSAL Chile',
+    secciones:[
+      { heading:'¿Qué es la Hepatitis B?', icon:'ℹ️', color:'#38bdf8', cuerpo:
+        'La Hepatitis B es una infección del hígado causada por el virus VHB. Puede ser:\n• Aguda (corta): el cuerpo la elimina solo en la mayoría de los adultos (90-95% de los casos).\n• Crónica: dura más de 6 meses. Ocurre más frecuentemente en personas contagiadas de recién nacidos o en la infancia.\n\nLa hepatitis B crónica se puede controlar muy bien con tratamiento. Con los medicamentos actuales, la mayoría de los pacientes viven una vida normal.'
+      },
+      { heading:'¿Cómo se contagia?', icon:'🔄', color:'#fb923c', cuerpo:
+        'La hepatitis B se transmite por:\n• Contacto sexual sin condón con una persona infectada\n• Sangre de persona infectada: jeringas compartidas, instrumentos cortantes no esterilizados, tatuajes, piercings\n• De madre a hijo durante el parto (se puede prevenir con vacuna al recién nacido)\n• Compartir artículos de higiene personal: máquina de afeitar, cepillo de dientes\n\nNO se contagia por:\n✅ Abrazos, besos en la mejilla, saludos de mano\n✅ Compartir la misma mesa o cubiertos\n✅ Toser, estornudar o hablar\n✅ Usar el mismo baño\n✅ Piscinas públicas\n\nPuede convivir normalmente con su familia y trabajar sin restricciones.'
+      },
+      { heading:'Vacuna a sus contactos', icon:'💉', color:'#34d399', cuerpo:
+        'Sus familiares cercanos y pareja deben vacunarse contra la Hepatitis B si aún no están vacunados.\n\nLa vacuna es:\n• Gratuita en Chile (MINSAL / PAI)\n• Muy eficaz: protege al 95% de las personas\n• Se aplica en 3 dosis (al mes 0, 1 y 6)\n\nPídale a su médico que evalúe a su familia y pareja.'
+      },
+      { heading:'¿Cómo cuidarse?', icon:'✅', color:'#34d399', cuerpo:
+        'Con hepatitis B crónica:\n• Asista a todos sus controles (análisis de sangre y ecografía según indicación del especialista)\n• Tome sus medicamentos exactamente como le indicaron (no los suspenda sin avisar)\n• Cero alcohol: el alcohol acelera el daño hepático en personas con VHB\n• Use condón en las relaciones sexuales\n• No comparta elementos cortantes, máquina de afeitar, cepillo de dientes\n• Informe a su dentista, su médico de urgencia y cualquier médico que lo atienda que tiene Hepatitis B\n• No done sangre ni órganos\n\nVigilancia de cáncer hepático:\nLas personas con hepatitis B crónica tienen mayor riesgo de cáncer de hígado. Por eso su especialista indicará ecografías y análisis (AFP) cada 6 meses. No las saltee.'
+      },
+      { heading:'GES y sistema de salud en Chile', icon:'🏥', color:'#a78bfa', cuerpo:
+        'La Hepatitis B crónica tiene cobertura GES (Garantías Explícitas en Salud, GES N°57).\n\nEsto significa que si se confirma el diagnóstico:\n• El tratamiento antiviral (si el especialista lo indica) está cubierto financieramente\n• Los controles y exámenes de seguimiento tienen garantía de atención\n\nSu médico de APS lo derivará al especialista (hepatólogo o gastroenterólogo) para confirmar el diagnóstico y decidir si necesita tratamiento.'
+      }
+    ]
+  },
+  {
+    id:'vhc', icon:'💊', label:'Hepatitis C', color:'#4ade80',
+    titulo:'Hepatitis C: hoy tiene cura',
+    subtitulo:'Información para pacientes · GES N°50 · MINSAL Chile',
+    secciones:[
+      { heading:'Lo más importante: la Hepatitis C tiene cura', icon:'🌟', color:'#34d399', cuerpo:
+        'La Hepatitis C se puede curar. Con los tratamientos actuales (pastillas por 8 a 12 semanas), más del 95% de los pacientes se curan completamente.\n\n"Curación" significa que el virus desaparece de la sangre para siempre. Después de curar la Hepatitis C:\n• El hígado puede recuperarse (especialmente si la enfermedad no llegó a cirrosis avanzada)\n• El riesgo de cáncer de hígado disminuye significativamente\n• La persona ya no puede contagiar a otros'
+      },
+      { heading:'¿Qué es la Hepatitis C?', icon:'ℹ️', color:'#38bdf8', cuerpo:
+        'La Hepatitis C es una infección crónica del hígado causada por el virus VHC. La mayoría de las personas no saben que la tienen porque no da síntomas durante muchos años. Puede estar en su cuerpo silenciosamente por 20 o 30 años y causar daño progresivo al hígado.\n\nPor eso es importante hacerse el examen si tiene factores de riesgo, aunque se sienta bien.'
+      },
+      { heading:'¿Cómo se contagia?', icon:'🔄', color:'#fb923c', cuerpo:
+        'La Hepatitis C se transmite principalmente por sangre:\n• Jeringas o agujas compartidas (uso de drogas intravenosas)\n• Transfusiones de sangre o trasplantes antes de 1990 (antes del tamizaje)\n• Instrumentos cortantes no esterilizados: tatuajes, piercings, acupuntura\n• Raramente por vía sexual (poco frecuente)\n\nNO se contagia por:\n✅ Abrazos, besos, manos\n✅ Compartir comida, utensilios, vasos\n✅ Toser, estornudar\n✅ Piscinas o baños públicos\n\nPuede convivir normalmente con su familia.'
+      },
+      { heading:'El tratamiento: fácil y eficaz', icon:'💊', color:'#a78bfa', cuerpo:
+        '¿Cómo es el tratamiento?\n• Son pastillas (no inyecciones) que se toman 1 vez al día\n• El tratamiento dura entre 8 y 12 semanas\n• Los efectos secundarios son muy leves en la mayoría de las personas: algo de cansancio, dolor de cabeza leve\n• No interfiere con la vida diaria — puede trabajar y hacer actividad normal\n\n¿Cómo sé que me curé?\n• A los 3 meses de terminar el tratamiento se hace un análisis de sangre\n• Si el virus no se detecta = curación completa\n• El seguimiento posterior lo indica el especialista'
+      },
+      { heading:'GES en Chile: el tratamiento es cubierto', icon:'🏥', color:'#34d399', cuerpo:
+        'Si se confirma hepatitis C crónica en Chile:\n• El tratamiento con antivirales de acción directa (AAD) tiene cobertura GES (N°50)\n• Los exámenes de diagnóstico y seguimiento también tienen garantía\n\nSu médico de APS le solicitará el examen inicial (anti-VHC). Si es positivo, lo derivará al especialista para confirmar con RNA-VHC y comenzar el tratamiento.\n\nNo deje de consultar aunque lleve años con el diagnóstico — hoy existe la cura y vale la pena tratarse.'
+      },
+      { heading:'Cuidados mientras espera el tratamiento', icon:'✅', color:'#34d399', cuerpo:
+        '• Cero alcohol: el alcohol acelera el daño del hígado\n• No comparta agujas, jeringas ni artículos de higiene personal que puedan tener sangre\n• Informe a sus médicos y dentista que tiene hepatitis C\n• Vacúnese contra Hepatitis A y B si aún no está vacunado (su CESFAM puede indicarlo)'
+      }
+    ]
+  },
+  {
+    id:'alcohol', icon:'🍷', label:'Alcohol y el hígado', color:'#fbbf24',
+    titulo:'El alcohol y su hígado: lo que necesita saber',
+    subtitulo:'Guía para pacientes · Programa Alcohol y Drogas · APS Chile',
+    secciones:[
+      { heading:'¿Qué hace el alcohol en el hígado?', icon:'ℹ️', color:'#fb923c', cuerpo:
+        'El hígado es el órgano que procesa casi todo el alcohol que toma. Cuando bebe, el hígado trabaja extra para eliminar el alcohol — y eso lo daña.\n\nCon el tiempo, el consumo regular de alcohol puede causar:\n1. Hígado graso alcohólico: primer signo. Reversible si deja de tomar.\n2. Hepatitis alcohólica: inflamación del hígado. Puede ser grave.\n3. Cirrosis alcohólica: daño permanente con cicatrices. El hígado pierde su capacidad de funcionar.\n\nLo importante: el daño ocurre de forma silenciosa durante años. Cuando aparecen los síntomas, el daño ya está avanzado.'
+      },
+      { heading:'¿Cuánto alcohol es demasiado?', icon:'📏', color:'#fbbf24', cuerpo:
+        'Una "unidad de alcohol" equivale a:\n• 1 lata de cerveza (330 ml, 5%)\n• 1 copa de vino (150 ml, 12%)\n• 1 trago de destilado (pisco, ron, whisky — 45 ml, 40%)\n\nLímites que ya son perjudiciales para el hígado:\n• Hombres: más de 14 unidades por semana\n• Mujeres: más de 7 unidades por semana\n\nPERO si usted ya tiene una enfermedad del hígado (cirrosis, hepatitis, hígado graso), el límite es CERO. No existe ninguna cantidad segura.\n\n"Solo uno" o "solo en fiestas" también daña el hígado enfermo.'
+      },
+      { heading:'¿Cómo reducir el consumo?', icon:'📉', color:'#34d399', cuerpo:
+        'Consejos prácticos para reducir:\n\n• Establezca días sin alcohol durante la semana y respételos\n• Reemplace el trago con: agua con gas y limón, bebidas sin alcohol, té helado, jugo natural\n• No tenga alcohol en casa: lo que no está disponible, no se toma\n• Avísele a su familia que quiere reducir — el apoyo ayuda mucho\n• Identifique las situaciones en que más bebe (¿cuando está estresado? ¿con ciertos amigos?) y prepare un plan\n• Espere antes de tomar el primer trago: muchas veces el deseo pasa solo después de 15 minutos'
+      },
+      { heading:'¿Cuándo pedir ayuda?', icon:'🤝', color:'#a78bfa', cuerpo:
+        'Consulte a su médico o al programa de alcohol de su CESFAM si:\n• No puede pasar un día completo sin beber\n• Bebe solo, a escondidas o a primera hora de la mañana\n• Ha tenido "lagunas" (no recuerda lo que hizo mientras bebía)\n• Ha faltado al trabajo o descuidado a su familia por el alcohol\n• Ha intentado dejar de beber y no ha podido\n• Ha sentido temblores, sudoración o ansiedad cuando no bebe\n\nEl alcoholismo es una enfermedad, no una debilidad moral. Tiene tratamiento efectivo y gratuito en Chile.\n\nRecursos gratuitos:\n• Programa de Alcohol y Drogas de su CESFAM\n• COSAM (Centros Comunitarios de Salud Mental)\n• Línea de apoyo SENDA: 1490 (gratuita, 24 horas)'
+      },
+      { heading:'Si tiene una enfermedad del hígado: CERO alcohol', icon:'🚫', color:'#f87171', cuerpo:
+        'Si su médico ya le diagnosticó cirrosis, hepatitis, hígado graso u otra enfermedad hepática:\n\nCUALQUIER cantidad de alcohol es peligrosa.\n\nIncluso 1 copa de vino puede:\n• Desencadenar una hepatitis alcohólica aguda (potencialmente mortal)\n• Acelerar la progresión a cirrosis descompensada\n• Provocar un sangrado de várices\n\nNo es exageración del médico. Es la realidad de cómo funciona un hígado enfermo.\n\nSi le cuesta dejar de beber completamente, dígaselo a su médico. Existe tratamiento para la dependencia al alcohol que lo puede ayudar.'
+      }
+    ]
+  },
+  {
+    id:'alarmas', icon:'🚨', label:'Señales de alarma', color:'#f87171',
+    titulo:'Señales de alarma hepática: cuándo ir a urgencias',
+    subtitulo:'Guía rápida para pacientes con enfermedades del hígado · APS Chile',
+    secciones:[
+      { heading:'🔴 LLAME AL SAMU (131) o vaya a urgencias de INMEDIATO', icon:'🚨', color:'#f87171', cuerpo:
+        'Estas señales son EMERGENCIAS. No espere la próxima consulta:\n\n🩸 SANGRADO:\n• Vómito con sangre (rojo brillante o café oscuro)\n• Deposiciones negras, pegajosas, con olor muy fuerte (como alquitrán)\n• Escupir sangre o sangrar por la boca sin causa clara\n\n🧠 MENTE:\n• Confusión o desorientación que no tenía antes\n• No reconocer a familiares o no saber dónde está\n• Cambio brusco de conducta: agresividad, somnolencia extrema\n• No puede hablar con claridad\n\n🫃 ABDOMEN:\n• Abdomen muy hinchado, duro y muy doloroso\n• Fiebre alta (más de 38°C) con abdomen hinchado\n\n🟡 PIEL Y OJOS:\n• Amarillamiento intenso de la piel y los ojos que aparece rápido\n\n😮‍💨 OTROS:\n• Desmayo o pérdida de conocimiento\n• Falta de aire intensa sin causa conocida\n• Presión arterial muy baja o pulso acelerado'
+      },
+      { heading:'🟡 Consulte esta semana (no espere más)', icon:'⚠️', color:'#fbbf24', cuerpo:
+        'Estas señales no son emergencia inmediata, pero deben evaluarse dentro de 2 a 5 días:\n\n• Abdomen más hinchado que lo habitual (aunque no duela)\n• Piernas muy hinchadas (edema) de aparición repentina\n• Orina muy oscura, color café oscuro o Coca-Cola\n• Fiebre de 37.5°-38°C sin síntomas de resfrío\n• Cansancio extremo, muy diferente al habitual\n• Cambios en el ritmo del sueño (dormir de día, no dormir de noche)\n• Pérdida de peso rápida sin razón clara\n\nLlame a su CESFAM y explique sus síntomas para que le den hora preferente.'
+      },
+      { heading:'Lo que debe tener siempre a mano', icon:'📋', color:'#34d399', cuerpo:
+        'Prepare una "hoja de emergencia" con:\n\n1. Su nombre completo y RUT\n2. Nombre de su enfermedad: por ejemplo "Cirrosis hepática compensada" o "Hepatitis B crónica"\n3. Lista de sus medicamentos (nombre, dosis, frecuencia)\n4. Nombre y teléfono de su médico tratante\n5. Nombre y teléfono de su CESFAM\n6. Número de su familiar más cercano\n\nGuarde esta hoja en su billetera y tenga una copia en casa.\n\nNúmeros importantes:\n📞 SAMU: 131\n📞 FONASA: 600 360 3000\n📞 Su CESFAM: _______________'
+      },
+      { heading:'¿Qué decir en urgencias?', icon:'🏥', color:'#38bdf8', cuerpo:
+        'Cuando llegue a urgencias, diga claramente:\n\n"Tengo [nombre de su enfermedad, ej: cirrosis hepática] y estoy presentando [síntoma principal]"\n\nEjemplo: "Tengo cirrosis hepática y estoy vomitando sangre" o "Tengo hepatitis B crónica y desde hoy amanecí muy confundido"\n\nEsto ayuda al médico de urgencias a atenderle más rápido y adecuadamente.\n\nSi puede, lleve la lista de sus medicamentos o una foto de ellos con el celular.'
+      }
+    ]
+  }
+];
+
+var _pacinfoActive = 'cirrosis';
+
+function _pacinfoRender() {
+  var tabsEl = document.getElementById('pacinfo-tabs');
+  var bodyEl = document.getElementById('pacinfo-body');
+  if (!tabsEl || !bodyEl) return;
+
+  // Render tabs
+  tabsEl.innerHTML = _pacinfoTopicos.map(function(t) {
+    var isActive = t.id === _pacinfoActive;
+    return '<button onclick="_pacinfoSelect(\''+t.id+'\')" style="display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:20px;border:1.5px solid '+(isActive?t.color:'var(--border)')+';background:'+(isActive?'rgba('+_hexToRgb(t.color)+',0.15)':'var(--bg2)')+';color:'+(isActive?t.color:'var(--text-muted)')+';font-size:0.78rem;cursor:pointer;font-weight:'+(isActive?'700':'400')+';transition:all 0.18s;white-space:nowrap;">'
+      +'<span>'+t.icon+'</span><span>'+t.label+'</span>'
+    +'</button>';
+  }).join('');
+
+  // Find active topic
+  var topic = _pacinfoTopicos.find(function(t){ return t.id === _pacinfoActive; });
+  if (!topic) return;
+
+  // Render content
+  var sectHtml = topic.secciones.map(function(s) {
+    return '<div style="margin-bottom:1rem;background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;">'
+      +'<div style="background:rgba('+_hexToRgb(s.color)+',0.10);border-bottom:1px solid rgba('+_hexToRgb(s.color)+',0.20);padding:10px 14px;display:flex;align-items:center;gap:8px;">'
+      +'<span style="font-size:1rem;">'+s.icon+'</span>'
+      +'<span style="font-size:0.85rem;font-weight:700;color:'+s.color+';">'+s.heading+'</span>'
+      +'</div>'
+      +'<div style="padding:12px 14px;font-size:0.82rem;color:var(--text-dim);line-height:1.75;white-space:pre-line;">'+s.cuerpo+'</div>'
+    +'</div>';
+  }).join('');
+
+  var plainText = '=== '+topic.titulo+' ===\n'+topic.subtitulo+'\n\n'
+    + topic.secciones.map(function(s){ return '--- '+s.heading+' ---\n'+s.cuerpo; }).join('\n\n')
+    + '\n\n─────────────────────────────\nGenerado por HepatoShield · Saluvel SPA · www.saluvel.cl\nEste documento es orientativo y no reemplaza la consulta médica.';
+
+  bodyEl.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:1rem;">'
+    +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">'
+    +'<div>'
+    +'<div style="font-size:1rem;font-weight:800;color:var(--text);margin-bottom:2px;">'+topic.icon+' '+topic.titulo+'</div>'
+    +'<div style="font-size:0.74rem;color:var(--text-muted);">'+topic.subtitulo+'</div>'
+    +'</div>'
+    +'<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">'
+    +'<button onclick="_pacinfoCopy()" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text-dim);font-size:0.78rem;cursor:pointer;">📋 Copiar texto</button>'
+    +'<button onclick="_pacinfoPrint(\''+topic.id+'\')" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text-dim);font-size:0.78rem;cursor:pointer;">🖨️ Imprimir</button>'
+    +'</div>'
+    +'</div>'
+    +'</div>'
+    +'<div id="pacinfo-secciones">'+sectHtml+'</div>'
+    +'<textarea id="pacinfo-plaintext" style="position:absolute;left:-9999px;top:-9999px;opacity:0;" aria-hidden="true">'+plainText+'</textarea>';
+}
+
+function _pacinfoSelect(id) {
+  _pacinfoActive = id;
+  _pacinfoRender();
+}
+
+function _pacinfoCopy() {
+  var el = document.getElementById('pacinfo-plaintext');
+  if (!el) return;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(el.value).then(function(){
+        showToast('Texto copiado', 'Ya puedes pegarlo en WhatsApp, Word o cualquier app.');
+      });
+    } else {
+      el.select(); document.execCommand('copy');
+      showToast('Texto copiado', 'Ya puedes pegarlo en WhatsApp, Word o cualquier app.');
+    }
+  } catch(e) { showToast('Error', 'No se pudo copiar automáticamente. Selecciona el texto manualmente.'); }
+}
+
+function _pacinfoPrint(id) {
+  var topic = _pacinfoTopicos.find(function(t){ return t.id === id; });
+  if (!topic) return;
+  var html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">'
+    +'<title>'+topic.titulo+'</title>'
+    +'<style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Arial,Helvetica,sans-serif;font-size:12pt;line-height:1.65;color:#111;background:#fff;padding:20mm 18mm;}@page{size:A4;margin:18mm;}h1{font-size:16pt;font-weight:700;color:#1a3a2a;border-bottom:3px solid #1a3a2a;padding-bottom:6px;margin-bottom:14px;}.sub{font-size:9pt;color:#555;margin-bottom:20px;}.sec{margin-bottom:18px;border:1.5px solid #ccc;border-radius:6px;overflow:hidden;}.sec-head{padding:8px 12px;font-weight:700;font-size:11pt;color:#1a3a2a;background:#eaf5ee;border-bottom:1.5px solid #ccc;}.sec-body{padding:10px 14px;font-size:10.5pt;white-space:pre-line;color:#222;}.footer{border-top:1.5px solid #999;margin-top:22px;padding-top:8px;font-size:8pt;color:#555;text-align:center;}.print-btn{position:fixed;top:12px;right:12px;padding:8px 16px;background:#1a7a3a;color:#fff;border:none;border-radius:6px;font-size:11pt;cursor:pointer;}@media print{.print-btn{display:none!important;}}</style>'
+    +'</head><body>'
+    +'<button class="print-btn" onclick="window.print()">Imprimir / PDF</button>'
+    +'<h1>'+topic.icon+' '+topic.titulo+'</h1>'
+    +'<div class="sub">'+topic.subtitulo+'</div>'
+    + topic.secciones.map(function(s){
+        return '<div class="sec"><div class="sec-head">'+s.icon+' '+s.heading+'</div><div class="sec-body">'+s.cuerpo+'</div></div>';
+      }).join('')
+    +'<div class="footer">Generado por HepatoShield · Saluvel SPA · www.saluvel.cl — Este documento es orientativo y no reemplaza la consulta médica.</div>'
+    +'</body></html>';
+  var w = window.open('','_blank','width=860,height=700');
+  if (w) { w.document.write(html); w.document.close(); setTimeout(function(){ w.focus(); }, 300); }
+}
+
+function _pacinfoSubTab(tab) {
+  var panelFormatos = document.getElementById('pacinfo-panel-formatos');
+  var panelHoja     = document.getElementById('pacinfo-panel-hoja');
+  var btnFormatos   = document.getElementById('pacinfo-tab-formatos');
+  var btnHoja       = document.getElementById('pacinfo-tab-hoja');
+  if (!panelFormatos || !panelHoja) return;
+  var isFormatos = tab === 'formatos';
+  panelFormatos.style.display = isFormatos ? '' : 'none';
+  panelHoja.style.display     = isFormatos ? 'none' : '';
+  if (btnFormatos) {
+    btnFormatos.style.background = isFormatos ? 'var(--teal)' : 'transparent';
+    btnFormatos.style.color      = isFormatos ? '#0a0f0d' : 'var(--text-muted)';
+    btnFormatos.style.fontWeight = isFormatos ? '700' : '400';
+  }
+  if (btnHoja) {
+    btnHoja.style.background = isFormatos ? 'transparent' : 'var(--teal)';
+    btnHoja.style.color      = isFormatos ? 'var(--text-muted)' : '#0a0f0d';
+    btnHoja.style.fontWeight = isFormatos ? '400' : '700';
+  }
+  if (!isFormatos) setTimeout(function(){ renderEduForm('aps'); }, 50);
+}
+
+function _hexToRgb(hex) {
+  var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return r+','+g+','+b;
+}
+</script>
 
 <!-- VISTAS ESPECIALISTA
 ══════════════════════════════════════════════ -->
@@ -7429,11 +7825,20 @@ function renderColaAPS(){
   var tbody=document.getElementById('cola-aps-tabla-body');
   if(!tbody) return;
   tbody.innerHTML='';
+  var filtroEl=document.getElementById('cola-aps-filtro');
+  var filtro=filtroEl?filtroEl.value:'todas';
   var keys=Object.keys(derivacionesDB);
+  // Aplicar filtro
+  if(filtro==='pendiente') keys=keys.filter(function(id){ return derivacionesDB[id].estado!=='atendida'; });
+  else if(filtro==='urgente') keys=keys.filter(function(id){ return derivacionesDB[id].prioridad==='urgente'||derivacionesDB[id].prioridad==='alta'; });
+  else if(filtro==='cirrosis') keys=keys.filter(function(id){
+    var mot=(derivacionesDB[id].motivo||'').toLowerCase();
+    return mot.indexOf('cirr')>-1||mot.indexOf('descomp')>-1||mot.indexOf('meld')>-1||derivacionesDB[id].meldNa!=null;
+  });
   if(!keys.length){
     var tr=document.createElement('tr');
     var td=document.createElement('td');
-    td.colSpan=5; td.style.textAlign='center';
+    td.colSpan=6; td.style.textAlign='center';
     td.style.padding='1.5rem'; td.style.color='var(--text-muted)';
     td.style.fontSize='0.82rem';
     td.textContent='No hay derivaciones registradas.';
@@ -7444,6 +7849,10 @@ function renderColaAPS(){
     var pa=order[derivacionesDB[a].prioridad]!==undefined?order[derivacionesDB[a].prioridad]:2;
     var pb=order[derivacionesDB[b].prioridad]!==undefined?order[derivacionesDB[b].prioridad]:2;
     if(pa!==pb) return pa-pb;
+    // Dentro del mismo nivel: ordenar por puntaje de riesgo compuesto (MELD×2 + FIB-4×1)
+    var rA=(derivacionesDB[a].meldNa||0)*2+(derivacionesDB[a].fib4||0);
+    var rB=(derivacionesDB[b].meldNa||0)*2+(derivacionesDB[b].fib4||0);
+    if(rA!==rB) return rB-rA; // mayor riesgo primero
     return new Date(derivacionesDB[b].fecha)-new Date(derivacionesDB[a].fecha);
   });
   var badgeMap={urgente:'badge-red',alta:'badge-amber',moderada:'badge-amber',rutina:'badge-green'};
@@ -7455,7 +7864,16 @@ function renderColaAPS(){
     strong.style.color='var(--white)'; strong.textContent=d.pacienteNombre;
     tdPac.appendChild(strong);
     var tdMot=document.createElement('td');
-    tdMot.textContent=d.motivo.length>60?d.motivo.slice(0,60)+'...':d.motivo;
+    tdMot.textContent=d.motivo&&d.motivo.length>55?d.motivo.slice(0,55)+'…':d.motivo||'—';
+    // Columna FIB-4 / MELD-Na
+    var tdRisk=document.createElement('td');
+    tdRisk.style.cssText='font-family:var(--font-mono);font-size:0.78rem;white-space:nowrap;';
+    var fib4v=d.fib4!=null?parseFloat(d.fib4):null;
+    var meldv=d.meldNa!=null?parseFloat(d.meldNa):null;
+    var fib4Col=fib4v!=null?(fib4v>=2.67?'var(--red)':fib4v>=1.3?'var(--amber)':'var(--teal)'):'var(--text-muted)';
+    var meldCol=meldv!=null?(meldv>=20?'var(--red)':meldv>=15?'#f97316':meldv>=10?'var(--amber)':'var(--teal)'):'var(--text-muted)';
+    tdRisk.innerHTML=(fib4v!=null?'<div style="color:'+fib4Col+';">FIB-4&nbsp;'+fib4v.toFixed(2)+'</div>':'<div style="color:var(--text-muted);font-size:0.70rem;">FIB-4 N/D</div>')
+      +(meldv!=null?'<div style="color:'+meldCol+';">MELD&nbsp;'+meldv.toFixed(0)+'</div>':'');
     var tdFec=document.createElement('td');
     tdFec.textContent=new Date(d.fecha).toLocaleDateString('es-CL');
     var tdEst=document.createElement('td');
@@ -7471,7 +7889,7 @@ function renderColaAPS(){
     btn.textContent='Ver detalle';
     (function(did){ btn.onclick=function(){ abrirDerivacionDetalle(did); }; })(id);
     tdAcc.appendChild(btn);
-    [tdPac,tdMot,tdFec,tdEst,tdAcc].forEach(function(td){ tr.appendChild(td); });
+    [tdPac,tdMot,tdRisk,tdFec,tdEst,tdAcc].forEach(function(td){ tr.appendChild(td); });
     tbody.appendChild(tr);
   });
 }
@@ -8136,7 +8554,12 @@ function doLogout() {
   sessionScores = {};
 }
 
+var _pacinfoStartTab = 'formatos'; // sub-tab a abrir al entrar en aps-pacinfo
+
 function showView(viewId) {
+  // aps-edu fusionado en aps-pacinfo — redirigir al sub-tab "hoja"
+  if (viewId === 'aps-edu') { _pacinfoStartTab = 'hoja'; viewId = 'aps-pacinfo'; }
+  else if (viewId === 'aps-pacinfo') { _pacinfoStartTab = 'formatos'; }
   if (viewId === 'admin-costos') { setTimeout(_initCostosView, 100); }
   // Mapas directos a las funciones correctas
   var espTabDirect = {
@@ -8164,7 +8587,7 @@ function showView(viewId) {
     var mapAnb = {
       'aps-consulta':'anb-consulta','aps-screening':'anb-screening','aps-masld':'anb-masld','aps-alcohol':'anb-alcohol',
       'aps-derivacion':'anb-derivacion','aps-vacunas':'anb-vacunas','aps-prevencion':'anb-prevencion',
-      'aps-cola':'anb-cola','aps-calculadoras':'anb-calculadoras','aps-hepatotox':'anb-hepatotox','aps-hep-dx':'anb-hep-dx','aps-ddi':'anb-ddi','aps-edu':'anb-edu','aps-resumen':'anb-resumen'
+      'aps-cola':'anb-cola','aps-calculadoras':'anb-calculadoras','aps-hepatotox':'anb-hepatotox','aps-hep-dx':'anb-hep-dx','aps-ddi':'anb-ddi','aps-edu':'anb-pacinfo','aps-pacinfo':'anb-pacinfo','aps-resumen':'anb-resumen'
     };
     var anb = document.getElementById(mapAnb[viewId]);
     if (anb) anb.classList.add('active');
@@ -8223,8 +8646,24 @@ function showView(viewId) {
   var si = document.getElementById('si-' + viewId); if(si) si.classList.add('active');
   if(viewId==='admin-kpis'||viewId==='admin-epidemio') setTimeout(initAdminCharts, 200);
   if(viewId==='admin-pwa') setTimeout(pwaRefreshStatus, 150);
+  if(viewId==='aps-prevencion') setTimeout(renderPrevencionPersonalizada, 50);
   if(viewId==='aps-hepatotox') setTimeout(function(){ renderHepatotox('aps'); }, 50);
-  if(viewId==='aps-edu') setTimeout(function(){ renderEduForm('aps'); }, 50);
+  if(viewId==='aps-pacinfo') setTimeout(function(){
+    var tab = _pacinfoStartTab || 'formatos';
+    _pacinfoSubTab(tab);
+    if(tab === 'formatos') {
+      // Auto-seleccionar tópico según motivo de consulta activo
+      var motivos = (typeof _cMotivos !== 'undefined') ? _cMotivos : [];
+      if      (motivos.indexOf('cirrosis')      > -1 || motivos.indexOf('descompensacion') > -1) _pacinfoActive = 'cirrosis';
+      else if (motivos.indexOf('masld')         > -1) _pacinfoActive = 'masld';
+      else if (motivos.indexOf('alcohol')       > -1) _pacinfoActive = 'alcohol';
+      else if (motivos.indexOf('vhb_vhc')       > -1) _pacinfoActive = 'vhb';
+      else if (motivos.indexOf('ictericia')     > -1) _pacinfoActive = 'alarmas';
+      else if (motivos.indexOf('transaminasas') > -1) _pacinfoActive = 'masld';
+      _pacinfoRender();
+    }
+    // renderEduForm se llama desde _pacinfoSubTab cuando tab==='hoja'
+  }, 50);
   if(viewId==='aps-hep-dx') { document.getElementById('hdx-results-aps') && (document.getElementById('hdx-results-aps').innerHTML = ''); }
   closeMobileSidebar();
   window.scrollTo(0,0);
@@ -9333,6 +9772,88 @@ function loadDemoAPS() {
   showToast('Caso demo cargado', c.msg);
 }
 
+
+// ─── DEMO CONSULTA — carga caso demo completo en Nueva Consulta ──
+function loadDemoConsulta() {
+  var selEl = document.getElementById('consulta-demo-select');
+  if (!selEl || !selEl.value) { showToast('Selecciona un caso', 'Elige un caso demo del selector antes de cargar.'); return; }
+  var demoCasos = {
+    verde: {
+      nombre:'Demo · Riesgo Bajo', rut:'DEMO-V', prevision:'FONASA A',
+      edad:34, sexo:'M', peso:72, talla:175, cintura:82,
+      motivos:['screening'],
+      labs:{ ast:28, alt:32, ggt:24, fa:55, plt:245, bili:0.7, alb:4.6, inr:1.0, cr:0.9, na:140, gli:88, tg:110, hdl:52, pas:118 },
+      msg:'34 años sin factores de riesgo, labs normales → RIESGO BAJO.'
+    },
+    amarillo: {
+      nombre:'Demo · MASLD Moderado', rut:'DEMO-A', prevision:'FONASA B',
+      edad:47, sexo:'F', peso:82, talla:162, cintura:98,
+      motivos:['masld','transaminasas'],
+      labs:{ ast:52, alt:68, ggt:82, fa:95, plt:178, bili:0.9, alb:4.1, inr:1.1, cr:0.8, na:139, gli:112, tg:195, hdl:38, pas:135 },
+      msg:'47 años, MASLD + DM2 + HTA, FIB-4 zona gris → RIESGO MODERADO.'
+    },
+    rojo: {
+      nombre:'Demo · Fibrosis Avanzada', rut:'DEMO-R', prevision:'FONASA C',
+      edad:58, sexo:'M', peso:78, talla:170, cintura:96,
+      motivos:['masld','transaminasas','cirrosis'],
+      labs:{ ast:88, alt:62, ggt:145, fa:132, plt:98, bili:1.8, alb:3.6, inr:1.3, cr:0.9, na:138, gli:118, tg:185, hdl:35, pas:142 },
+      msg:'58 años, FIB-4 5.2 + PLQ 98k → RIESGO ALTO — fibrosis avanzada probable.'
+    },
+    urgente: {
+      nombre:'Demo · Descompensación', rut:'DEMO-U', prevision:'FONASA A',
+      edad:63, sexo:'F', peso:65, talla:158, cintura:88,
+      motivos:['cirrosis','descompensacion','ictericia'],
+      labs:{ ast:142, alt:98, ggt:210, fa:185, plt:72, bili:4.8, alb:2.9, inr:1.8, cr:1.4, na:132, gli:95, tg:88, hdl:28, pas:98 },
+      msg:'63 años, Bili 4.8 + INR 1.8 + Na 132 → DESCOMPENSACIÓN — derivar urgente hoy.'
+    }
+  };
+  var c = demoCasos[selEl.value]; if(!c) return;
+  var setV = function(id, val) { var e = document.getElementById(id); if (e) e.value = val; };
+
+  // 1. Resetear estado completo
+  resetConsulta();
+
+  // 2. Activar modo nuevo y llenar datos
+  cModoNuevo();
+  setV('c_nombre_nuevo', c.nombre);
+  setV('c_rut_nuevo', c.rut);
+  var prevEl = document.getElementById('c_prev_nuevo'); if (prevEl) prevEl.value = c.prevision;
+
+  // Mostrar sección clínica (oculta por defecto en cModoNuevo)
+  var datCliEl = document.getElementById('c-datos-clinicos'); if (datCliEl) datCliEl.style.display = 'block';
+
+  // Datos demográficos
+  setV('c_edad', c.edad);
+  var sexEl = document.getElementById('c_sexo'); if (sexEl) sexEl.value = c.sexo;
+
+  // Mostrar y llenar peso/talla/cintura
+  var extraPan = document.getElementById('c-datos-extra'); if (extraPan) extraPan.style.display = 'grid';
+  var toggleB  = document.getElementById('c-toggle-extra'); if (toggleB) toggleB.textContent = '− Ocultar datos adicionales';
+  setV('c_peso', c.peso); setV('c_talla', c.talla); setV('c_cintura', c.cintura);
+  cAutoCalc();
+
+  // Marcar motivos de consulta
+  document.querySelectorAll('#c-motivo-grid input[type=checkbox]').forEach(function(cb){
+    cb.checked = c.motivos.indexOf(cb.value) > -1;
+  });
+  cUpdateMotivos();
+
+  // 3. Avanzar a paso 2 — internamente crea el paciente y renderiza labs
+  goConsultaStep(2);
+
+  // 4. Llenar labs — esperar dos ciclos de pintura para que cRenderLabs() haya actualizado el DOM
+  //    requestAnimationFrame es más fiable que setTimeout(fn,80) en dispositivos lentos
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      Object.keys(c.labs).forEach(function(k){ setV('c_'+k, c.labs[k]); });
+      // 5. Avanzar a paso 3 tras otro ciclo de pintura
+      requestAnimationFrame(function(){
+        goConsultaStep(3);
+        showToast('✅ Caso demo cargado', c.msg);
+      });
+    });
+  });
+}
 
 function loadDemoCompleto() {
   if (!confirm('Esto cargará la Suite Demo Institucional (15 pacientes) y sobreescribirá los datos actuales. ¿Continuar?')) return;
@@ -15362,13 +15883,13 @@ function cRenderLabs() {
   // Define which labs to show per motivo
   var labMap = {
     fib4_block: { label:'FIB-4 / Fibrosis', ids:['c_ast','c_alt','c_plt'], always: true },
-    masld:   { extra: ['c_gli','c_tg','c_hdl','c_pas'] },
-    transaminasas: { extra:[] },
-    alcohol:  { extra: ['c_ggt'] },
-    cirrosis: { extra: ['c_bili','c_alb','c_inr','c_cr','c_na'] },
-    vhb_vhc:  { extra: [] },
-    screening:{ extra: [] },
-    ictericia:{ extra: ['c_bili','c_ggt','c_fa'] },
+    masld:         { extra: ['c_gli','c_tg','c_hdl','c_pas'] },
+    transaminasas: { extra: ['c_ggt','c_fa','c_bili'] },   // FIX: patrón hepatocelular vs colestásico requiere GGT+FA+Bili
+    alcohol:       { extra: ['c_ggt'] },
+    cirrosis:      { extra: ['c_bili','c_alb','c_inr','c_cr','c_na'] },
+    vhb_vhc:       { extra: ['c_bili','c_ggt'] },           // FIX: actividad viral requiere Bili y GGT
+    screening:     { extra: [] },
+    ictericia:     { extra: ['c_bili','c_ggt','c_fa'] },
     descompensacion:{ extra:['c_bili','c_alb','c_inr','c_cr','c_na'] }
   };
   var allLabDefs = {
@@ -15408,6 +15929,9 @@ function cRenderLabs() {
   // Inyectar valores de _labSession en campos recién creados (si no tienen valor)
   _prefillConsultaFields();
   // AUDIT-C integrado cuando motivo = alcohol
+  // FIX: eliminar bloque previo antes de re-insertar (evita duplicación al ir/volver del paso 2)
+  var oldAudit = document.getElementById('c-audit-c-block');
+  if (oldAudit) oldAudit.parentNode.removeChild(oldAudit);
   if (_cMotivos.indexOf('alcohol') >= 0) {
     var auditContainer = document.createElement('div');
     auditContainer.id = 'c-audit-c-block';
@@ -15445,7 +15969,48 @@ function _calcAuditC() {
   res.innerHTML = '<span style="color:'+col+';">AUDIT-C: '+total+' pts — '+nivel+'</span>';
 }
 
-function cPreviewLab() { _syncLabSession(); } // actualiza sesión compartida con labs ingresados
+function cPreviewLab() {
+  _syncLabSession();
+  // Validación de rangos fisiológicamente imposibles — aviso visual sin bloquear
+  var alertas = [];
+  var checks = [
+    { id:'c_ast',  min:5,   max:5000, label:'GOT (AST)' },
+    { id:'c_alt',  min:5,   max:5000, label:'GPT (ALT)' },
+    { id:'c_plt',  min:5,   max:900,  label:'Plaquetas' },
+    { id:'c_alb',  min:1.0, max:6.0,  label:'Albúmina'  },
+    { id:'c_bili', min:0.1, max:50,   label:'Bilirrubina'},
+    { id:'c_inr',  min:0.5, max:15,   label:'INR'        },
+    { id:'c_cr',   min:0.3, max:20,   label:'Creatinina' },
+    { id:'c_na',   min:110, max:160,  label:'Sodio'      },
+    { id:'c_ggt',  min:5,   max:5000, label:'GGT'        },
+    { id:'c_fa',   min:20,  max:5000, label:'FA'         }
+  ];
+  checks.forEach(function(c){
+    var el = document.getElementById(c.id); if(!el||!el.value) return;
+    var v = parseFloat(el.value);
+    if (isNaN(v)) return;
+    if (v < c.min || v > c.max) {
+      alertas.push(c.label+': '+v+' (fuera de rango fisiológico '+c.min+'–'+c.max+')');
+      el.style.border = '1.5px solid #f87171';
+    } else {
+      el.style.border = '';
+    }
+  });
+  var warn = document.getElementById('c-labs-range-warn');
+  if (!warn) {
+    warn = document.createElement('div');
+    warn.id = 'c-labs-range-warn';
+    warn.style.cssText = 'margin-top:0.5rem;padding:6px 12px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.35);border-radius:7px;font-size:0.74rem;color:#f87171;font-family:var(--font-mono);display:none;';
+    var cont = document.getElementById('c-labs-container');
+    if (cont && cont.parentNode) cont.parentNode.insertBefore(warn, cont.nextSibling);
+  }
+  if (alertas.length) {
+    warn.style.display = 'block';
+    warn.innerHTML = '⚠️ Verificar valores — posible error de digitación:<br>' + alertas.join(' · ');
+  } else {
+    warn.style.display = 'none';
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  HEPATOTOX — Base de datos de fármacos, fitoterapia y hongos · v2.0
@@ -18030,7 +18595,7 @@ function cRenderResultados() {
       f4recom='Control anual. Sin derivación urgente por fibrosis.';
     } else if (fib4 <= cutHigh) {
       f4zone='Zona indeterminada — Evaluar con elastografía'; f4col='#fbbf24'; f4cls='yellow';
-      f4recom='Derivar en 4–8 semanas para elastografía o biopsia.';
+      f4recom='Derivar en 4–8 semanas a hepatología para elastografía (el especialista decidirá si se requiere biopsia).';
       if (maxRisk === 'green') maxRisk = 'yellow';
       decisiones.push({ urgencia:'preferente', texto:'FIB-4 indeterminado ('+fib4.toFixed(2)+') → solicitar elastografía' });
     } else {
@@ -18083,7 +18648,11 @@ function cRenderResultados() {
       // 1.5–3× VN → leve. EASL: repetir en 3 meses, evaluar causas secundarias antes de derivar
       tCol='#fbbf24'; tCls='yellow';
       tZone='Transaminasas 1.5–3× VN — Elevación leve';
-      tRecom='Repetir en 3 meses. Evaluar: MASLD, alcohol (AUDIT), fármacos hepatotóxicos, VHB/VHC, hipotiroidismo. FIB-4 obligatorio si aún no calculado (EASL 2023).';
+      var _fib4ya = window._cFIB4Last;
+      var _fib4txt = _fib4ya !== null && _fib4ya !== undefined
+        ? 'FIB-4 calculado: '+_fib4ya.toFixed(2)+(_fib4ya > 2.67 ? ' — alto riesgo' : _fib4ya > 1.3 ? ' — zona gris' : ' — bajo riesgo')+'.'
+        : 'FIB-4 obligatorio si aún no calculado (EASL 2023).';
+      tRecom='Repetir en 3 meses. Evaluar: MASLD, alcohol (AUDIT), fármacos hepatotóxicos, VHB/VHC, hipotiroidismo. '+_fib4txt;
       if (maxRisk === 'green') maxRisk = 'yellow';
     } else {
       tCol = null; // normales, no mostrar tarjeta
@@ -18149,7 +18718,16 @@ function cRenderResultados() {
         ?'MASLD probable — '+masldCritC.length+' criterio(s) cardiometabolico(s) cumplido(s)'
         :'Sin criterios MASLD suficientes (requiere IMC >= 23 + al menos 1 criterio)';
       var masldRecom = hasMasldC
-        ? '&#8594; EASL 2024: pérdida ≥7–10% peso corporal (objetivo primario), actividad física 150 min/sem aeróbica o 75 min/sem alta intensidad, control glicemia + dislipidemia. Solicitar ecografía + FIB-4. Si FIB-4 >1.3 → derivar en ≤3 meses.'
+        ? (function(){
+            var _mf4 = window._cFIB4Last;
+            var _mf4str = _mf4 !== null && _mf4 !== undefined
+              ? 'FIB-4 ya calculado: '+_mf4.toFixed(2)+(_mf4 > 2.67 ? ' → derivar en ≤30 días.' : _mf4 > 1.3 ? ' (zona gris) → derivar en ≤3 meses.' : ' → control anual.')
+              : 'Solicitar FIB-4 (si >1.3 → derivar en ≤3 meses).';
+            // Recordatorio nutricionista solo si cirrosis/descompensacion no están (esos ya muestran tarjeta propia)
+            var _noCirr = _cMotivos.indexOf('cirrosis') === -1 && _cMotivos.indexOf('descompensacion') === -1;
+            var _nutriNote = _noCirr ? '<br>&#8594; 🥗 <strong>Derivar a nutricionista:</strong> plan dietético individualizado — eliminar azúcares añadidos, dieta mediterránea o baja en CH refinados (EASL 2024).' : '';
+            return '&#8594; EASL 2024: pérdida ≥7–10% peso corporal (objetivo primario), actividad física 150 min/sem aeróbica o 75 min/sem alta intensidad, control glicemia + dislipidemia. Solicitar ecografía hepática. '+_mf4str+_nutriNote;
+          })()
         : '&#8594; Sin criterios MASLD completos. Evaluar nuevamente si aparecen factores cardiometabólicos.';
       html+='<div class="c-result-card" style="border-color:'+mColM+';background:rgba(251,191,36,0.06);">'
         +'<div style="font-size:0.82rem;font-weight:700;color:'+mColM+';margin-bottom:3px;">'+mTxtM+'</div>'
@@ -18158,7 +18736,13 @@ function cRenderResultados() {
         +'<div style="font-size:0.75rem;color:var(--text-dim);">'+masldRecom+'</div>'
         +'</div>';
       if(hasMasldC&&maxRisk==='green') maxRisk='yellow';
-      if(hasMasldC) decisiones.push({urgencia:'programada',texto:'MASLD probable → ecografía + FIB-4; si FIB-4 >1.3 derivar en ≤3 meses (EASL 2024)'});
+      if(hasMasldC) {
+        var _mf4d = window._cFIB4Last;
+        var _masldDec = _mf4d !== null && _mf4d !== undefined
+          ? 'MASLD probable → FIB-4 '+_mf4d.toFixed(2)+(_mf4d > 2.67 ? ' → derivar en ≤30 días' : _mf4d > 1.3 ? ' → derivar en ≤3 meses' : ' → control anual')
+          : 'MASLD probable → ecografía + FIB-4; si FIB-4 >1.3 derivar en ≤3 meses (EASL 2024)';
+        decisiones.push({urgencia:'programada', texto:_masldDec});
+      }
     }
   }
 
@@ -18179,6 +18763,68 @@ function cRenderResultados() {
       +'<div style="font-size:0.75rem;color:var(--text-dim);">&#8594; '+mRecom+'</div></div>';
   }
 
+  // ── 4b. Cirrosis conocida sin MELD calculable (labs insuficientes) ──
+  if (_cMotivos.indexOf('cirrosis') > -1 && meld === null) {
+    if (maxRisk === 'green') maxRisk = 'yellow';
+    decisiones.push({urgencia:'preferente', texto:'Cirrosis conocida — solicitar labs completos para MELD-Na y FIB-4, derivar a hepatología'});
+    html += '<div class="c-result-card yellow">'
+      +'<div style="font-size:0.82rem;font-weight:700;color:#fbbf24;margin-bottom:4px;">Cirrosis conocida — Labs incompletos</div>'
+      +'<div style="font-size:0.75rem;color:var(--text-dim);">&#8594; Para calcular MELD-Na ingrese: bilirrubina, creatinina, INR y sodio. Para FIB-4: edad, GOT, GPT y plaquetas.'
+      +'<br>&#8594; Si ya tiene diagnóstico de cirrosis: derivar a hepatología para estadificación (Child-Pugh / MELD) y vigilancia de complicaciones (HCC, várices, ascitis).'
+      +'<br>&#8594; Solicitar: perfil hepático completo + recuento de plaquetas + ecografía abdominal.</div></div>';
+  }
+
+  // ── 4b-HCC. Vigilancia HCC en cirrosis confirmada ─────────────
+  if (_cMotivos.indexOf('cirrosis') > -1 || _cMotivos.indexOf('descompensacion') > -1) {
+    decisiones.push({urgencia:'programada', texto:'Vigilancia HCC — ecografía hepática + AFP cada 6 meses (AASLD 2018 · EASL 2018 · GES N°72 Chile). Si no tiene en curso: solicitar o derivar.'});
+    html += '<div class="c-result-card yellow">'
+      +'<div style="font-size:0.82rem;font-weight:700;color:#fbbf24;margin-bottom:4px;">📡 Vigilancia HCC — Obligatoria en Cirrosis</div>'
+      +'<div style="font-size:0.75rem;color:var(--text-dim);">'
+      +'&#8594; <strong>Ecografía abdominal + AFP cada 6 meses</strong> — estándar universal en cirrosis de cualquier etiología (AASLD 2018, EASL 2018).'
+      +'<br>&#8594; <strong>GES N°72 Chile</strong>: cubre diagnóstico y tratamiento de CHC — garantía de oportunidad desde la sospecha.'
+      +'<br>&#8594; <strong>En APS:</strong> verificar que el paciente tenga este control activo. Si no tiene ecografía en los últimos 6 meses → solicitar o derivar para reactivar vigilancia.'
+      +'<br>&#8594; AFP &gt;20 ng/mL o nódulo &gt;10 mm en cirrótico → derivar con urgencia preferente a hepatología (≤30 días).'
+      +'</div></div>';
+  }
+
+  // ── 4c. Descompensación aguda ─────────────────────────────────
+  if (_cMotivos.indexOf('descompensacion') > -1) {
+    esUrgenciaAguda = true; maxRisk = 'red';
+    var meldDesc = meld !== null ? 'MELD-Na: '+meld+' pts. ' : 'Calcular MELD-Na (Bili+Cr+INR+Na). ';
+    var descompRecom = meld !== null && meld >= 18 ? 'Enviar a Servicio de Urgencia HOY.' : 'Derivar a hepatología esta semana (≤7 días).';
+    decisiones.push({urgencia:'urgente', texto:'Descompensación hepática → '+descompRecom});
+    html += '<div class="c-result-card red">'
+      +'<div style="font-size:0.82rem;font-weight:700;color:#f87171;margin-bottom:4px;">⚠️ Descompensación Hepática Aguda</div>'
+      +'<div style="font-size:0.75rem;color:var(--text-dim);">&#8594; '+meldDesc+descompRecom
+      +'<br>&#8594; <strong>Evaluar en APS:</strong> nivel de conciencia (encefalopatía), distensión abdominal (ascitis), signos de sangrado (hematemesis, melena), diuresis.'
+      +'<br>&#8594; <strong>Si sangrado activo, confusión o colapso:</strong> llamar SAMU 131 — no trasladar solo.'
+      +'<br>&#8594; <strong>NO ajustar diuréticos ni lactuosa sin evaluación especialista.</strong> Derivar SIEMPRE.</div></div>';
+  }
+
+  // ── 4d. Derivación a nutricionista (según motivo) ────────────
+  var _needsNutri = false;
+  var _nutriTxt = '';
+  if (_cMotivos.indexOf('cirrosis') > -1 || _cMotivos.indexOf('descompensacion') > -1) {
+    _needsNutri = true;
+    var _nutriMeldTxt = window._cMELDLast !== null && window._cMELDLast !== undefined
+      ? ' MELD-Na '+window._cMELDLast+' — riesgo de desnutrición y sarcopenia elevado.'
+      : '';
+    _nutriTxt = 'Derivar a nutricionista (CESFAM/especialidad): evaluación RFH-NRS + requerimientos proteicos (1.2–1.5 g/kg/día) + consejería sobre colación nocturna. Sarcopenia en 40–70% de cirróticos — predictor independiente de mortalidad (ESPEN 2019).'+_nutriMeldTxt;
+    html += '<div class="c-result-card yellow">'
+      +'<div style="font-size:0.82rem;font-weight:700;color:#fbbf24;margin-bottom:4px;">🥗 Evaluación Nutricional — Cirrosis</div>'
+      +'<div style="font-size:0.75rem;color:var(--text-dim);">&#8594; <strong>Derivar a nutricionista:</strong> RFH-NRS (cribado sarcopenia), requerimientos 30–35 kcal/kg/día, proteínas 1.2–1.5 g/kg/día, colación nocturna 50 g CHO (previene catabolismo).'
+      +'<br>&#8594; <strong>Restricción proteica CONTRAINDICADA</strong> en cirrosis estable (solo restricción transitoria en EH aguda).'
+      +'<br>&#8594; <strong>Na &lt;2 g/día</strong> si ascitis; sodio libre si sin ascitis.'
+      +'<br>&#8594; Vitamina D, zinc, tiamina: solicitar si sospecha déficit (ictericia, desnutrición, alcohol).</div></div>';
+  } else if (_cMotivos.indexOf('masld') > -1) {
+    _needsNutri = true;
+    _nutriTxt = 'Derivar a nutricionista: plan dietético MASLD — reducción de peso ≥7% (meta mínima), eliminación bebidas azucaradas, dieta mediterránea o baja en CH refinados (EASL 2024).';
+    // No extra card: the MASLD card already covers this. Only push to decisiones.
+  }
+  if (_needsNutri) {
+    decisiones.push({urgencia:'programada', texto:_nutriTxt});
+  }
+
   // ── 5. Flags clínicos por motivo ─────────────────────────────
   if (_cMotivos.indexOf('vhb_vhc') > -1) {
     if (maxRisk === 'green') maxRisk = 'yellow';
@@ -18192,19 +18838,38 @@ function cRenderResultados() {
 
   // ── 4b. Alcohol como motivo — consejería estructurada obligatoria ────
   if (_cMotivos.indexOf('alcohol') > -1) {
-    if (maxRisk === 'green') maxRisk = 'yellow';
-    var ggt_alc = parseFloat((document.getElementById('c_ggt')||{}).value||'0') || 0;
-    var elevGGT = ggt_alc >= 50; // GGT ≥50 sugiere consumo crónico
-    var auditC = window._cAUDITC != null ? window._cAUDITC : null;
-    var auditCStr = auditC !== null ? ' AUDIT-C: '+auditC+' pts.' : '';
-    decisiones.push({urgencia:'programada', texto:'Consumo de alcohol → AUDIT-C'+auditCStr+(auditC>=4?' intervención breve indicada':auditC>=8?' derivar programa dependencia':' consejo breve')+(elevGGT?' (GGT elevada refuerza sospecha)':'')});
-    html += '<div class="c-result-card yellow">'
-      +'<div style="font-size:0.82rem;font-weight:700;color:#fbbf24;margin-bottom:4px;">Consumo de Alcohol reportado</div>'
-      +'<div style="font-size:0.75rem;color:var(--text-dim);">&#8594; <strong>OMS/MINSAL:</strong> Aplicar AUDIT completo (módulo Alcohol en APS). '
-      +(elevGGT?'GGT '+ggt_alc+' sugerente de consumo crónico. ':'')
-      +'Si AUDIT ≥8: intervención breve estructurada (5A). Si AUDIT ≥16: derivar a programa de dependencia. Si FIB-4 alto + alcohol: derivar hepatología preferente.'
-      +(auditC!==null?'<br>&#8594; AUDIT-C '+auditC+' pts: '+(auditC<=2?'bajo riesgo':auditC<=4?'riesgo moderado':auditC<=7?'consumo perjudicial':'dependencia probable'):'')
-      +'</div></div>';
+    var _alcCirrosis = _cMotivos.indexOf('cirrosis') > -1 || _cMotivos.indexOf('descompensacion') > -1;
+    if (_alcCirrosis) {
+      // Mensaje integrado más grave cuando hay cirrosis + alcohol
+      maxRisk = 'red';
+      esUrgenciaAguda = true;
+      var auditCAlc = window._cAUDITC != null ? window._cAUDITC : null;
+      var auditRecAlc = auditCAlc !== null ? (auditCAlc >= 8 ? 'derivar programa de dependencia (SENDA)' : 'intervención breve estructurada (5A)') : 'derivar programa de dependencia';
+      decisiones.push({urgencia:'urgente', texto:'Alcohol + Cirrosis — ABSTINENCIA TOTAL obligatoria. '+auditRecAlc+'. Evaluar Maddrey DF si GOT/Bili disponibles.'});
+      html += '<div class="c-result-card red">'
+        +'<div style="font-size:0.82rem;font-weight:700;color:#f87171;margin-bottom:4px;">🍷🏥 Alcohol + Cirrosis — Riesgo Máximo</div>'
+        +'<div style="font-size:0.75rem;color:var(--text-dim);">&#8594; <strong>ABSTINENCIA TOTAL obligatoria</strong> — no existe ninguna cantidad segura en cirrosis. Cualquier ingesta puede precipitar hepatitis alcohólica aguda o descompensación.'
+        +'<br>&#8594; Evaluar <strong>Maddrey DF</strong>: si tiene TP del paciente + TP control + Bilirrubina → usar calculadora en módulo Calculadoras. DF ≥32: mortalidad 35–50%, considerar corticoides.'
+        +'<br>&#8594; AUDIT-C obligatorio → '+(auditCAlc!==null?'AUDIT-C: '+auditCAlc+' pts — '+auditRecAlc:'aplicar AUDIT-C en módulo Alcohol')+'.'
+        +'<br>&#8594; <strong>Derivar a programa de dependencia alcohólica</strong> (SENDA/CESFAM) — la abstinencia es el tratamiento más efectivo disponible en APS.'
+        +'</div></div>';
+    } else {
+      // Mensaje estándar sin cirrosis
+      if (maxRisk === 'green') maxRisk = 'yellow';
+      var ggt_alc = parseFloat((document.getElementById('c_ggt')||{}).value||'0') || 0;
+      var elevGGT = ggt_alc >= 50;
+      var auditC = window._cAUDITC != null ? window._cAUDITC : null;
+      var auditCStr = auditC !== null ? 'AUDIT-C: '+auditC+' pts. ' : '';
+      var auditRec = auditC !== null ? (auditC >= 8 ? 'derivar programa dependencia' : auditC >= 4 ? 'intervención breve indicada' : 'consejo breve') : 'consejo breve';
+      decisiones.push({urgencia:'programada', texto:'Consumo de alcohol → '+auditCStr+auditRec+(elevGGT?' (GGT elevada refuerza sospecha)':'')});
+      html += '<div class="c-result-card yellow">'
+        +'<div style="font-size:0.82rem;font-weight:700;color:#fbbf24;margin-bottom:4px;">Consumo de Alcohol reportado</div>'
+        +'<div style="font-size:0.75rem;color:var(--text-dim);">&#8594; <strong>OMS/MINSAL:</strong> Aplicar AUDIT completo (módulo Alcohol en APS). '
+        +(elevGGT?'GGT '+ggt_alc+' U/L sugerente de consumo crónico. ':'')
+        +'Si AUDIT ≥8: intervención breve estructurada (5A). Si AUDIT ≥16: derivar a programa de dependencia. Si FIB-4 alto + alcohol: derivar hepatología preferente.'
+        +(auditC!==null?'<br>&#8594; AUDIT-C '+auditC+' pts: '+(auditC<=2?'bajo riesgo':auditC<=4?'riesgo moderado':auditC<=7?'consumo perjudicial':'dependencia probable'):'')
+        +'</div></div>';
+    }
   }
 
   // ── 6. Fallbacks ─────────────────────────────────────────────
@@ -18221,23 +18886,35 @@ function cRenderResultados() {
     var ggt_i  = parseFloat((document.getElementById('c_ggt') ||{}).value||'0') || 0;
     var inr_i  = parseFloat((document.getElementById('c_inr') ||{}).value||'0') || 0;
     // Gradación clínica según severidad (basado en EASL CPG Colestasis 2017 + AASLD)
-    var ictGrave   = bili_i >= 10 || fa_i >= 300 || ggt_i >= 300 || inr_i >= 1.5;
-    var ictModerada= bili_i >= 3  || fa_i >= 120 || ggt_i >= 120;
-    var ictLeve    = !ictGrave && !ictModerada; // Bili <3, FA <120, GGT <120 = patrón leve sin labs o indeterminado
+    // INR ≥1.5 solo clasifica como ictGrave si hay bili ≥5 (evitar falso positivo en cirrosis con disfunción sintética sin ictericia real)
+    var ictGrave   = bili_i >= 10 || fa_i >= 300 || ggt_i >= 300 || (inr_i >= 1.5 && bili_i >= 5);
+    var ictModerada= !ictGrave && (bili_i >= 3  || fa_i >= 120 || ggt_i >= 120 || (inr_i >= 1.5 && bili_i >= 2));
+    var ictLeve    = !ictGrave && !ictModerada;
     maxRisk = 'red';
     if (ictGrave) {
       esUrgenciaAguda = true;
-      decisiones.push({ urgencia:'urgente', texto:'Ictericia severa (Bili ≥10 o FA/GGT ≥300 o INR ≥1.5) → descartar colangitis/hepatitis fulminante, derivar HOY' });
+      var graveTriggers = [];
+      if(bili_i >= 10) graveTriggers.push('Bili '+bili_i.toFixed(1)+' mg/dL');
+      if(fa_i >= 300) graveTriggers.push('FA '+fa_i+' U/L');
+      if(ggt_i >= 300) graveTriggers.push('GGT '+ggt_i+' U/L');
+      if(inr_i >= 1.5 && bili_i >= 5) graveTriggers.push('INR '+inr_i.toFixed(2)+' + Bili '+bili_i.toFixed(1));
+      var graveTrigStr = graveTriggers.length ? graveTriggers.join(', ') : 'labs graves';
+      decisiones.push({ urgencia:'urgente', texto:'Ictericia/colestasis severa ('+graveTrigStr+') → descartar colangitis/hepatitis fulminante, derivar HOY' });
       html += '<div class="c-result-card red">'
         +'<div style="font-size:0.82rem;font-weight:700;color:#f87171;margin-bottom:3px;">Ictericia severa / Colestasis grave</div>'
-        +'<div style="font-size:0.75rem;color:var(--text-dim);">&#8594; Bili ≥10 o FA/GGT ≥300 o INR ≥1.5. Descartar: colangitis aguda, hepatitis fulminante, obstrucción biliar completa. Ecografía urgente + derivar HOY o SU.</div>'
+        +'<div style="font-size:0.75rem;color:var(--text-dim);">&#8594; '+graveTrigStr+'. Descartar: colangitis aguda, hepatitis fulminante, obstrucción biliar completa. Ecografía urgente + derivar HOY o SU.</div>'
         +'</div>';
     } else if (ictModerada) {
       esUrgenciaAguda = true;
-      decisiones.push({ urgencia:'urgente', texto:'Ictericia moderada (Bili 3–9 o FA/GGT 3–7×VN) → hepatitis aguda / obstrucción parcial, derivar esta semana' });
+      var ictTriggers = [];
+      if(bili_i >= 3) ictTriggers.push('Bili '+bili_i.toFixed(1)+' mg/dL');
+      if(fa_i >= 120) ictTriggers.push('FA '+fa_i+' U/L (elevada)');
+      if(ggt_i >= 120) ictTriggers.push('GGT '+ggt_i+' U/L (elevada)');
+      var ictTrigStr = ictTriggers.length ? ictTriggers.join(', ') : 'labs elevados';
+      decisiones.push({ urgencia:'urgente', texto:'Colestasis/ictericia moderada ('+ictTrigStr+') → evaluar causa hepatobiliar, derivar en ≤7 días' });
       html += '<div class="c-result-card red">'
         +'<div style="font-size:0.82rem;font-weight:700;color:#fb923c;margin-bottom:3px;">Ictericia moderada / Colestasis significativa</div>'
-        +'<div style="font-size:0.75rem;color:var(--text-dim);">&#8594; Bili 3–9 mg/dL o FA/GGT elevadas. Solicitar ecografía biliopancreática + labs: hepatitis viral, perfil hepático completo, bilirrubina fraccionada. Derivar a gastroenterología/medicina interna en ≤7 días — el especialista evaluará necesidad de ERCP u otras intervenciones.</div>'
+        +'<div style="font-size:0.75rem;color:var(--text-dim);">&#8594; '+ictTrigStr+'. Solicitar ecografía biliopancreática + labs: hepatitis viral, perfil hepático completo, bilirrubina fraccionada. Derivar a gastroenterología/medicina interna en ≤7 días — el especialista evaluará necesidad de ERCP u otras intervenciones.</div>'
         +'</div>';
     } else {
       // Ictericia leve o sin labs → PREFERENTE
@@ -18962,7 +19639,13 @@ function cGenerarResumen() {
       };
       if (fib4 !== null) _snap.scores.fib4 = parseFloat(fib4.toFixed(2));
       if (meld !== null) _snap.scores.meld = meld;
-      var _snap_labMap = {bili:'c_bili',creat:'c_cr',alb:'c_alb',inr:'c_inr',plaq:'c_plt',ast:'c_ast',alt:'c_alt'};
+      var _snap_labMap = {
+        ast:'c_ast', alt:'c_alt', plaq:'c_plt',
+        bili:'c_bili', alb:'c_alb', inr:'c_inr',
+        creat:'c_cr', na:'c_na',
+        ggt:'c_ggt', fa:'c_fa',
+        gli:'c_gli', tg:'c_tg', hdl:'c_hdl', pas:'c_pas'
+      };
       Object.keys(_snap_labMap).forEach(function(field){
         var el=document.getElementById(_snap_labMap[field]);
         if(el){ var v=parseFloat(el.value); if(!isNaN(v)&&v>0) _snap.labs[field]=v; }
@@ -19012,6 +19695,10 @@ function cOmitirLabs() {
   ['ast','alt','plt','alb','bili','inr','cr','na','ggt','fa','gli','tg','hdl','pas'].forEach(function(k){ _labSession[k]=null; });
   var lc = document.getElementById('c-labs-container');
   if (lc) lc.innerHTML = '';
+  // FIX: eliminar bloque AUDIT-C (está fuera del container)
+  var oldAudit = document.getElementById('c-audit-c-block');
+  if (oldAudit) oldAudit.parentNode.removeChild(oldAudit);
+  window._cAUDITC = null;
   goConsultaStep(3);
 }
 
@@ -19049,6 +19736,13 @@ function resetConsulta() {
   // Limpiar DOM del contenedor de labs para evitar contaminación entre pacientes
   var _labsCont = document.getElementById('c-labs-container');
   if (_labsCont) _labsCont.innerHTML = '';
+  // FIX: eliminar bloque AUDIT-C (se inserta fuera del container, no se limpia con innerHTML)
+  var _auditBlock = document.getElementById('c-audit-c-block');
+  if (_auditBlock) _auditBlock.parentNode.removeChild(_auditBlock);
+  // Limpiar aviso de rango de labs
+  var _rangeWarn = document.getElementById('c-labs-range-warn');
+  if (_rangeWarn) _rangeWarn.style.display = 'none';
+  window._cAUDITC = null;
   // Limpiar banner paciente activo
   activePatientId = null;
   updateBanner();
@@ -19072,7 +19766,7 @@ function calcApsFIB4() {
     recom = 'Control anual. No requiere derivación por fibrosis.';
   } else if (fib4 <= cutHigh) {
     zona='ZONA INDETERMINADA — Considerar elastografía'; color='#fbbf24'; bg='rgba(251,191,36,0.08)';
-    recom = 'Derivar en 4–8 semanas para elastografía o biopsia.';
+    recom = 'Derivar en 4–8 semanas a hepatología para elastografía (el especialista decidirá si se requiere biopsia).';
   } else {
     zona='ALTO RIESGO — Fibrosis avanzada probable'; color='#f87171'; bg='rgba(248,113,113,0.08)';
     recom = 'Derivar urgente preferente a gastroenterología.';
@@ -19334,16 +20028,22 @@ function calcApsMELD() {
   else if (meld_na<25){zona='MELD alto'; color='#f97316'; bg='rgba(249,115,22,0.08)'; recom='Derivar hoy. Puede requerir hospitalización.';}
   else                {zona='MELD muy alto — descompensación grave'; color='#f87171'; bg='rgba(248,113,113,0.08)'; recom='Derivar a SU ahora. Riesgo vital elevado.';}
   el.style.display='block';
+  var _naWarn = isNaN(na)
+    ? '<div style="margin-top:8px;padding:6px 10px;background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.35);border-radius:6px;font-size:0.72rem;color:#fbbf24;">'
+      +'⚠️ <strong>Sodio no ingresado</strong> — resultado es MELD estándar, no MELD-Na. '
+      +'Ingrese el sodio sérico (campo «Sodio mEq/L») para obtener MELD-Na, que es más preciso en cirrosis con hiponatremia.</div>'
+    : '';
   el.innerHTML = '<div style="background:'+bg+';border:1px solid '+color+'44;border-radius:10px;padding:12px;">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
-    +'<div><span style="font-size:0.70rem;color:var(--text-muted);font-family:var(--font-mono);">MELD / MELD-Na</span>'
+    +'<div><span style="font-size:0.70rem;color:var(--text-muted);font-family:var(--font-mono);">'+(isNaN(na)?'MELD estándar (sin ajuste Na)':'MELD / MELD-Na')+'</span>'
     +'<div style="font-size:0.76rem;color:var(--text-muted);">Mortalidad 90 días</div></div>'
     +'<div style="text-align:right;">'
     +'<span style="font-size:0.70rem;color:var(--text-muted);">MELD </span><span style="font-size:1.28rem;font-weight:700;color:'+color+';">'+meld+'</span>'
-    +(!isNaN(na)?'  <span style="font-size:0.70rem;color:var(--text-muted);">MELD-Na </span><span style="font-size:1.6rem;font-weight:800;color:'+color+';">'+meld_na+'</span>':'')
+    +(!isNaN(na)?'&nbsp;&nbsp;<span style="font-size:0.70rem;color:var(--text-muted);">MELD-Na </span><span style="font-size:1.6rem;font-weight:800;color:'+color+';">'+meld_na+'</span>':'')
     +'</div></div>'
     +'<div style="font-size:0.83rem;font-weight:700;color:'+color+';margin-bottom:4px;">'+zona+'</div>'
-    +'<div style="font-size:0.76rem;color:var(--text-dim);">→ '+recom+'</div></div>';
+    +'<div style="font-size:0.76rem;color:var(--text-dim);">&#8594; '+recom+'</div>'
+    +_naWarn+'</div>';
 }
 
 function calcApsMaddrey() {
@@ -19369,6 +20069,105 @@ function calcApsMaddrey() {
     +'<div style="font-size:0.78rem;color:'+color+';">DF</div></div></div>'
     +'<div style="font-size:0.78rem;font-weight:700;color:'+color+';margin-bottom:4px;">'+zona+'</div>'
     +'<div style="font-size:0.74rem;color:var(--text-dim);">&#8594; '+recom+'</div></div>';
+}
+
+// ─── Prevención personalizada por motivo de consulta ─────────────
+function renderPrevencionPersonalizada() {
+  var el = document.getElementById('prev-personalizado');
+  if (!el) return;
+  var motivos = (typeof _cMotivos !== 'undefined') ? _cMotivos : [];
+  if (!motivos.length) { el.style.display = 'none'; return; }
+
+  var sections = [];
+
+  // MASLD / Transaminasas
+  if (motivos.indexOf('masld') > -1 || motivos.indexOf('transaminasas') > -1) {
+    sections.push({ icon:'🫀', color:'var(--teal)', title:'Control Metabólico — MASLD', items:[
+      'Reducción de peso <strong>≥7%</strong> del peso corporal — meta mínima; ≥10% para regresión histológica (EASL 2024)',
+      'Ejercicio aeróbico <strong>150–300 min/semana</strong> de intensidad moderada (caminar rápido, bicicleta, natación)',
+      'Eliminar bebidas azucaradas y fructosa añadida — principal desencadenante de esteatohepatitis',
+      'HbA1c <strong>&lt;7%</strong> en DM2 — control glucémico estricto reduce progresión de fibrosis',
+      'Café sin azúcar 1–2 tazas/día — efecto hepatoprotector demostrado (reduce riesgo fibrosis ≈30%)',
+      'Dieta mediterránea o baja en carbohidratos refinados — evidencia nivel A (EASL 2024)'
+    ]});
+  }
+
+  // Alcohol
+  if (motivos.indexOf('alcohol') > -1) {
+    sections.push({ icon:'🍷', color:'#f87171', title:'Abstinencia Alcohólica', items:[
+      '<strong>Abstinencia total</strong> — no existe dosis segura en hepatopatía alcohólica',
+      'Tiamina (B1) 100 mg/día × 3–5 días en bebedores crónicos, antes de reponer glucosa (prevenir Wernicke)',
+      'Si AUDIT-C ≥4: <strong>intervención breve</strong> en la consulta (5–10 min, técnica motivacional)',
+      'Si AUDIT-C ≥8 o dependencia clínica: derivar a <strong>programa de dependencia / psiquiatría</strong>',
+      'Informar recursos SENDA en CESFAM — apoyo familiar es factor protector demostrado',
+      'GOT/GPT a los 3 meses post-abstinencia para evaluar recuperación hepática'
+    ]});
+  }
+
+  // Cirrosis / Descompensación
+  if (motivos.indexOf('cirrosis') > -1 || motivos.indexOf('descompensacion') > -1) {
+    sections.push({ icon:'🏥', color:'#f97316', title:'Manejo en Cirrosis — Prevención de Descompensación', items:[
+      'Restricción de sodio <strong>&lt;2 g/día</strong> — no añadir sal, evitar conservas, embutidos y comida procesada',
+      'Cumplimiento estricto de diuréticos — no suspender ni modificar dosis sin indicación del especialista',
+      '<strong>Contraindicados absolutamente:</strong> AINEs (ibuprofeno, ketorolaco, naproxeno) — precipitan SHR',
+      'Paracetamol máximo <strong>2 g/día</strong> en cirrosis compensada (evitar en descompensada)',
+      'Vigilancia neurológica: cambios de orientación, inversión del sueño, desinhibición → sospecha EH',
+      'HCC: ecografía + AFP cada <strong>6 meses</strong> — GES N°72 Chile',
+      'Vacunación prioritaria: VHA (2 dosis), Influenza anual, Neumocócica 23v'
+    ]});
+  }
+
+  // Hepatitis viral
+  if (motivos.indexOf('vhb_vhc') > -1) {
+    sections.push({ icon:'🦠', color:'#60a5fa', title:'Hepatitis Viral — Prevención de Progresión', items:[
+      '<strong>Abstinencia alcohólica total</strong> — alcohol + VHB/VHC multiplica riesgo de cirrosis ×5',
+      'Vacunación VHA urgente si anti-VHA IgG negativo (solicitar serología antes de vacunar)',
+      'No compartir objetos de higiene personal (afeitadora, cortaúñas) — prevención contagio domiciliario',
+      'Contactos directos del hogar: notificar y enviar para serología VHB + vacunación si susceptibles',
+      'Monitorear carga viral + transaminasas según protocolo GES N°50 (VHB) / N°57 (VHC)',
+      'Evitar hepatotóxicos: herbolaria, anabolizantes, kava kava, suplementos sin regulación ISP'
+    ]});
+  }
+
+  // Ictericia
+  if (motivos.indexOf('ictericia') > -1) {
+    sections.push({ icon:'⚠️', color:'#fbbf24', title:'Ictericia — Consejería y Señales de Alarma', items:[
+      'Suspender todo hepatotóxico posible (fármacos no esenciales, herbolaria, suplementos)',
+      '<strong>Abstinencia alcohólica completa</strong> mientras persista la ictericia',
+      'Hidratación oral adecuada — mínimo 1.5 L agua/día si no hay restricción hídrica',
+      'Bilirrubina progresiva, coluria (orina oscura), acolia (deposición blanca), prurito → consultar en ≤48 h',
+      '<strong>Urgencia inmediata:</strong> confusión, sangrado, fiebre + ictericia → SAMU 131'
+    ]});
+  }
+
+  // Screening (solo si es el único motivo)
+  if (!sections.length && motivos.indexOf('screening') > -1) {
+    sections.push({ icon:'🔍', color:'var(--teal)', title:'Screening — Consejería Preventiva', items:[
+      'Alcohol: hombres ≤14 U/semana, mujeres ≤7 U/semana (1 U = 1 copa vino o 1 cerveza estándar)',
+      'IMC objetivo &lt;25 kg/m² — sobrepeso duplica riesgo de MASLD',
+      'Actividad física: 30 min/día mínimo 5 días a la semana',
+      'Control anual: perfil lipídico, glicemia en ayunas, presión arterial, peso y cintura',
+      'Si antecedente familiar de cirrosis o CHC: agregar GOT/GPT + ecografía abdominal anual'
+    ]});
+  }
+
+  if (!sections.length) { el.style.display = 'none'; return; }
+
+  var html = '<div style="background:rgba(0,212,160,0.07);border:1px solid rgba(0,212,160,0.28);border-radius:10px;padding:1rem 1.25rem;">'
+    +'<div style="font-size:0.79rem;font-weight:700;color:var(--teal);letter-spacing:0.05em;margin-bottom:0.85rem;">'
+    +'🎯 PLAN PREVENTIVO PERSONALIZADO — según motivo de consulta activo</div>';
+  sections.forEach(function(sec){
+    html += '<div style="margin-bottom:0.9rem;">'
+      +'<div style="font-size:0.82rem;font-weight:700;color:'+sec.color+';margin-bottom:0.3rem;">'+sec.icon+' '+sec.title+'</div>'
+      +'<ul style="margin:0;padding-left:1.2rem;font-size:0.80rem;color:var(--text-dim);line-height:1.8;">';
+    sec.items.forEach(function(item){ html += '<li>'+item+'</li>'; });
+    html += '</ul></div>';
+  });
+  html += '<div style="font-size:0.70rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:0.5rem;margin-top:0.25rem;">'
+    +'Las recomendaciones generales se muestran más abajo. Este panel se actualiza según el motivo de consulta activo.</div></div>';
+
+  el.innerHTML = html;
+  el.style.display = 'block';
 }
 
 // ─── Semáforo de derivación ───────────────────────────────────────
@@ -20751,8 +21550,13 @@ var _cie10Service = {
     return Promise.resolve(this._localSuggest(motivos, decisionTexts));
   },
   _localSuggest: function(motivos, texts) {
+    // Orden de prioridad clínica: diagnósticos específicos primero, inespecíficos al final
+    var priority = ['descompensacion','cirrosis','vhb_vhc','alcohol','masld','ictericia','transaminasas','screening'];
+    var sorted = (motivos||[]).slice().sort(function(a,b){
+      return priority.indexOf(a) - priority.indexOf(b);
+    });
     var results = [], seen = {};
-    (motivos||[]).forEach(function(m){
+    sorted.forEach(function(m){
       (_cie10Service._localMap[m]||[]).forEach(function(c){
         if(!seen[c.code]){ results.push(c); seen[c.code]=true; }
       });
@@ -20762,7 +21566,10 @@ var _cie10Service = {
       results.push({ code:'K74.0', desc:'Fibrosis hepática' });
     if (combined.indexOf('esteatohepatitis')!==-1 && !seen['K75.8'])
       results.push({ code:'K75.8', desc:'Otras hepatitis crónicas especificadas (MASH)' });
-    return results.slice(0, 3);
+    // Suprimir R74.0 (inespecífico) si ya hay código hepático específico presente
+    var hasSpecific = results.some(function(c){ return ['K74.6','K72.9','K70.3','B18.1','B18.2','K76.0'].indexOf(c.code) > -1; });
+    if (hasSpecific) results = results.filter(function(c){ return c.code !== 'R74.0'; });
+    return results.slice(0, 5);
   }
 };
 
