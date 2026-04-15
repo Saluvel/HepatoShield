@@ -1225,6 +1225,58 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
   from { opacity:0; transform:translateY(8px); }
   to   { opacity:1; transform:translateY(0); }
 }
+/* ═══ FEATURE: SEMÁFORO CLÍNICO APS ═══════════════════════════════ */
+#aps-semaforo{display:none;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);margin-bottom:12px;transition:all .3s;}
+#aps-semaforo.sema-verde{background:rgba(52,211,153,.07);border-color:rgba(52,211,153,.3);}
+#aps-semaforo.sema-amarillo{background:rgba(251,191,36,.07);border-color:rgba(251,191,36,.3);}
+#aps-semaforo.sema-rojo{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.3);}
+#aps-semaforo.sema-urgente{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.5);}
+.sema-luz{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex-shrink:0;}
+.sema-body{flex:1;min-width:0;}
+.sema-label{font-size:.68rem;font-family:var(--font-mono);color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;}
+.sema-title{font-size:.88rem;font-weight:800;margin:1px 0;}
+.sema-action{font-size:.74rem;color:var(--text-dim);}
+.sema-accion-btn{font-size:.68rem;font-family:var(--font-mono);border-radius:6px;padding:4px 10px;cursor:pointer;font-weight:700;flex-shrink:0;white-space:nowrap;}
+/* ═══ FEATURE: WIZARD ¿QUÉ HAGO AHORA? ═════════════════════════════ */
+#modal-wizard-aps{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9000;align-items:center;justify-content:center;padding:1rem;}
+#modal-wizard-aps.open{display:flex;}
+.wizard-box{background:var(--bg1);border:1px solid var(--border);border-radius:16px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.wizard-header{padding:14px 18px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.wizard-step-content{padding:18px;min-height:240px;}
+.wizard-footer{padding:10px 18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:8px;}
+.wizard-option{display:block;width:100%;text-align:left;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:8px;cursor:pointer;font-size:.84rem;color:var(--text);transition:all .15s;}
+.wizard-option:hover,.wizard-option.selected{background:rgba(0,212,160,.1);border-color:var(--teal);color:var(--teal);}
+.wizard-progress{display:flex;gap:5px;margin-bottom:14px;}
+.wizard-prog-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .2s;}
+.wizard-prog-dot.active{background:var(--teal);}
+.wizard-prog-dot.done{background:rgba(0,212,160,.45);}
+.wizard-recom-box{background:var(--bg2);border-radius:10px;padding:14px;margin-top:8px;}
+/* ═══ FEATURE: CARTA DE DERIVACIÓN ══════════════════════════════════ */
+#modal-carta-der{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9000;align-items:center;justify-content:center;padding:1rem;}
+#modal-carta-der.open{display:flex;}
+.carta-box{background:var(--bg1);border:1px solid var(--border);border-radius:16px;width:100%;max-width:580px;max-height:92vh;overflow-y:auto;}
+.carta-header{padding:14px 18px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.carta-body{padding:14px 18px;}
+#carta-der-text{font-family:var(--font-mono);font-size:.78rem;color:var(--text-dim);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;min-height:300px;width:100%;resize:vertical;box-sizing:border-box;line-height:1.75;}
+.carta-footer{padding:10px 18px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;}
+/* ═══ FEATURE: CHECKLIST PRE-DERIVACIÓN ═════════════════════════════ */
+.der-checklist{margin-top:12px;background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:12px 14px;display:none;}
+.der-checklist.visible{display:block;}
+.der-checklist-title{font-size:.70rem;font-family:var(--font-mono);color:#fbbf24;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.der-cl-item{display:flex;align-items:center;gap:8px;font-size:.80rem;color:var(--text-dim);padding:3px 0;cursor:pointer;}
+.der-cl-item input[type=checkbox]{accent-color:var(--teal);width:14px;height:14px;cursor:pointer;}
+.der-cl-item.item-done{color:#34d399;}
+.der-cl-item.item-done input{accent-color:#34d399;}
+/* ═══ FEATURE: FICHA SESIÓN PERSISTENTE ═════════════════════════════ */
+#aps-sesion-banner{display:none;background:rgba(0,212,160,.07);border:1px solid rgba(0,212,160,.22);border-radius:10px;padding:10px 14px;margin-bottom:10px;}
+.sesion-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.sesion-nombre{font-size:.86rem;font-weight:700;color:var(--teal);}
+.sesion-scores{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px;}
+.sesion-badge{font-size:.66rem;font-family:var(--font-mono);background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.22);border-radius:4px;padding:2px 7px;color:#34d399;}
+/* ═══ FEATURE: BOTÓN COPIAR INLINE ══════════════════════════════════ */
+.copy-inline-btn{font-size:.70rem;font-family:var(--font-mono);background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.3);color:var(--teal);border-radius:6px;padding:4px 10px;cursor:pointer;font-weight:700;transition:all .15s;margin-top:8px;display:inline-block;}
+.copy-inline-btn:hover{background:rgba(0,212,160,.18);}
+.copy-inline-btn.copied{background:rgba(52,211,153,.18);border-color:#34d399;color:#34d399;}
 </style>
 
 <!-- Escudo pixelado → nítido -->
@@ -1569,6 +1621,7 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
   <button type="button" class="esp-nav-btn"         id="anb-pacinfo"      onclick="showView('aps-pacinfo')"><span class="dot" style="background:#38bdf8;"></span>📚&nbsp;Info&nbsp;Paciente</button>
   <button type="button" class="esp-nav-btn"         id="anb-resumen"      onclick="showView('aps-resumen')"><span class="esp-nav-icon">📋</span>Resumen&nbsp;/&nbsp;PDF</button>
   <button type="button" class="esp-nav-btn"         id="anb-quickmode"    onclick="toggleQuickModeBar()" style="border-color:rgba(251,191,36,0.45);color:#fbbf24;"><span style="font-size:0.75rem;">⚡</span>&nbsp;Herramientas</button>
+  <button type="button" class="esp-nav-btn"         id="anb-wizard"       onclick="openWizardAPS()" style="border-color:rgba(0,212,160,0.5);color:var(--teal);font-weight:700;">🧭&nbsp;¿Qué hago?</button>
   </div>
   <div id="esp-nav" role="navigation" style="display:none;">
   <button type="button" class="esp-nav-btn active" id="enb-seguimiento"   onclick="switchEspTab('seguimiento')"><span class="esp-nav-dot" style="background:#00d4a0"></span>Seguimiento</button>
@@ -1751,6 +1804,21 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
      APS: MODO CONSULTA — Flujo guiado en 4 pasos
 ══════════════════════════════════════════════════════════ -->
 <div id="view-aps-consulta" class="view-panel" style="display:none;padding:0;">
+
+<!-- BANNER SESIÓN PERSISTENTE -->
+<div id="aps-sesion-banner">
+  <div class="sesion-row">
+    <div>
+      <div class="sema-label">SESIÓN GUARDADA</div>
+      <div class="sesion-nombre" id="sesion-nombre-display">—</div>
+      <div class="sesion-scores" id="sesion-scores-display"></div>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="restaurarSesionAPS()" style="background:rgba(0,212,160,0.15);border:1px solid rgba(0,212,160,0.35);color:var(--teal);border-radius:7px;padding:5px 12px;font-size:0.72rem;font-family:var(--font-mono);font-weight:700;cursor:pointer;">↩ Restaurar</button>
+      <button onclick="limpiarSesionAPS()" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:7px;padding:5px 12px;font-size:0.72rem;font-family:var(--font-mono);cursor:pointer;">✕ Nuevo</button>
+    </div>
+  </div>
+</div>
 
 <!-- Barra de progreso — flujo normal, sin sticky -->
 <div id="consulta-progress-bar" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:0.65rem 1.25rem;display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;">
@@ -2617,6 +2685,16 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
 
 <!-- NAV horizontal entre calculadoras APS -->
 <div style="display:flex;gap:6px;flex-wrap:wrap;padding:0.75rem 1.5rem;border-bottom:1px solid var(--border);overflow-x:auto;">
+  <!-- SEMÁFORO CLÍNICO -->
+  <div id="aps-semaforo">
+    <div class="sema-luz" id="aps-sema-icon">⚪</div>
+    <div class="sema-body">
+      <div class="sema-label">SEMÁFORO CLÍNICO · APS</div>
+      <div class="sema-title" id="aps-sema-title">Sin datos aún</div>
+      <div class="sema-action" id="aps-sema-action">Ingrese datos en cualquier calculadora para ver el resultado.</div>
+    </div>
+    <button class="sema-accion-btn" id="aps-sema-btn" style="display:none;"></button>
+  </div>
   <button class="aps-calc-tab active" id="apstab-fib4"      onclick="switchApsCalc('fib4')"    >📊 FIB-4</button>
   <button class="aps-calc-tab"        id="apstab-apri"      onclick="switchApsCalc('apri')"    >🔬 APRI</button>
   <button class="aps-calc-tab"        id="apstab-nfs"       onclick="switchApsCalc('nfs')"     >📉 NFS</button>
@@ -2888,6 +2966,16 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
         </div>
       </div>
       <div id="aps-derivar-result" style="display:none;margin-top:14px;"></div>
+      <!-- CHECKLIST PRE-DERIVACIÓN -->
+      <div class="der-checklist" id="aps-der-checklist">
+        <div class="der-checklist-title">✅ Checklist antes de derivar — ¿Tiene estos estudios?</div>
+        <div id="aps-der-cl-items"></div>
+        <div style="margin-top:8px;font-size:0.70rem;color:var(--text-muted);font-family:var(--font-mono);">💡 Completar estos estudios antes de derivar evita devoluciones por estudios incompletos.</div>
+      </div>
+      <!-- BOTÓN CARTA DERIVACIÓN -->
+      <div id="aps-der-carta-btn-wrap" style="display:none;margin-top:10px;">
+        <button onclick="generarCartaDerivar()" style="background:rgba(0,212,160,0.1);border:1px solid rgba(0,212,160,0.3);color:var(--teal);border-radius:8px;padding:8px 16px;font-size:0.78rem;font-family:var(--font-mono);font-weight:700;cursor:pointer;">📝 Generar Carta de Derivación</button>
+      </div>
     </div>
   </div>
 </div>
@@ -8990,6 +9078,7 @@ function loginAs(role, subRole) {
     var nw2 = document.getElementById('nav-wrapper');
     if(nw2) nw2.classList.add('active');
     setTimeout(initNavArrows, 100);
+    setTimeout(checkSesionAPS, 400);
   }
   // Show hamburger toggle for all roles (sidebar starts closed)
   var ham = document.getElementById('hdr-hamburger');
@@ -20525,6 +20614,9 @@ function calcApsFIB4() {
     zona='ALTO RIESGO — Fibrosis avanzada probable'; color='#f87171'; bg='rgba(248,113,113,0.08)';
     recom = 'Derivar urgente preferente a gastroenterología.';
   }
+  var semaLevel = fib4 < cutLow ? 'verde' : fib4 <= cutHigh ? 'amarillo' : 'rojo';
+  updateApsSemaforo(semaLevel, 'FIB-4 '+fib4.toFixed(2), null, recom);
+  var copyText = 'FIB-4: '+fib4.toFixed(2)+'\nInterpretación: '+zona+'\nRecomendación: '+recom+(age>65?'\n(Cortes ajustados >65a)':'');
   el.style.display='block';
   el.innerHTML = '<div style="background:'+bg+';border:1px solid '+color+'44;border-radius:10px;padding:12px;">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
@@ -20533,7 +20625,10 @@ function calcApsFIB4() {
     +'<div style="font-size:0.83rem;font-weight:700;color:'+color+';margin-bottom:4px;">'+zona+'</div>'
     +'<div style="font-size:0.76rem;color:var(--text-dim);">→ '+recom+'</div>'
     +(age>65?'<div style="font-size:0.76rem;color:var(--text-muted);margin-top:4px;">⚠️ Cortes ajustados para >65 años (EASL 2023)</div>':'')
+    +'<button class="copy-inline-btn" id="copy-btn-fib4" onclick="copyCalcResult(\''+copyText.replace(/'/g,"\\'")+'\',\'copy-btn-fib4\')">📋 Copiar resultado</button>'
     +'</div>';
+  window._lastFib4Score = fib4; window._lastFib4Level = semaLevel;
+  guardarSesionAPS();
 }
 
 // ─── APRI ─────────────────────────────────────────────────────────
@@ -20555,13 +20650,18 @@ function calcApsAPRI() {
     zona='Fibrosis avanzada probable (F3-F4)'; color='#f87171'; bg='rgba(248,113,113,0.08)';
     recom='Derivar urgente preferente a gastroenterología.';
   }
+  var semaLevelAPRI = apri < 0.5 ? 'verde' : apri <= 1.5 ? 'amarillo' : 'rojo';
+  updateApsSemaforo(semaLevelAPRI, 'APRI '+apri.toFixed(2), null, recom);
+  var copyTextAPRI = 'APRI: '+apri.toFixed(2)+'\nInterpretación: '+zona+'\nRecomendación: '+recom;
   el.style.display='block';
   el.innerHTML = '<div style="background:'+bg+';border:1px solid '+color+'44;border-radius:10px;padding:12px;">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
     +'<span style="font-size:0.70rem;color:var(--text-muted);font-family:var(--font-mono);">APRI</span>'
     +'<span style="font-size:1.4rem;font-weight:800;color:'+color+';">'+apri.toFixed(2)+'</span></div>'
     +'<div style="font-size:0.83rem;font-weight:700;color:'+color+';margin-bottom:4px;">'+zona+'</div>'
-    +'<div style="font-size:0.76rem;color:var(--text-dim);">→ '+recom+'</div></div>';
+    +'<div style="font-size:0.76rem;color:var(--text-dim);">→ '+recom+'</div>'
+    +'<button class="copy-inline-btn" id="copy-btn-apri" onclick="copyCalcResult(\''+copyTextAPRI.replace(/'/g,"\\'")+'\',\'copy-btn-apri\')">📋 Copiar resultado</button>'
+    +'</div>';
 }
 
 // ─── NFS ──────────────────────────────────────────────────────────
@@ -20587,13 +20687,18 @@ function calcApsNFS() {
     zona='Fibrosis avanzada probable (F3-F4)'; color='#f87171'; bg='rgba(248,113,113,0.08)';
     recom='Derivar urgente preferente a gastroenterología.';
   }
+  var semaLevelNFS = nfs < -1.455 ? 'verde' : nfs <= 0.676 ? 'amarillo' : 'rojo';
+  updateApsSemaforo(semaLevelNFS, 'NFS '+nfs.toFixed(3), null, recom);
+  var copyTextNFS = 'NFS: '+nfs.toFixed(3)+'\nInterpretación: '+zona+'\nRecomendación: '+recom;
   el.style.display='block';
   el.innerHTML = '<div style="background:'+bg+';border:1px solid '+color+'44;border-radius:10px;padding:12px;">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
     +'<span style="font-size:0.70rem;color:var(--text-muted);font-family:var(--font-mono);">NFS SCORE</span>'
     +'<span style="font-size:1.4rem;font-weight:800;color:'+color+';">'+nfs.toFixed(3)+'</span></div>'
     +'<div style="font-size:0.83rem;font-weight:700;color:'+color+';margin-bottom:4px;">'+zona+'</div>'
-    +'<div style="font-size:0.76rem;color:var(--text-dim);">→ '+recom+'</div></div>';
+    +'<div style="font-size:0.76rem;color:var(--text-dim);">→ '+recom+'</div>'
+    +'<button class="copy-inline-btn" id="copy-btn-nfs" onclick="copyCalcResult(\''+copyTextNFS.replace(/'/g,"\\'")+'\',\'copy-btn-nfs\')">📋 Copiar resultado</button>'
+    +'</div>';
 }
 
 // ─── IMC + Screening MASLD ────────────────────────────────────────
@@ -20979,6 +21084,10 @@ function calcApsDerivar() {
     return '<span style="font-size:0.73rem;background:rgba(255,255,255,0.05);border:1px solid '+color+'44;border-radius:4px;padding:2px 7px;color:'+color+';">'+(labels[v]||v)+'</span>';
   }).join(' ');
 
+  // Actualizar semáforo
+  var semaLevelDer = nivel===4 ? 'urgente' : nivel===3 ? 'rojo' : 'amarillo';
+  updateApsSemaforo(semaLevelDer, null, titulo, desc);
+
   el.style.display='block';
   el.innerHTML = '<div style="background:'+bg+';border:1px solid '+color+'55;border-radius:10px;padding:14px 16px;">'
     +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;">'
@@ -20990,6 +21099,12 @@ function calcApsDerivar() {
     +'<div style="display:flex;flex-wrap:wrap;gap:4px;">'+criteriosHTML+'</div>'
     +'<div style="margin-top:10px;font-size:0.70rem;color:var(--text-muted);font-family:var(--font-mono);">📚 GES N°88 MINSAL · Res. Exenta N°1452 · Vigente 01/12/2025</div>'
     +'</div>';
+
+  // Mostrar checklist y botón carta
+  mostrarChecklistDerivar(vals);
+  var cartaWrap = document.getElementById('aps-der-carta-btn-wrap');
+  if (cartaWrap) { cartaWrap.style.display='block'; window._lastDerivarVals=vals; window._lastDerivarNivel=nivel; window._lastDerivarTitulo=titulo; }
+  guardarSesionAPS();
 }
 
 
@@ -23400,6 +23515,587 @@ function pwaCambiarPin() {
   });
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// FEATURE 1: SEMÁFORO CLÍNICO APS
+// ═══════════════════════════════════════════════════════════════════════
+function updateApsSemaforo(nivel, scoreText, titulo, accion) {
+  var el = document.getElementById('aps-semaforo');
+  if (!el) return;
+  var iconos = { verde:'🟢', amarillo:'🟡', rojo:'🔴', urgente:'🚨' };
+  var colores = { verde:'#34d399', amarillo:'#fbbf24', rojo:'#f87171', urgente:'#ef4444' };
+  var titulos = {
+    verde:'BAJO RIESGO — Manejo en APS',
+    amarillo:'RIESGO MODERADO — Seguimiento activo',
+    rojo:'ALTO RIESGO — Derivar a especialista',
+    urgente:'URGENCIA — Derivar HOY al SU'
+  };
+  el.style.display = 'flex';
+  el.className = 'sema-' + nivel;
+  document.getElementById('aps-sema-icon').textContent = iconos[nivel];
+  var color = colores[nivel];
+  var titleEl = document.getElementById('aps-sema-title');
+  titleEl.textContent = (titulo || titulos[nivel]) + (scoreText ? ' · ' + scoreText : '');
+  titleEl.style.color = color;
+  var accionEl = document.getElementById('aps-sema-action');
+  accionEl.textContent = accion || '';
+  var btn = document.getElementById('aps-sema-btn');
+  if (nivel === 'rojo' || nivel === 'urgente') {
+    btn.style.display = 'inline-block';
+    btn.textContent = nivel === 'urgente' ? '🚨 Ver criterios' : '📋 ¿Cuándo derivar?';
+    btn.style.cssText = 'font-size:.68rem;font-family:var(--font-mono);border-radius:6px;padding:4px 10px;cursor:pointer;font-weight:700;flex-shrink:0;background:' + color + '18;border:1px solid ' + color + '44;color:' + color + ';';
+    btn.onclick = function() { showView('aps-calculadoras'); if(typeof switchApsCalc==='function') switchApsCalc('derivar'); };
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// FEATURE 2: COPIAR RESULTADO DE CALCULADORA
+// ═══════════════════════════════════════════════════════════════════════
+function copyCalcResult(text, btnId) {
+  var doFallback = function() {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+    } catch(e) {}
+    showToast('📋 Copiado', 'Resultado copiado al portapapeles.');
+    var btn = document.getElementById(btnId);
+    if (btn) { btn.textContent='✅ Copiado'; btn.classList.add('copied'); setTimeout(function(){ btn.textContent='📋 Copiar resultado'; btn.classList.remove('copied'); }, 2000); }
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      showToast('📋 Copiado', 'Resultado copiado al portapapeles.');
+      var btn = document.getElementById(btnId);
+      if (btn) { btn.textContent='✅ Copiado'; btn.classList.add('copied'); setTimeout(function(){ btn.textContent='📋 Copiar resultado'; btn.classList.remove('copied'); }, 2000); }
+    }).catch(doFallback);
+  } else { doFallback(); }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// FEATURE 4: CHECKLIST PRE-DERIVACIÓN
+// ═══════════════════════════════════════════════════════════════════════
+function mostrarChecklistDerivar(vals) {
+  var cl = document.getElementById('aps-der-checklist');
+  var clItems = document.getElementById('aps-der-cl-items');
+  if (!cl || !clItems) return;
+
+  var hasFib4 = vals.indexOf('fib4_alto') > -1 || vals.indexOf('nfs_alto') > -1;
+  var hasViral = vals.indexOf('vhb_vhc') > -1;
+  var hasCirrhosis = vals.some(function(v){ return ['child_b8','child_c','meld_na_15','eh_34','eh_2_recurrente','ascitis_refract','pbe','shr','hcc_prev'].indexOf(v) > -1; });
+  var fib4Already = window._lastFib4Score != null;
+
+  var items = [
+    { id:'cl_hemo', label:'Hemograma completo', done: false },
+    { id:'cl_pfh', label:'Perfil hepático (GOT, GPT, GGT, FA, Bili total y directa)', done: false },
+    { id:'cl_inr', label:'Tiempo de protrombina / INR', done: false },
+    { id:'cl_crea', label:'Creatinina y electrolitos séricos', done: false },
+    { id:'cl_alb', label:'Albúmina sérica', done: false },
+    { id:'cl_eco', label:'Ecografía abdominal', done: false },
+    { id:'cl_fib4', label:'FIB-4 calculado' + (fib4Already ? ' ✓ (ya calculado: '+(window._lastFib4Score||'').toFixed(2)+')' : ''), done: fib4Already }
+  ];
+
+  if (hasViral) {
+    items.push({ id:'cl_vhb', label:'HBsAg + Anti-HBc + Anti-VHC', done: false });
+    items.push({ id:'cl_cargaviral', label:'Carga viral (VHB o VHC según corresponda)', done: false });
+  }
+  if (hasCirrhosis) {
+    items.push({ id:'cl_eda', label:'Endoscopía digestiva alta (o referir con solicitud)', done: false });
+  }
+
+  var html = items.map(function(item){
+    return '<label class="der-cl-item' + (item.done ? ' item-done' : '') + '" id="wrap-'+item.id+'">'
+      + '<input type="checkbox" ' + (item.done ? 'checked' : '') + ' onchange="this.closest(\'.der-cl-item\').classList.toggle(\'item-done\',this.checked)">'
+      + item.label + '</label>';
+  }).join('');
+  clItems.innerHTML = html;
+  cl.classList.add('visible');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// FEATURE 3: CARTA DE DERIVACIÓN AUTOMÁTICA
+// ═══════════════════════════════════════════════════════════════════════
+function generarCartaDerivar() {
+  var modal = document.getElementById('modal-carta-der');
+  if (!modal) return;
+  modal.classList.add('open');
+  regenerarCarta();
+}
+
+function regenerarCarta() {
+  var ta = document.getElementById('carta-der-text');
+  if (!ta) return;
+  var s = localStorage.getItem('hsi_settings');
+  var settings = s ? JSON.parse(s) : {};
+  var doctor = settings.doctorName || 'Médico APS';
+  var inst = settings.instName || 'Centro de Salud';
+  var fecha = new Date().toLocaleDateString('es-CL', {day:'2-digit', month:'long', year:'numeric'});
+  var destino = (document.getElementById('carta-destino') || {}).value || 'gastroenterologia';
+  var destinoLabel = { gastroenterologia:'Gastroenterología', hepatologia:'Hepatología', urgencia:'Servicio de Urgencias' }[destino] || 'Gastroenterología';
+  var pacNombre = ((document.getElementById('carta-pac-nombre') || {}).value || '').trim() || 'Paciente';
+
+  var vals = window._lastDerivarVals || [];
+  var nivel = window._lastDerivarNivel || 2;
+  var titulo = window._lastDerivarTitulo || 'DERIVACIÓN PREFERENTE';
+  var urgencia = nivel === 4 ? 'URGENTE (derivar hoy)' : nivel === 3 ? 'Alta prioridad (≤30 días GES)' : 'Preferente (2–4 semanas)';
+
+  var labels = {
+    hda:'Hemorragia digestiva activa', ascitis_refract:'Ascitis refractaria', pbe:'Sospecha peritonitis bacteriana espontánea',
+    shr:'Sospecha síndrome hepatorrenal', eh_34:'Encefalopatía hepática Grado III-IV',
+    child_b8:'Child-Pugh B8 o superior', child_c:'Child-Pugh C', meld_na_15:'MELD-Na ≥15',
+    autoinmune:'Enfermedad autoinmune hepática (CBP/HAI/CEP)', eh_2_recurrente:'Encefalopatía hepática Grado II recurrente',
+    hcc_prev:'Antecedente personal de hepatocarcinoma',
+    fib4_alto:'FIB-4 >2.67 (fibrosis avanzada probable)', nfs_alto:'NFS >0.676 (fibrosis avanzada probable)',
+    vhb_vhc:'Hepatitis viral crónica confirmada (VHB/VHC)', transaminasas:'Transaminasas >3×VN persistentes >6 meses',
+    masld_fib:'MASLD con FIB-4 indeterminado >6 meses', hcc_nodulo:'Nódulo hepático >1cm en imágenes',
+    ictericia:'Ictericia progresiva (Bilirrubina >3 mg/dL)'
+  };
+  var criterios = vals.map(function(v){ return '  • ' + (labels[v] || v); }).join('\n');
+
+  var fib4Str = window._lastFib4Score != null ? '\nFIB-4: ' + window._lastFib4Score.toFixed(2) + ' (' + (window._lastFib4Level === 'rojo' ? 'alto riesgo' : window._lastFib4Level === 'amarillo' ? 'indeterminado' : 'bajo riesgo') + ')' : '';
+
+  var carta = 'INTERCONSULTA MÉDICA — ' + fecha.toUpperCase() + '\n';
+  carta += '═'.repeat(50) + '\n\n';
+  carta += 'DE:    ' + doctor + '\n';
+  carta += '       ' + inst + '\n\n';
+  carta += 'PARA:  Servicio de ' + destinoLabel + '\n\n';
+  carta += 'RE:    Derivación de paciente — ' + titulo + '\n';
+  carta += 'URGENCIA: ' + urgencia + '\n\n';
+  carta += '─'.repeat(50) + '\n';
+  carta += 'PACIENTE: ' + pacNombre + '\n';
+  carta += 'Fecha de evaluación: ' + fecha + '\n\n';
+  carta += 'MOTIVO DE DERIVACIÓN\n';
+  carta += '─'.repeat(30) + '\n';
+  carta += criterios + '\n\n';
+  if (fib4Str) { carta += 'SCORES CALCULADOS\n─'.repeat(1) + '─'.repeat(29) + '\n' + fib4Str.trim() + '\n\n'; }
+  carta += 'SOLICITUD\n';
+  carta += '─'.repeat(30) + '\n';
+  carta += 'Se solicita evaluación por ' + destinoLabel + ' para estudio y manejo\n';
+  carta += 'de la patología hepática descrita. El paciente fue informado\n';
+  carta += 'de la derivación y sus implicancias.\n\n';
+  carta += '─'.repeat(50) + '\n';
+  carta += doctor + '\n';
+  carta += inst + ' · ' + fecha + '\n';
+  carta += '📚 GES N°88 MINSAL · Res. Exenta N°1452 · Vigente 01/12/2025\n';
+  carta += 'HepatoShield Institucional v3.0 · Saluvel SPA';
+  ta.value = carta;
+  ta.removeAttribute('readonly');
+}
+
+function copiarCarta() {
+  var ta = document.getElementById('carta-der-text');
+  var btn = document.getElementById('btn-copiar-carta');
+  if (!ta) return;
+  var text = ta.value;
+  var doFallback = function() {
+    ta.select(); document.execCommand('copy');
+    showToast('📋 Carta copiada', 'Carta de derivación copiada al portapapeles.');
+    if (btn) { btn.textContent='✅ Copiada'; setTimeout(function(){ btn.textContent='📋 Copiar carta'; }, 2200); }
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      showToast('📋 Carta copiada', 'Carta de derivación copiada al portapapeles.');
+      if (btn) { btn.textContent='✅ Copiada'; setTimeout(function(){ btn.textContent='📋 Copiar carta'; }, 2200); }
+    }).catch(doFallback);
+  } else { doFallback(); }
+}
+
+function imprimirCarta() {
+  var ta = document.getElementById('carta-der-text');
+  if (!ta) return;
+  var w = window.open('', '_blank', 'width=680,height=800');
+  if (!w) return;
+  w.document.write('<html><head><title>Carta de Derivación</title><style>body{font-family:monospace;font-size:12px;margin:30px;line-height:1.7;color:#222;}pre{white-space:pre-wrap;}</style></head><body><pre>'+ta.value.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</pre><script>window.onload=function(){window.print();}<\/script></body></html>');
+  w.document.close();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// FEATURE 5: WIZARD ¿QUÉ HAGO AHORA?
+// ═══════════════════════════════════════════════════════════════════════
+var _wizardState = { step: 0, hallazgo: null, fib4: null, alarmas: [] };
+
+function openWizardAPS() {
+  _wizardState = { step: 1, hallazgo: null, fib4: null, alarmas: [] };
+  var modal = document.getElementById('modal-wizard-aps');
+  if (modal) { modal.classList.add('open'); wizardRender(); }
+}
+
+function closeWizardAPS() {
+  var modal = document.getElementById('modal-wizard-aps');
+  if (modal) modal.classList.remove('open');
+}
+
+function wizardBack() {
+  if (_wizardState.step > 1) { _wizardState.step--; wizardRender(); }
+}
+
+function wizardReiniciar() {
+  _wizardState = { step: 1, hallazgo: null, fib4: null, alarmas: [] };
+  wizardRender();
+}
+
+function wizardRender() {
+  var cont = document.getElementById('wizard-step-content');
+  var btnBack = document.getElementById('wizard-btn-back');
+  var btnRei = document.getElementById('wizard-btn-reiniciar');
+  if (!cont) return;
+  if (btnBack) btnBack.style.display = _wizardState.step > 1 && _wizardState.step < 4 ? 'inline-block' : 'none';
+  if (btnRei) btnRei.style.display = _wizardState.step === 4 ? 'inline-block' : 'none';
+
+  var prog = '';
+  for (var i = 1; i <= 4; i++) {
+    prog += '<div class="wizard-prog-dot ' + (i === _wizardState.step ? 'active' : i < _wizardState.step ? 'done' : '') + '"></div>';
+  }
+
+  if (_wizardState.step === 1) {
+    cont.innerHTML = '<div class="wizard-progress">' + prog + '</div>'
+      + '<div style="font-size:0.78rem;color:var(--text-muted);font-family:var(--font-mono);margin-bottom:10px;">PASO 1 DE 4 · HALLAZGO PRINCIPAL</div>'
+      + '<div style="font-size:0.92rem;font-weight:700;color:var(--text);margin-bottom:14px;">¿Cuál es el motivo/hallazgo de esta consulta?</div>'
+      + '<button class="wizard-option" onclick="wizardSelect1(\'transaminasas\')">🔬 Transaminasas elevadas (GOT/GPT)</button>'
+      + '<button class="wizard-option" onclick="wizardSelect1(\'esteatosis\')">🟡 Esteatosis hepática / MASLD en imágenes</button>'
+      + '<button class="wizard-option" onclick="wizardSelect1(\'cirrosis\')">🔴 Sospecha o diagnóstico de cirrosis</button>'
+      + '<button class="wizard-option" onclick="wizardSelect1(\'viral\')">🦠 Hepatitis viral (VHB o VHC confirmado)</button>'
+      + '<button class="wizard-option" onclick="wizardSelect1(\'screening\')">✅ Screening hepático de rutina</button>';
+  } else if (_wizardState.step === 2) {
+    var fib4Pre = window._lastFib4Score != null ? 'FIB-4 calculado: <strong style="color:var(--teal);">' + window._lastFib4Score.toFixed(2) + '</strong> — haga click en la opción correspondiente.' : 'Aún no calculado en esta sesión. Puede calcular en Calculadoras → FIB-4.';
+    cont.innerHTML = '<div class="wizard-progress">' + prog + '</div>'
+      + '<div style="font-size:0.78rem;color:var(--text-muted);font-family:var(--font-mono);margin-bottom:10px;">PASO 2 DE 4 · ÍNDICE FIB-4</div>'
+      + '<div style="font-size:0.92rem;font-weight:700;color:var(--text);margin-bottom:6px;">¿Cuál es el resultado del FIB-4?</div>'
+      + '<div style="font-size:0.76rem;color:var(--text-dim);margin-bottom:12px;">💡 ' + fib4Pre + '</div>'
+      + '<button class="wizard-option" onclick="wizardSelect2(\'bajo\')">🟢 Bajo — FIB-4 &lt;1.3 (o &lt;2.0 si &gt;65 años)</button>'
+      + '<button class="wizard-option" onclick="wizardSelect2(\'indeterminado\')">🟡 Indeterminado — FIB-4 entre 1.3 y 2.67</button>'
+      + '<button class="wizard-option" onclick="wizardSelect2(\'alto\')">🔴 Alto — FIB-4 &gt;2.67 (o &gt;4.0 si &gt;65 años)</button>'
+      + '<button class="wizard-option" onclick="wizardSelect2(\'nocalculado\')" style="border-style:dashed;">❓ No calculado aún</button>';
+  } else if (_wizardState.step === 3) {
+    cont.innerHTML = '<div class="wizard-progress">' + prog + '</div>'
+      + '<div style="font-size:0.78rem;color:var(--text-muted);font-family:var(--font-mono);margin-bottom:10px;">PASO 3 DE 4 · SÍNTOMAS DE ALARMA</div>'
+      + '<div style="font-size:0.92rem;font-weight:700;color:var(--text);margin-bottom:12px;">¿Presenta alguno de estos síntomas?</div>'
+      + '<div style="display:grid;gap:6px;margin-bottom:14px;">'
+      + '<label class="wizard-option" style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" id="wz_ictericia" style="accent-color:var(--teal);"> Ictericia (ojos o piel amarilla)</label>'
+      + '<label class="wizard-option" style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" id="wz_ascitis"> Ascitis (abdomen distendido)</label>'
+      + '<label class="wizard-option" style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" id="wz_hematemesis"> Hematemesis o melena (sangrado digestivo)</label>'
+      + '<label class="wizard-option" style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" id="wz_encefalo"> Confusión / desorientación (encefalopatía)</label>'
+      + '<label class="wizard-option" style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" id="wz_ninguno"> Ninguno de los anteriores</label>'
+      + '</div>'
+      + '<button onclick="wizardStep3Next()" style="width:100%;background:var(--teal);color:#000;border:none;border-radius:8px;padding:10px;font-weight:800;cursor:pointer;font-size:0.84rem;font-family:var(--font-mono);">Continuar →</button>';
+  } else if (_wizardState.step === 4) {
+    cont.innerHTML = '<div class="wizard-progress">' + prog + '</div>'
+      + '<div style="font-size:0.78rem;color:var(--text-muted);font-family:var(--font-mono);margin-bottom:10px;">PASO 4 DE 4 · RECOMENDACIÓN</div>'
+      + wizardGetRecomendacion();
+  }
+}
+
+function wizardSelect1(hallazgo) { _wizardState.hallazgo = hallazgo; _wizardState.step = 2; wizardRender(); }
+function wizardSelect2(fib4) { _wizardState.fib4 = fib4; _wizardState.step = 3; wizardRender(); }
+function wizardStep3Next() {
+  _wizardState.alarmas = [];
+  ['wz_ictericia','wz_ascitis','wz_hematemesis','wz_encefalo'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el && el.checked) _wizardState.alarmas.push(id.replace('wz_',''));
+  });
+  _wizardState.step = 4;
+  wizardRender();
+}
+
+function wizardGetRecomendacion() {
+  var h = _wizardState.hallazgo;
+  var f = _wizardState.fib4;
+  var a = _wizardState.alarmas || [];
+
+  // ── Banderas de alarma individuales ──────────────────────────────────────
+  var tieneAlarmas    = a.length > 0;
+  var tieneHematemesis= a.indexOf('hematemesis') > -1;
+  var tieneEncefalo   = a.indexOf('encefalo')    > -1;
+  var tieneAscitis    = a.indexOf('ascitis')     > -1;
+  var tieneIctericia  = a.indexOf('ictericia')   > -1;
+
+  // ── REGLAS CLÍNICAS (EASL CPG 2023 · GES N°88 · MINSAL Chile) ────────────
+  //
+  // NIVEL 1 — EMERGENCIA → SU HOY
+  //   Siempre: hematemesis/melena, encefalopatía grado III-IV
+  //   También: ascitis de nuevo inicio (posible 1ª descompensación cirrosis)
+  //            ictericia + ascitis (descompensación grave combinada)
+  //            cualquier alarma en cirrosis conocida
+  //
+  // NIVEL 2 — DERIVAR URGENTE ESPECIALISTA (≤2 semanas)
+  //   Ictericia sola progresiva, FIB-4 alto, cirrosis, hepatitis viral,
+  //   transaminasas >3xVN >6 meses con FIB-4 no bajo
+  //
+  // NIVEL 3 — ZONA GRIS → elastografía + control activo
+  //   FIB-4 indeterminado sin alarmas, MASLD/esteatosis sin alarmas
+  //
+  // NIVEL 4 — CALCULAR FIB-4 PRIMERO
+  //   Cuando no se ha calculado y no hay alarmas urgentes
+  //
+  // NIVEL 5 — BAJO RIESGO → control anual APS
+  //   SOLO si: FIB-4 bajo confirmado + sin ninguna alarma
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // PRINCIPIO FUNDAMENTAL: ningún síntoma de alarma (ascitis, ictericia,
+  // hematemesis, encefalopatía) puede terminar en "seguimiento ambulatorio" o
+  // "bajo riesgo". Cualquier alarma eleva el nivel mínimo a urgente.
+
+  var esEmergenciaSU = (
+    tieneHematemesis ||
+    tieneEncefalo    ||
+    tieneAscitis     ||                        // ascitis = descompensación hasta probar lo contrario
+    (tieneIctericia && tieneAlarmas && a.length > 1) || // ictericia + otra alarma
+    (h === 'cirrosis' && tieneAlarmas)         // cirrosis conocida + cualquier síntoma
+  );
+
+  var esDerivarUrgente = !esEmergenciaSU && (
+    tieneIctericia     ||                      // ictericia sola = siempre derivar
+    f === 'alto'       ||                      // FIB-4 > 2.67
+    h === 'cirrosis'   ||                      // diagnóstico de cirrosis
+    h === 'viral'      ||                      // hepatitis viral
+    (h === 'transaminasas' && f !== 'bajo' && f !== 'nocalculado')
+  );
+
+  var esZonaGris = !esEmergenciaSU && !esDerivarUrgente && (
+    f === 'indeterminado'                          ||
+    h === 'esteatosis'                             ||
+    (h === 'transaminasas' && f === 'nocalculado') ||
+    (h === 'transaminasas' && f === 'bajo')        // transaminasas leve + FIB-4 bajo → vigilar
+  );
+
+  var necesitaFib4 = !esEmergenciaSU && !esDerivarUrgente && !esZonaGris && f === 'nocalculado';
+
+  // ── Construir respuesta ──────────────────────────────────────────────────
+  var ico, color, titulo, pasos, contexto = '';
+
+  if (esEmergenciaSU) {
+    ico = '🚨'; color = '#ef4444';
+    titulo = 'DERIVAR HOY — SERVICIO DE URGENCIAS';
+
+    // Mensaje específico según causa real
+    var motivoSU = tieneHematemesis ? 'hemorragia digestiva activa (hematemesis / melena)'
+      : tieneEncefalo ? 'encefalopatía hepática (confusión / desorientación)'
+      : tieneAscitis  ? 'ascitis de nueva aparición o en aumento (posible descompensación hepática aguda)'
+      : (tieneIctericia && h === 'cirrosis') ? 'ictericia + cirrosis conocida (posible insuficiencia hepática aguda)'
+      : 'síntomas de descompensación hepática';
+
+    pasos = [
+      'Derivar de forma INMEDIATA al Servicio de Urgencias hospitalario.',
+      'No esperar turno ni interconsulta ambulatoria. Derivar hoy.',
+      'Comunicar al SU el motivo: ' + motivoSU + '.',
+      'Adjuntar últimos exámenes disponibles (especialmente INR, creatinina, bilirrubina).',
+      tieneAscitis ? 'Si el paciente tiene ascitis tensa: valorar paracentesis diagnóstica en SU.' : '',
+      tieneEncefalo ? 'Evitar sedantes / benzodiazepinas en el traslado.' : '',
+      'GES N°88: cirrosis descompensada tiene garantía de atención inmediata en SU.'
+    ].filter(Boolean);
+
+  } else if (esDerivarUrgente) {
+    ico = '🔴'; color = '#f87171';
+    titulo = 'DERIVAR A ESPECIALISTA — PRIORIDAD ALTA';
+    pasos = [
+      'Gestionar interconsulta a gastroenterología / hepatología preferente.',
+      f === 'alto' ? 'FIB-4 > 2.67: fibrosis avanzada probable. Derivar en ≤4 semanas.' : '',
+      h === 'viral' ? 'Hepatitis viral crónica: solicitar carga viral y genotipo antes de la derivación.' : '',
+      tieneIctericia ? 'Ictericia progresiva: solicitar bilirrubina total y fraccionada, ecografía biliopancreática.' : '',
+      (h === 'cirrosis' && !tieneAlarmas) ? 'Cirrosis estable: derivar en ≤30 días (garantía GES N°88).' : '',
+      'Completar checklist de estudios antes de derivar (ver sección Calculadoras).',
+      'GES N°88 garantiza atención por especialista ≤30 días desde indicación médica.'
+    ].filter(Boolean);
+
+  } else if (esZonaGris) {
+    ico = '🟡'; color = '#fbbf24';
+    titulo = 'ZONA GRIS — SEGUIMIENTO ACTIVO EN APS';
+    pasos = [
+      f === 'indeterminado' ? 'FIB-4 indeterminado: repetir en 6 meses o solicitar elastografía.' : '',
+      h === 'esteatosis' ? 'MASLD confirmado: calcular FIB-4 y NFS si aún no se ha hecho.' : '',
+      'Solicitar elastografía hepática transitoria (FibroScan®) si disponible.',
+      'Optimizar factores de riesgo: reducción de peso, control glicémico, lípidos, abstinencia alcohólica.',
+      'Control en APS en 3 meses con FIB-4, perfil hepático y ecografía.',
+      'Si el FIB-4 sube a >2.67 en el próximo control: derivar a especialista.'
+    ].filter(Boolean);
+
+  } else if (necesitaFib4) {
+    ico = '📊'; color = '#60a5fa';
+    titulo = 'CALCULAR FIB-4 PRIMERO';
+    pasos = [
+      'Ir a Calculadoras → FIB-4 e ingresar: edad, plaquetas (PLQ), GOT (AST) y GPT (ALT).',
+      'Si no tiene exámenes, solicitarlos hoy: hemograma completo + perfil hepático.',
+      'El resultado del FIB-4 definirá si se requiere derivación o solo seguimiento.',
+      'También puede calcular APRI y NFS como complemento diagnóstico.'
+    ];
+
+  } else {
+    // BAJO RIESGO — solo llega aquí si FIB-4 bajo y SIN ninguna alarma
+    ico = '🟢'; color = '#34d399';
+    titulo = 'BAJO RIESGO — MANEJO EN APS';
+    pasos = [
+      'FIB-4 bajo: fibrosis significativa poco probable en este momento.',
+      'Sin síntomas de alarma presentes.',
+      'Control preventivo anual con FIB-4, hemograma y perfil hepático completo.',
+      h === 'esteatosis' ? 'Continuar manejo de MASLD: dieta, ejercicio, control metabólico.' : '',
+      'Reforzar estilos de vida: reducción de peso, cero alcohol, actividad física.',
+      'Consultar antes del año si aparecen: ictericia, ascitis, sangrado digestivo o confusión.'
+    ].filter(Boolean);
+  }
+
+  // ── Renderizar ───────────────────────────────────────────────────────────
+  var esDerivar = esEmergenciaSU || esDerivarUrgente;
+  var pasosHTML = pasos.map(function(p, i){
+    return '<div style="display:flex;gap:8px;margin-bottom:6px;">'
+      + '<span style="color:'+color+';font-weight:700;flex-shrink:0;">'+(i+1)+'.</span>'
+      + '<span style="font-size:0.82rem;color:var(--text-dim);">'+p+'</span>'
+      + '</div>';
+  }).join('');
+
+  var btnsDer = esDerivar
+    ? '<button onclick="showView(\'aps-calculadoras\');if(typeof switchApsCalc===\'function\')switchApsCalc(\'derivar\');closeWizardAPS();" '
+      + 'style="background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.35);color:#f87171;border-radius:7px;padding:6px 14px;font-size:0.72rem;font-family:var(--font-mono);font-weight:700;cursor:pointer;">📋 Ver criterios derivación</button>'
+    : '';
+
+  return '<div class="wizard-recom-box" style="border:1px solid '+color+'33;">'
+    + '<div style="font-size:1.05rem;font-weight:800;color:'+color+';margin-bottom:10px;">'+ico+' '+titulo+'</div>'
+    + pasosHTML
+    + '</div>'
+    + '<div style="margin-top:8px;font-size:0.68rem;color:var(--text-muted);font-family:var(--font-mono);">📚 Basado en EASL CPG 2023 · GES N°88 MINSAL · Guías Chilenas de Hepatología</div>'
+    + '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">'
+    + btnsDer
+    + '<button onclick="closeWizardAPS();" style="background:var(--bg2);border:1px solid var(--border);color:var(--text-muted);border-radius:7px;padding:6px 14px;font-size:0.72rem;font-family:var(--font-mono);cursor:pointer;">Cerrar</button>'
+    + '</div>';
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// FEATURE 6: FICHA PACIENTE PERSISTENTE (localStorage)
+// ═══════════════════════════════════════════════════════════════════════
+var _LSK_SESSION = 'hsi_v3_aps_session';
+
+function guardarSesionAPS() {
+  try {
+    var data = {
+      fecha: new Date().toISOString(),
+      nombre: window._cNombreActual || window._lastConsultaNombre || null,
+      fib4: window._lastFib4Score || null,
+      fib4Level: window._lastFib4Level || null,
+      derivarVals: window._lastDerivarVals || [],
+      derivarNivel: window._lastDerivarNivel || null,
+      accion: window._lastConsultaAccion || null
+    };
+    localStorage.setItem(_LSK_SESSION, JSON.stringify(data));
+  } catch(e) {}
+}
+
+function checkSesionAPS() {
+  try {
+    var raw = localStorage.getItem(_LSK_SESSION);
+    if (!raw) return;
+    var data = JSON.parse(raw);
+    if (!data || (!data.fib4 && !data.nombre && (!data.derivarVals || data.derivarVals.length === 0))) return;
+    // Sólo mostrar si la sesión es de hoy
+    var hoy = new Date().toDateString();
+    var sesionDate = data.fecha ? new Date(data.fecha).toDateString() : null;
+    if (sesionDate && sesionDate !== hoy) return;
+
+    var banner = document.getElementById('aps-sesion-banner');
+    var nombreEl = document.getElementById('sesion-nombre-display');
+    var scoresEl = document.getElementById('sesion-scores-display');
+    if (!banner || !nombreEl || !scoresEl) return;
+
+    nombreEl.textContent = data.nombre || 'Paciente sin nombre registrado';
+    var badges = [];
+    if (data.fib4) badges.push('<span class="sesion-badge">FIB-4 ' + parseFloat(data.fib4).toFixed(2) + '</span>');
+    if (data.derivarNivel) badges.push('<span class="sesion-badge">Nivel derivación ' + data.derivarNivel + '</span>');
+    if (data.accion) badges.push('<span class="sesion-badge">' + data.accion.slice(0,30) + '</span>');
+    scoresEl.innerHTML = badges.join('');
+    banner.style.display = 'block';
+  } catch(e) {}
+}
+
+function restaurarSesionAPS() {
+  try {
+    var raw = localStorage.getItem(_LSK_SESSION);
+    if (!raw) return;
+    var data = JSON.parse(raw);
+    // Restaurar FIB-4 en campos si hay datos
+    if (data.fib4) {
+      window._lastFib4Score = data.fib4;
+      window._lastFib4Level = data.fib4Level;
+      updateApsSemaforo(data.fib4Level || 'amarillo', 'FIB-4 ' + parseFloat(data.fib4).toFixed(2), null, 'Sesión restaurada desde registro anterior.');
+    }
+    if (data.nombre) window._cNombreActual = data.nombre;
+    var banner = document.getElementById('aps-sesion-banner');
+    if (banner) banner.style.display = 'none';
+    showToast('↩ Sesión restaurada', 'Datos de la sesión anterior cargados correctamente.');
+    showView('aps-calculadoras');
+  } catch(e) {}
+}
+
+function limpiarSesionAPS() {
+  try { localStorage.removeItem(_LSK_SESSION); } catch(e) {}
+  window._lastFib4Score = null; window._lastFib4Level = null;
+  window._lastDerivarVals = []; window._lastDerivarNivel = null;
+  window._lastConsultaNombre = null;
+  var banner = document.getElementById('aps-sesion-banner');
+  if (banner) banner.style.display = 'none';
+  showToast('✕ Sesión limpiada', 'Listo para nuevo paciente.');
+}
+
 </script>
+
+<!-- ═══════════════════════════════════════════════════════
+     MODAL: WIZARD ¿QUÉ HAGO AHORA? — APS
+═══════════════════════════════════════════════════════ -->
+<div id="modal-wizard-aps" role="dialog" aria-modal="true">
+  <div class="wizard-box">
+    <div class="wizard-header">
+      <div>
+        <div style="font-size:0.68rem;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:0.08em;">ASISTENTE CLÍNICO · APS</div>
+        <div style="font-size:1rem;font-weight:800;color:var(--teal);">🧭 ¿Qué hago ahora?</div>
+      </div>
+      <button onclick="closeWizardAPS()" style="background:none;border:none;color:var(--text-muted);font-size:1.3rem;cursor:pointer;line-height:1;">✕</button>
+    </div>
+    <div class="wizard-step-content" id="wizard-step-content">
+      <!-- Contenido dinámico via JS -->
+    </div>
+    <div class="wizard-footer">
+      <button id="wizard-btn-back" onclick="wizardBack()" style="background:var(--bg2);border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:8px 16px;font-size:0.78rem;font-family:var(--font-mono);cursor:pointer;display:none;">← Atrás</button>
+      <div></div>
+      <button id="wizard-btn-reiniciar" onclick="wizardReiniciar()" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:8px 14px;font-size:0.72rem;font-family:var(--font-mono);cursor:pointer;display:none;">🔄 Reiniciar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MODAL: CARTA DE DERIVACIÓN AUTOMÁTICA — APS
+═══════════════════════════════════════════════════════ -->
+<div id="modal-carta-der" role="dialog" aria-modal="true">
+  <div class="carta-box">
+    <div class="carta-header">
+      <div>
+        <div style="font-size:0.68rem;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:0.08em;">CARTA CLÍNICA · APS</div>
+        <div style="font-size:1rem;font-weight:800;color:var(--teal);">📝 Carta de Derivación</div>
+      </div>
+      <button onclick="document.getElementById('modal-carta-der').classList.remove('open')" style="background:none;border:none;color:var(--text-muted);font-size:1.3rem;cursor:pointer;line-height:1;">✕</button>
+    </div>
+    <div class="carta-body">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+        <div style="flex:1;min-width:140px;">
+          <div style="font-size:0.68rem;font-family:var(--font-mono);color:var(--text-muted);margin-bottom:4px;">NOMBRE PACIENTE (opcional)</div>
+          <input type="text" id="carta-pac-nombre" placeholder="Iniciales o nombre" class="inp" style="font-size:0.82rem;width:100%;box-sizing:border-box;">
+        </div>
+        <div style="flex:1;min-width:120px;">
+          <div style="font-size:0.68rem;font-family:var(--font-mono);color:var(--text-muted);margin-bottom:4px;">DESTINO</div>
+          <select id="carta-destino" class="inp" style="font-size:0.82rem;width:100%;box-sizing:border-box;" onchange="regenerarCarta()">
+            <option value="gastroenterologia">Gastroenterología</option>
+            <option value="hepatologia">Hepatología</option>
+            <option value="urgencia">Servicio de Urgencias</option>
+          </select>
+        </div>
+      </div>
+      <textarea id="carta-der-text" readonly></textarea>
+      <div style="margin-top:6px;font-size:0.68rem;color:var(--text-muted);font-family:var(--font-mono);">💡 Texto editable. Personalice antes de copiar o imprimir.</div>
+    </div>
+    <div class="carta-footer">
+      <button onclick="copiarCarta()" id="btn-copiar-carta" style="background:rgba(0,212,160,0.12);border:1px solid rgba(0,212,160,0.3);color:var(--teal);border-radius:8px;padding:8px 16px;font-size:0.78rem;font-family:var(--font-mono);font-weight:700;cursor:pointer;">📋 Copiar carta</button>
+      <button onclick="imprimirCarta()" style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;border-radius:8px;padding:8px 16px;font-size:0.78rem;font-family:var(--font-mono);font-weight:700;cursor:pointer;">🖨️ Imprimir</button>
+      <button onclick="document.getElementById('modal-carta-der').classList.remove('open')" style="margin-left:auto;background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:8px 14px;font-size:0.78rem;font-family:var(--font-mono);cursor:pointer;">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
