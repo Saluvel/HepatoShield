@@ -10642,6 +10642,18 @@ function loadDemoConsulta() {
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
       Object.keys(c.labs).forEach(function(k){ setV('c_'+k, c.labs[k]); });
+      // Disparar panel MASLD en tiempo real y validación de rangos
+      if (typeof cPreviewLab === 'function') cPreviewLab();
+      // Guardar en historial de laboratorios
+      var histVals = {};
+      var keyMap = { ast:'ast', alt:'alt', plt:'plt', ggt:'ggt', fa:'fa',
+                     bili:'bili', alb:'alb', inr:'inr', cr:'crea', na:'na',
+                     gli:'gli', tg:'tg', hdl:'hdl' };
+      Object.keys(c.labs).forEach(function(k){
+        var hk = keyMap[k]; if (hk) histVals[hk] = c.labs[k];
+      });
+      histVals.age = c.edad;
+      if (typeof _saveLabRecord === 'function') _saveLabRecord(histVals, 'Demo');
       // 5. Avanzar a paso 3 tras otro ciclo de pintura
       requestAnimationFrame(function(){
         goConsultaStep(3);
@@ -10789,6 +10801,25 @@ function loadDemoCompleto() {
   ];
 
   saveDB(); saveDerDB(); saveElastoDB();
+
+  // ── Poblar Historial de Laboratorios con evolución de 3 pacientes demo ──
+  // Muestra 3 trayectorias clínicas distintas: mejora, estabilidad, deterioro
+  var _labHistDemo = [];
+  var _demoHist = [
+    // ── TRAYECTORIA 1: María González Torres (DEMO-002) — MASLD mejorando con cambios de estilo de vida
+    { id:9001, fecha:d(210), source:'Demo · María G.', pacienteId:'DEMO-002', vals:{ ast:52, alt:68, plt:178, bili:0.9,  alb:4.1, inr:1.10, crea:0.80, na:139, ggt:82,  fa:95,  _fib4:2.45 }},
+    { id:9002, fecha:d(120), source:'Demo · María G.', pacienteId:'DEMO-002', vals:{ ast:45, alt:58, plt:185, bili:0.8,  alb:4.2, inr:1.08, crea:0.78, na:140, ggt:68,  fa:88,  _fib4:2.18 }},
+    { id:9003, fecha:d(45),  source:'Demo · María G.', pacienteId:'DEMO-002', vals:{ ast:42, alt:54, plt:190, bili:0.80, alb:4.3, inr:1.06, crea:0.76, na:140, ggt:55,  fa:82,  _fib4:2.10 }},
+    // ── TRAYECTORIA 2: Carlos Rodríguez Vega (DEMO-001) — Cirrosis MASLD, estable bajo control
+    { id:9004, fecha:d(120), source:'Demo · Carlos R.', pacienteId:'DEMO-001', vals:{ ast:95, alt:67, plt:88,  bili:2.1,  alb:3.4, inr:1.40, crea:0.90, na:137, ggt:145, fa:132, _fib4:5.12 }},
+    { id:9005, fecha:d(75),  source:'Demo · Carlos R.', pacienteId:'DEMO-001', vals:{ ast:88, alt:61, plt:92,  bili:1.9,  alb:3.5, inr:1.35, crea:0.90, na:138, ggt:128, fa:124, _fib4:4.89 }},
+    { id:9006, fecha:d(18),  source:'Demo · Carlos R.', pacienteId:'DEMO-001', vals:{ ast:82, alt:58, plt:98,  bili:1.6,  alb:3.7, inr:1.28, crea:0.85, na:139, ggt:112, fa:118, _fib4:4.67 }},
+    // ── TRAYECTORIA 3: Ana López Fuentes (DEMO-004) — VHB cirrosis descompensada, deterioro progresivo
+    { id:9007, fecha:d(82),  source:'Demo · Ana L.', pacienteId:'DEMO-004', vals:{ ast:142, alt:98,  plt:65, bili:5.2,  alb:2.7, inr:2.00, crea:1.40, na:133, ggt:210, fa:185, _fib4:5.82 }},
+    { id:9008, fecha:d(42),  source:'Demo · Ana L.', pacienteId:'DEMO-004', vals:{ ast:160, alt:112, plt:58, bili:6.1,  alb:2.5, inr:2.20, crea:1.60, na:130, ggt:235, fa:198, _fib4:6.14 }}
+  ];
+  localStorage.setItem(_LSK_LAB_HIST, JSON.stringify(_demoHist));
+
   window.renderPatientList && window.renderPatientList();
   window.renderLibrary && window.renderLibrary();
   window.renderLibrary2 && window.renderLibrary2();
@@ -20901,6 +20932,13 @@ function resetConsulta() {
   // Limpiar aviso de rango de labs
   var _rangeWarn = document.getElementById('c-labs-range-warn');
   if (_rangeWarn) _rangeWarn.style.display = 'none';
+  // Limpiar paneles dinámicos añadidos en paso 2 y 3
+  ['c-masld-criteria-panel','c-vhbvhc-banner','c-mini-decision','c-ges-alert'].forEach(function(id){
+    var el = document.getElementById(id); if (el && el.parentNode) el.parentNode.removeChild(el);
+  });
+  // Limpiar CIE-10 del paso 4
+  var _cie10El = document.getElementById('c-cie10-sugeridos'); if (_cie10El) _cie10El.innerHTML = '';
+  window._cCIE10Sugeridos = [];
   window._cAUDITC = null;
   // Limpiar banner paciente activo
   activePatientId = null;
@@ -24687,11 +24725,12 @@ function _loadLabHistory() {
   catch(e) { return []; }
 }
 
-function _saveLabRecord(vals, source) {
+function _saveLabRecord(vals, source, overridePacienteId) {
   if (!vals || Object.keys(vals).length === 0) return;
   var history = _loadLabHistory();
+  var pid = overridePacienteId !== undefined ? overridePacienteId : (_cPacienteId || null);
   var record  = { id: Date.now(), fecha: new Date().toISOString().slice(0,10),
-                  source: source || 'OCR', vals: {} };
+                  source: source || 'OCR', pacienteId: pid, vals: {} };
   // Copy all numeric lab values (skip 'age' as display row)
   var labKeys = Object.keys(_LAB_NORM_RANGES);
   labKeys.forEach(function(k) { if (vals[k] != null) record.vals[k] = vals[k]; });
@@ -24715,10 +24754,16 @@ function _deleteLabRecord(id) {
 }
 
 function _clearLabHistory() {
-  if (!confirm('¿Eliminar todo el historial de laboratorios? Esta acción no se puede deshacer.')) return;
-  localStorage.removeItem(_LSK_LAB_HIST);
+  var pid = _cPacienteId || null;
+  var all = _loadLabHistory();
+  var hasOwn = all.some(function(r){ return r.pacienteId === pid; });
+  if (!hasOwn) { showToast('Sin registros','No hay registros de este paciente para eliminar.'); return; }
+  var quien = pid ? (patientDB[pid] ? patientDB[pid].nombre : 'este paciente') : 'paciente sin registro';
+  if (!confirm('¿Eliminar todo el historial de ' + quien + '? Esta acción no se puede deshacer.')) return;
+  var kept = all.filter(function(r){ return r.pacienteId !== pid; });
+  localStorage.setItem(_LSK_LAB_HIST, JSON.stringify(kept));
   _renderLabHistory();
-  showToast('🗑 Historial borrado','Se eliminaron todos los registros.');
+  showToast('🗑 Historial borrado','Se eliminaron todos los registros del paciente.');
 }
 
 // ── Color coding ────────────────────────────────────────────────────
@@ -24777,13 +24822,31 @@ function _labTrend(prev, curr) {
 function _renderLabHistory() {
   var container = document.getElementById('lab-hist-container');
   if (!container) return;
-  var history = _loadLabHistory();
+  var pid = _cPacienteId || null;
+  var allHistory = _loadLabHistory();
+
+  // Filtrar por paciente activo
+  var history = allHistory.filter(function(r){
+    return r.pacienteId === pid;
+  });
+
+  // Sin paciente activo
+  if (pid === null) {
+    container.innerHTML =
+      '<div style="text-align:center;padding:36px 16px;color:var(--text-muted);font-size:.80rem;font-family:var(--font-mono);">'
+      +'<div style="font-size:2rem;margin-bottom:10px;">👤</div>'
+      +'<div style="font-weight:700;color:var(--text);margin-bottom:5px;">Sin paciente activo</div>'
+      +'<div>Inicie una consulta y seleccione un paciente para ver su historial evolutivo de laboratorios.</div>'
+      +'</div>';
+    return;
+  }
 
   if (history.length === 0) {
+    var pNombre = patientDB[pid] ? patientDB[pid].nombre : 'este paciente';
     container.innerHTML =
       '<div style="text-align:center;padding:36px 16px;color:var(--text-muted);font-size:.80rem;font-family:var(--font-mono);">'
       +'<div style="font-size:2rem;margin-bottom:10px;">📋</div>'
-      +'<div style="font-weight:700;color:var(--text);margin-bottom:5px;">Sin registros</div>'
+      +'<div style="font-weight:700;color:var(--text);margin-bottom:5px;">Sin registros para '+pNombre+'</div>'
       +'<div>Aplica un OCR o agrega un registro manual para comenzar el seguimiento longitudinal.</div>'
       +'</div>';
     return;
@@ -24851,8 +24914,9 @@ function _renderLabHistory() {
 
 // ── Copiar historial ───────────────────────────────────────────────
 function _copyLabHistory() {
-  var history = _loadLabHistory();
-  if (history.length === 0) { showToast('⚠️ Sin datos','El historial está vacío.'); return; }
+  var pid = _cPacienteId || null;
+  var history = _loadLabHistory().filter(function(r){ return r.pacienteId === pid; });
+  if (history.length === 0) { showToast('⚠️ Sin datos','No hay registros para este paciente.'); return; }
   var lines = ['HISTORIAL DE LABORATORIOS — HepatoShield Institucional v3.0', ''];
   var dates = history.map(function(r){ return r.fecha; });
   lines.push('Parámetro\t' + dates.join('\t'));
