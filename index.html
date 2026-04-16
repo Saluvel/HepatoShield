@@ -1277,6 +1277,79 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
 .copy-inline-btn{font-size:.70rem;font-family:var(--font-mono);background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.3);color:var(--teal);border-radius:6px;padding:4px 10px;cursor:pointer;font-weight:700;transition:all .15s;margin-top:8px;display:inline-block;}
 .copy-inline-btn:hover{background:rgba(0,212,160,.18);}
 .copy-inline-btn.copied{background:rgba(52,211,153,.18);border-color:#34d399;color:#34d399;}
+/* ═══ FEATURE: OCR LABORATORIOS ═════════════════════════════════════ */
+.ocr-drop-zone{border:2px dashed var(--border);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg2);}
+.ocr-drop-zone:hover,.ocr-drop-zone.drag-over{border-color:var(--teal);background:rgba(0,212,160,.06);}
+.ocr-drop-icon{font-size:2.4rem;margin-bottom:8px;}
+.ocr-drop-title{font-size:.92rem;font-weight:700;color:var(--text);margin-bottom:4px;}
+.ocr-drop-sub{font-size:.74rem;color:var(--text-muted);}
+.ocr-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px;}
+.ocr-btn{border-radius:8px;padding:8px 18px;font-size:.78rem;font-family:var(--font-mono);font-weight:700;cursor:pointer;border:none;}
+.ocr-btn-primary{background:var(--teal);color:#000;}
+.ocr-btn-outline{background:transparent;border:1px solid var(--teal)!important;color:var(--teal);}
+#ocr-preview-wrap{display:none;margin-top:14px;border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+#ocr-preview{width:100%;max-height:240px;object-fit:contain;background:#000;display:block;}
+#ocr-progress-wrap{display:none;margin-top:16px;}
+.ocr-progress-bg{background:var(--bg2);border-radius:100px;height:8px;overflow:hidden;margin:8px 0;}
+.ocr-progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),#00b8d4);border-radius:100px;transition:width .3s;width:0%;}
+#ocr-status-text{font-size:.72rem;font-family:var(--font-mono);color:var(--text-muted);}
+#ocr-results{display:none;margin-top:16px;}
+.ocr-tag{display:inline-block;font-size:.66rem;font-family:var(--font-mono);border-radius:4px;padding:2px 7px;margin:2px;}
+.ocr-tag-found{background:rgba(0,212,160,.12);border:1px solid rgba(0,212,160,.3);color:#34d399;}
+.ocr-tag-miss{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text-muted);}
+.ocr-table{width:100%;border-collapse:collapse;font-size:.80rem;}
+.ocr-table th{text-align:left;padding:5px 8px;font-size:.67rem;font-family:var(--font-mono);color:var(--text-muted);border-bottom:1px solid var(--border);}
+.ocr-table td{padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.04);}
+.ocr-val-input{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:3px 7px;font-size:.80rem;color:var(--text);width:88px;}
+.ocr-val-input.detected{border-color:rgba(0,212,160,.45);}
+#ocr-raw-wrap{display:none;margin-top:10px;}
+#ocr-raw-text{font-family:var(--font-mono);font-size:.70rem;color:var(--text-muted);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;width:100%;min-height:120px;resize:vertical;box-sizing:border-box;}
+.ocr-apply-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);}
+.ocr-calc-badge{font-size:.68rem;font-family:var(--font-mono);background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.25);color:var(--teal);border-radius:4px;padding:2px 8px;}
+/* ═══ HISTORIAL DE LABORATORIOS ══════════════════════════════════════ */
+.lab-tabs{display:flex;gap:6px;margin-bottom:12px;}
+.lab-tab{flex:1;text-align:center;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);font-size:.78rem;font-family:var(--font-mono);font-weight:700;cursor:pointer;color:var(--text-muted);transition:all .15s;}
+.lab-tab.active{background:rgba(0,212,160,.12);border-color:var(--teal);color:var(--teal);}
+.lab-hist-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.lab-hist-table{border-collapse:collapse;min-width:100%;font-size:.76rem;}
+.lab-hist-table th{position:sticky;background:var(--bg1);padding:6px 10px;font-size:.66rem;font-family:var(--font-mono);color:var(--text-muted);border-bottom:2px solid var(--border);white-space:nowrap;text-align:center;}
+.lab-hist-table th.col-param{text-align:left;left:0;z-index:2;min-width:140px;}
+.lab-hist-table th.col-ref{text-align:center;min-width:80px;}
+.lab-hist-table td{padding:5px 10px;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap;}
+.lab-hist-table td.col-param{position:sticky;left:0;background:var(--bg1);font-size:.78rem;color:var(--text);font-weight:600;z-index:1;border-right:1px solid var(--border);}
+.lab-hist-table td.col-ref{text-align:center;font-size:.68rem;font-family:var(--font-mono);color:var(--text-muted);}
+.lab-hist-table td.col-val{text-align:center;border-radius:5px;font-weight:700;font-family:var(--font-mono);}
+.lv-normal{color:#34d399;}
+.lv-leve{color:#fbbf24;}
+.lv-alto{color:#fb923c;}
+.lv-critico{color:#f87171;}
+.lv-bajo{color:#60a5fa;}
+.lv-critico-bajo{color:#a78bfa;}
+.lv-ausente{color:var(--border);font-weight:400;}
+.lv-calc{color:#94a3b8;font-style:italic;}
+.trend-up{color:#f87171;font-size:.70rem;margin-left:2px;}
+.trend-down{color:#60a5fa;font-size:.70rem;margin-left:2px;}
+.trend-eq{color:var(--text-muted);font-size:.70rem;margin-left:2px;}
+.lab-entry-header{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 6px;}
+.lab-entry-date{font-size:.68rem;font-weight:700;color:var(--text);}
+.lab-entry-src{font-size:.60rem;font-family:var(--font-mono);color:var(--text-muted);}
+.lab-entry-del{font-size:.62rem;cursor:pointer;color:rgba(248,113,113,.5);padding:1px 4px;border-radius:3px;transition:.1s;}
+.lab-entry-del:hover{color:#f87171;background:rgba(248,113,113,.1);}
+.lab-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font-size:.68rem;}
+.lab-legend-item{display:flex;align-items:center;gap:4px;color:var(--text-muted);}
+.lab-legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+/* ── Modal Entrada Manual Labs ── */
+#modal-manual-lab{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:9100;align-items:center;justify-content:center;padding:1rem;}
+#modal-manual-lab.open{display:flex;}
+.manuallab-box{background:var(--bg1);border:1px solid var(--border);border-radius:16px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;}
+.manuallab-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid var(--border);}
+.manuallab-body{padding:18px 20px;}
+.manuallab-footer{display:flex;gap:8px;justify-content:flex-end;padding:12px 20px 16px;border-top:1px solid var(--border);}
+.manuallab-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-top:12px;}
+.manuallab-field label{display:block;font-size:.66rem;font-family:var(--font-mono);color:var(--text-muted);margin-bottom:3px;letter-spacing:.05em;}
+.manuallab-field input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:.82rem;color:var(--text);font-family:var(--font-mono);box-sizing:border-box;}
+.lab-note-input{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:3px 8px;font-size:.72rem;color:var(--text);font-family:var(--font-mono);width:100%;box-sizing:border-box;}
+.lab-hist-empty{text-align:center;padding:40px 20px;color:var(--text-muted);}
 </style>
 
 <!-- Escudo pixelado → nítido -->
@@ -1622,6 +1695,7 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
   <button type="button" class="esp-nav-btn"         id="anb-resumen"      onclick="showView('aps-resumen')"><span class="esp-nav-icon">📋</span>Resumen&nbsp;/&nbsp;PDF</button>
   <button type="button" class="esp-nav-btn"         id="anb-quickmode"    onclick="toggleQuickModeBar()" style="border-color:rgba(251,191,36,0.45);color:#fbbf24;"><span style="font-size:0.75rem;">⚡</span>&nbsp;Herramientas</button>
   <button type="button" class="esp-nav-btn"         id="anb-wizard"       onclick="openWizardAPS()" style="border-color:rgba(0,212,160,0.5);color:var(--teal);font-weight:700;">🧭&nbsp;¿Qué hago?</button>
+  <button type="button" class="esp-nav-btn"         id="anb-ocr"          onclick="showView('aps-ocr')" style="border-color:rgba(96,165,250,0.5);color:#60a5fa;font-weight:700;">📷&nbsp;OCR&nbsp;Labs</button>
   </div>
   <div id="esp-nav" role="navigation" style="display:none;">
   <button type="button" class="esp-nav-btn active" id="enb-seguimiento"   onclick="switchEspTab('seguimiento')"><span class="esp-nav-dot" style="background:#00d4a0"></span>Seguimiento</button>
@@ -2043,6 +2117,7 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
 
   <div style="display:flex;gap:8px;flex-wrap:wrap;">
     <button type="button" class="btn btn-primary" onclick="cGenerarResumen()" style="font-size:0.86rem;">Generar Resumen</button>
+    <button type="button" class="btn btn-outline" onclick="cGenerarResumenPaciente()" style="font-size:0.82rem;border-color:rgba(96,165,250,.5);color:#60a5fa;" title="Hoja simple en lenguaje de paciente">📋 Para el paciente</button>
     <button type="button" class="btn btn-outline" onclick="showView('aps-cola')" style="font-size:0.86rem;">Ver Cola APS &#8594;</button>
     <button type="button" class="btn btn-outline" onclick="resetConsulta()" style="font-size:0.82rem;border-color:var(--text-muted);color:var(--text-muted);">&#10227; Nueva Consulta</button>
   </div>
@@ -2982,6 +3057,109 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
 
 </div>
 </div><!-- /view-aps-calculadoras -->
+
+<!-- ══════════════════════════════════════════════
+     APS: OCR LABORATORIOS
+══════════════════════════════════════════════ -->
+<div id="view-aps-ocr" class="view-panel" style="display:none;">
+  <div class="section-title" style="margin-bottom:.15rem;">📷 Laboratorios — OCR & Historial</div>
+  <div class="section-sub" style="margin-bottom:.75rem;">Lea exámenes con la cámara · Historial evolutivo · Alertas de alteraciones</div>
+
+  <!-- PESTAÑAS -->
+  <div class="lab-tabs">
+    <button class="lab-tab active" id="labtab-ocr"     onclick="switchLabTab('ocr')">📷 Subir / Leer Labs</button>
+    <button class="lab-tab"        id="labtab-historial" onclick="switchLabTab('historial')">📊 Historial Evolutivo</button>
+  </div>
+
+  <!-- PANEL OCR -->
+  <div id="labpanel-ocr">
+  <!-- ZONA DE CARGA -->
+  <div class="card" style="padding:1rem;margin-bottom:.75rem;">
+    <div class="ocr-drop-zone" id="ocr-drop-zone"
+         onclick="document.getElementById('ocr-file-input').click()"
+         ondragover="event.preventDefault();this.classList.add('drag-over')"
+         ondragleave="this.classList.remove('drag-over')"
+         ondrop="this.classList.remove('drag-over');handleOCRDrop(event)">
+      <div class="ocr-drop-icon">📋</div>
+      <div class="ocr-drop-title">Subir informe de laboratorio</div>
+      <div class="ocr-drop-sub">JPG · PNG · WEBP · Arrastra aquí o haz click</div>
+      <div class="ocr-btns">
+        <button class="ocr-btn ocr-btn-primary" onclick="event.stopPropagation();document.getElementById('ocr-file-input').click()">📁 Elegir archivo</button>
+        <button class="ocr-btn ocr-btn-outline" onclick="event.stopPropagation();document.getElementById('ocr-camera-input').click()">📷 Usar cámara</button>
+      </div>
+    </div>
+    <input type="file" id="ocr-file-input"   accept="image/*"         style="display:none" onchange="handleOCRFile(this)">
+    <input type="file" id="ocr-camera-input" accept="image/*" capture="environment" style="display:none" onchange="handleOCRFile(this)">
+
+    <!-- PREVIEW -->
+    <div id="ocr-preview-wrap">
+      <img id="ocr-preview" alt="Vista previa del informe">
+      <div style="padding:8px 12px;background:var(--bg2);font-size:.70rem;color:var(--text-muted);font-family:var(--font-mono);display:flex;justify-content:space-between;align-items:center;">
+        <span id="ocr-file-name">—</span>
+        <button onclick="resetOCRView()" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:.75rem;">✕ Quitar</button>
+      </div>
+    </div>
+
+    <!-- PROGRESO OCR -->
+    <div id="ocr-progress-wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <span style="font-size:.76rem;font-weight:700;color:var(--teal);font-family:var(--font-mono);">🔍 Procesando OCR...</span>
+        <span id="ocr-pct-text" style="font-size:.70rem;color:var(--text-muted);font-family:var(--font-mono);">0%</span>
+      </div>
+      <div class="ocr-progress-bg"><div class="ocr-progress-fill" id="ocr-progress-bar"></div></div>
+      <div id="ocr-status-text">Inicializando motor OCR...</div>
+      <div style="margin-top:6px;font-size:.68rem;color:var(--text-muted);">💡 Primera ejecución descarga ~10MB. Las siguientes son instantáneas.</div>
+    </div>
+  </div>
+
+  <!-- RESULTADOS -->
+  <div id="ocr-results"></div>
+
+  <!-- TEXTO RAW COLAPSABLE -->
+  <div id="ocr-raw-wrap">
+    <div style="font-size:.68rem;font-family:var(--font-mono);color:var(--text-muted);margin-bottom:4px;">TEXTO CRUDO DEL OCR (referencia)</div>
+    <textarea id="ocr-raw-text" readonly></textarea>
+  </div>
+
+  <!-- TIPS -->
+  <div style="margin-top:1rem;padding:10px 14px;background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2);border-radius:10px;font-size:.74rem;color:var(--text-dim);">
+    <strong style="color:#60a5fa;">💡 Consejos para mejor precisión:</strong><br>
+    • Foto en buena iluminación, sin sombras ni reflejos<br>
+    • Informe plano (no doblado). Si es digital: captura de pantalla directa<br>
+    • Compatible con Bupa, Integramédica, Red UC, ISP/FONASA y otros laboratorios chilenos<br>
+    • Los valores detectados son <u>editables</u> antes de aplicarlos — siempre verifique
+  </div>
+  </div><!-- /labpanel-ocr -->
+
+  <!-- PANEL HISTORIAL -->
+  <div id="labpanel-historial" style="display:none;">
+    <!-- Acciones superiores -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+      <div>
+        <div style="font-size:.70rem;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:.06em;">EVOLUCIÓN DE LABORATORIOS</div>
+        <div style="font-size:.88rem;font-weight:700;color:var(--text);">Tabla de seguimiento longitudinal</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button onclick="_addManualLabEntry()" style="background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.3);color:var(--teal);border-radius:7px;padding:6px 14px;font-size:.74rem;font-family:var(--font-mono);font-weight:700;cursor:pointer;">➕ Agregar manual</button>
+        <button onclick="_copyLabHistory()" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:7px;padding:6px 12px;font-size:.72rem;font-family:var(--font-mono);cursor:pointer;">📋 Copiar tabla</button>
+        <button onclick="_clearLabHistory()" style="background:transparent;border:1px solid rgba(248,113,113,.3);color:#f87171;border-radius:7px;padding:6px 12px;font-size:.72rem;font-family:var(--font-mono);cursor:pointer;">🗑 Limpiar</button>
+      </div>
+    </div>
+    <!-- Tabla -->
+    <div id="lab-hist-container"></div>
+    <!-- Leyenda -->
+    <div class="lab-legend">
+      <div class="lab-legend-item"><div class="lab-legend-dot" style="background:#34d399;"></div> Normal</div>
+      <div class="lab-legend-item"><div class="lab-legend-dot" style="background:#fbbf24;"></div> Leve (1–2×VN)</div>
+      <div class="lab-legend-item"><div class="lab-legend-dot" style="background:#fb923c;"></div> Moderado (2–3×VN)</div>
+      <div class="lab-legend-item"><div class="lab-legend-dot" style="background:#f87171;"></div> Crítico (&gt;3×VN)</div>
+      <div class="lab-legend-item"><div class="lab-legend-dot" style="background:#60a5fa;"></div> Bajo</div>
+      <div class="lab-legend-item"><span style="color:#f87171;font-size:.80rem;">↑</span> Subió</div>
+      <div class="lab-legend-item"><span style="color:#60a5fa;font-size:.80rem;">↓</span> Bajó</div>
+    </div>
+  </div><!-- /labpanel-historial -->
+
+</div>
 
 <!-- ══════════════════════════════════════════════
      APS: Resumen / PDF / Excel
@@ -16449,7 +16627,17 @@ function goConsultaStep(step) {
     if (panel) panel.style.display = (s === step) ? 'block' : 'none';
   }
   if (step === 2) cRenderLabs();
-  if (step === 3) cRenderResultados();
+  if (step === 3) {
+    // Propagar edad/sexo al módulo de calculadoras para uso posterior sin re-ingreso
+    var _edadSync = document.getElementById('c_edad');
+    var _sexoSync = document.getElementById('c_sexo');
+    if (_edadSync && _edadSync.value) {
+      ['aps_fib_age','aps_nfs_age'].forEach(function(fId){
+        var fEl = document.getElementById(fId); if (fEl && !fEl.value) fEl.value = _edadSync.value;
+      });
+    }
+    cRenderResultados();
+  }
   if (step === 4) {
     cRenderAcciones();
     // Inyectar CIE-10 si ya fueron calculados en paso 3
@@ -16547,6 +16735,23 @@ function cRenderLabs() {
   });
   container.innerHTML = html;
   container.style.gridTemplateColumns = toShow.length <= 4 ? '1fr 1fr' : '1fr 1fr 1fr';
+
+  // ── Panel MASLD live — criterios diagnósticos en tiempo real ──────────
+  var oldMasldP = document.getElementById('c-masld-criteria-panel');
+  if (oldMasldP) oldMasldP.parentNode.removeChild(oldMasldP);
+  if (_cMotivos.indexOf('masld') >= 0) {
+    var mpanel = document.createElement('div');
+    mpanel.id = 'c-masld-criteria-panel';
+    mpanel.style.cssText = 'margin-top:12px;padding:10px 14px;background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.2);border-radius:10px;';
+    mpanel.innerHTML = '<div style="font-size:.66rem;font-family:var(--font-mono);color:#fbbf24;letter-spacing:.06em;font-weight:700;margin-bottom:6px;">📊 CRITERIOS MASLD — EASL 2024 (se actualiza al ingresar valores)</div>'
+      + '<div id="c-masld-crit-body" style="font-size:.74rem;color:var(--text-muted);line-height:1.7;">Ingrese glicemia, triglicéridos, HDL y PA sistólica para evaluar criterios.</div>'
+      + '<div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(251,191,36,.15);font-size:.67rem;color:rgba(251,191,36,.55);">⚠️ Requiere IMC — asegúrese de ingresar peso y talla en el Paso 1.</div>';
+    var labsParent = container.parentNode || container;
+    labsParent.insertBefore(mpanel, container.nextSibling);
+    // Actualizar inmediatamente si hay valores previos
+    setTimeout(_updateMasldCriteriaLive, 80);
+  }
+
   // Inyectar valores de _labSession en campos recién creados (si no tienen valor)
   _prefillConsultaFields();
   // AUDIT-C integrado cuando motivo = alcohol
@@ -16631,6 +16836,66 @@ function cPreviewLab() {
   } else {
     warn.style.display = 'none';
   }
+  // Actualizar panel de criterios MASLD en tiempo real
+  _updateMasldCriteriaLive();
+}
+
+function _updateMasldCriteriaLive() {
+  var body = document.getElementById('c-masld-crit-body');
+  if (!body) return;
+  var sexo = (document.getElementById('c_sexo') || {}).value || 'M';
+  var peso = parseFloat((document.getElementById('c_peso') || {}).value);
+  var talla= parseFloat((document.getElementById('c_talla') || {}).value);
+  var cintura = parseFloat((document.getElementById('c_cintura') || {}).value);
+  var gli  = parseFloat((document.getElementById('c_gli') || {}).value);
+  var tg   = parseFloat((document.getElementById('c_tg')  || {}).value);
+  var hdl  = parseFloat((document.getElementById('c_hdl') || {}).value);
+  var pas  = parseFloat((document.getElementById('c_pas') || {}).value);
+
+  var imc = (!isNaN(peso) && !isNaN(talla) && talla > 0) ? peso / Math.pow(talla/100, 2) : null;
+  var imcOk = imc !== null && imc >= 23;
+
+  var criterios = [
+    { label: 'Glicemia ayuno ≥100 mg/dL', ok: !isNaN(gli) && gli >= 100, val: !isNaN(gli) ? gli+' mg/dL' : null },
+    { label: 'Triglicéridos ≥150 mg/dL',  ok: !isNaN(tg)  && tg  >= 150, val: !isNaN(tg)  ? tg+' mg/dL' : null },
+    { label: 'HDL bajo ('+(sexo==='F'?'<50':'<40')+' mg/dL)', ok: !isNaN(hdl) && hdl < (sexo==='F' ? 50 : 40), val: !isNaN(hdl) ? hdl+' mg/dL' : null },
+    { label: 'PA sistólica ≥130 mmHg',    ok: !isNaN(pas) && pas >= 130, val: !isNaN(pas) ? pas+' mmHg' : null },
+    { label: 'Cintura ≥'+(sexo==='F'?'80':'94')+' cm',  ok: !isNaN(cintura) && cintura >= (sexo==='F' ? 80 : 94), val: !isNaN(cintura) ? cintura+' cm' : null }
+  ];
+
+  var cumplidos = criterios.filter(function(c){ return c.ok; });
+  var conocidos = criterios.filter(function(c){ return c.val !== null; });
+  var imcLabel = imc ? 'IMC '+imc.toFixed(1)+' kg/m²' : 'IMC no calculado (ingrese peso y talla)';
+  var imcColor = imcOk ? '#34d399' : imc ? '#f87171' : '#94a3b8';
+  var imcIcon  = imcOk ? '✓' : imc ? '✗' : '?';
+
+  var html = '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">'
+    + '<span style="color:'+imcColor+';font-weight:700;">'+imcIcon+'</span>'
+    + '<span style="color:'+imcColor+';font-weight:600;">Requisito base: '+imcLabel+'</span></div>';
+
+  html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;">';
+  criterios.forEach(function(c) {
+    var col = c.val === null ? 'var(--border)' : c.ok ? '#34d399' : '#94a3b8';
+    var icon = c.val === null ? '?' : c.ok ? '✓' : '—';
+    html += '<span style="font-size:.70rem;border-radius:5px;padding:2px 8px;border:1px solid '+col+';color:'+col+';">'
+      + icon+' '+c.label+(c.val ? ' ('+c.val+')' : '') + '</span>';
+  });
+  html += '</div>';
+
+  var suficiente = imcOk && cumplidos.length >= 1;
+  var sinDatos = conocidos.length === 0;
+  if (sinDatos) {
+    html += '<div style="color:var(--text-muted);font-size:.72rem;">Ingrese los valores del laboratorio para evaluar criterios MASLD.</div>';
+  } else if (suficiente) {
+    html += '<div style="color:#34d399;font-weight:700;font-size:.76rem;">✓ MASLD confirmado — '+cumplidos.length+' criterio(s) metabólico(s) presentes + IMC ≥23</div>';
+  } else if (imcOk && cumplidos.length === 0) {
+    html += '<div style="color:#fbbf24;font-size:.72rem;">IMC cumplido. Sin criterios metabólicos confirmados — solicite glicemia, TG, HDL.</div>';
+  } else if (!imcOk && cumplidos.length >= 1) {
+    html += '<div style="color:#fb923c;font-size:.72rem;">'+cumplidos.length+' criterio(s) metabólico(s) — falta confirmar IMC ≥23 (ingrese peso y talla en Paso 1).</div>';
+  } else {
+    html += '<div style="color:var(--text-muted);font-size:.72rem;">Criterios insuficientes — complete los datos para evaluar MASLD.</div>';
+  }
+  body.innerHTML = html;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -19841,6 +20106,50 @@ function cRenderResultados() {
     });
   }
 
+  // ── VHB/VHC quick check — si hay transaminasas elevadas y no tiene ese motivo ──
+  var oldVhbBanner = document.getElementById('c-vhbvhc-banner');
+  if (oldVhbBanner) oldVhbBanner.parentNode.removeChild(oldVhbBanner);
+  var _astVal = parseFloat((document.getElementById('c_ast')||{}).value);
+  var _altVal = parseFloat((document.getElementById('c_alt')||{}).value);
+  var _hayTransaminasas = (!isNaN(_astVal) && _astVal > 40) || (!isNaN(_altVal) && _altVal > 40);
+  var _yaViral = _cMotivos.indexOf('vhb_vhc') >= 0;
+  if (_hayTransaminasas && !_yaViral) {
+    var vbanner = document.createElement('div');
+    vbanner.id = 'c-vhbvhc-banner';
+    vbanner.style.cssText = 'margin-top:0.6rem;padding:10px 14px;background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.3);border-radius:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;';
+    vbanner.innerHTML = '<div style="font-size:.76rem;color:#a78bfa;">'
+      + '<strong>¿Se descartó VHB y VHC?</strong> — Las guías EASL/MINSAL exigen serología viral en toda transaminasemia.'
+      + '</div>'
+      + '<div style="display:flex;gap:6px;">'
+      + '<button onclick="_cVhbcConfirm(true)" style="font-size:.70rem;font-family:var(--font-mono);font-weight:700;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.4);color:#a78bfa;border-radius:6px;padding:4px 12px;cursor:pointer;">✓ Sí, ya tiene serología</button>'
+      + '<button onclick="_cVhbcConfirm(false)" style="font-size:.70rem;font-family:var(--font-mono);font-weight:700;background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:6px;padding:4px 12px;cursor:pointer;">No — solicitar</button>'
+      + '</div>';
+    container.parentNode.insertBefore(vbanner, container.nextSibling);
+  }
+
+  // ── Mini-panel "¿Qué hago?" integrado al final del paso 3 ──────────────
+  var oldMiniWiz = document.getElementById('c-mini-decision');
+  if (oldMiniWiz) oldMiniWiz.parentNode.removeChild(oldMiniWiz);
+  var miniIcon = esUrgenciaAguda ? '🚨' : maxRisk === 'red' ? '🔴' : maxRisk === 'yellow' ? '🟡' : '🟢';
+  var miniColor = esUrgenciaAguda ? '#f87171' : maxRisk === 'red' ? '#fb923c' : maxRisk === 'yellow' ? '#fbbf24' : '#34d399';
+  var miniTitulo = esUrgenciaAguda ? 'DERIVAR HOY — Urgencia clínica' :
+                   maxRisk === 'red' ? 'DERIVAR PREFERENTE ≤30 días' :
+                   maxRisk === 'yellow' ? 'REQUIERE SEGUIMIENTO — Zona gris' :
+                   'BAJO RIESGO — Control en APS';
+  var miniTexto = decisiones.length
+    ? decisiones.map(function(d){ return '→ '+d.texto; }).join('<br>')
+    : '→ Sin hallazgos de alto riesgo. Control rutinario.';
+  var miniWiz = document.createElement('div');
+  miniWiz.id = 'c-mini-decision';
+  miniWiz.style.cssText = 'margin-top:0.75rem;padding:12px 16px;background:rgba(0,0,0,.25);border:1.5px solid '+miniColor+';border-radius:12px;';
+  miniWiz.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">'
+    + '<div style="font-size:.70rem;font-family:var(--font-mono);color:'+miniColor+';font-weight:800;letter-spacing:.08em;">¿QUÉ HAGO CON ESTE PACIENTE?</div>'
+    + '<button onclick="goConsultaStep(4)" style="font-size:.70rem;font-family:var(--font-mono);font-weight:700;background:'+miniColor+';color:#000;border:none;border-radius:6px;padding:3px 12px;cursor:pointer;">Ver acciones →</button>'
+    + '</div>'
+    + '<div style="font-size:.88rem;font-weight:800;color:'+miniColor+';margin-bottom:4px;">'+miniIcon+' '+miniTitulo+'</div>'
+    + '<div style="font-size:.74rem;color:var(--text-dim);line-height:1.7;">'+miniTexto+'</div>';
+  container.parentNode.appendChild(miniWiz);
+
   // ── Alerta GES automatizada ──────────────────────────────────
   var gesContainer = document.getElementById('c-ges-alert');
   if (!gesContainer) {
@@ -19932,13 +20241,20 @@ function cRenderAcciones() {
   }
 
   var html = '<div style="margin-bottom:8px;font-size:0.70rem;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:0.08em;">SELECCIONE LA ACCIÓN PARA ESTE PACIENTE</div>';
-  acciones.forEach(function(a) {
+  acciones.forEach(function(a, idx) {
+    var badge = idx === 0
+      ? '<span style="font-size:.60rem;font-family:var(--font-mono);font-weight:800;background:'+a.color+';color:#000;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:middle;">✓ RECOMENDADA</span>'
+      : '';
     html += '<button type="button" class="c-accion-btn" id="caccion-'+a.id+'" onclick="cSelAccion(\''+a.id+'\')">'
       +'<span style="width:10px;height:10px;border-radius:50%;background:'+a.color+';flex-shrink:0;display:inline-block;margin-right:8px;"></span>'
-      +'<div><div class="ca-label">'+a.label+'</div><div class="ca-desc">'+a.desc+'</div></div>'
+      +'<div style="flex:1;"><div class="ca-label">'+a.label+badge+'</div><div class="ca-desc">'+a.desc+'</div></div>'
       +'</button>';
   });
   container.innerHTML = html;
+  // Auto-seleccionar la primera acción recomendada
+  if (acciones.length > 0) {
+    setTimeout(function(){ cSelAccion(acciones[0].id); }, 80);
+  }
   _cAccionSeleccionada = null;
   var docPrev = document.getElementById('c-doc-preview');
   if (docPrev) { docPrev.innerHTML=''; docPrev.style.display='none'; }
@@ -24034,6 +24350,680 @@ function limpiarSesionAPS() {
   showToast('✕ Sesión limpiada', 'Listo para nuevo paciente.');
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// FEATURE: OCR DE LABORATORIOS
+// ═══════════════════════════════════════════════════════════════════════
+
+var _ocrLoading = false;
+var _ocrCurrentValues = {};
+
+// ── Carga lazy de Tesseract.js desde CDN ────────────────────────────
+function _loadTesseract(cb) {
+  if (window.Tesseract) { cb(); return; }
+  if (_ocrLoading) {
+    var t = setInterval(function(){ if(window.Tesseract){ clearInterval(t); cb(); }}, 300);
+    return;
+  }
+  _ocrLoading = true;
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js';
+  s.onload  = function(){ _ocrLoading = false; cb(); };
+  s.onerror = function(){ _ocrLoading = false; showToast('⚠️ Sin conexión','No se pudo cargar el motor OCR. Verifique su internet.'); };
+  document.head.appendChild(s);
+}
+
+// ── Manejo de archivo (input y drag&drop) ───────────────────────────
+function handleOCRFile(input) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+  if (!file.type.match(/^image\//)) {
+    showToast('⚠️ Formato','Solo se admiten imágenes (JPG, PNG, WEBP). Para PDF use captura de pantalla.'); return;
+  }
+  _processOCRFileObj(file);
+}
+function handleOCRDrop(ev) {
+  ev.preventDefault();
+  var file = ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files[0];
+  if (!file) return;
+  _processOCRFileObj(file);
+}
+function _processOCRFileObj(file) {
+  var nameEl = document.getElementById('ocr-file-name');
+  if (nameEl) nameEl.textContent = file.name;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var previewWrap = document.getElementById('ocr-preview-wrap');
+    var previewImg  = document.getElementById('ocr-preview');
+    if (previewWrap) previewWrap.style.display = 'block';
+    if (previewImg)  previewImg.src = e.target.result;
+    document.getElementById('ocr-results') && (document.getElementById('ocr-results').style.display='none');
+    document.getElementById('ocr-raw-wrap') && (document.getElementById('ocr-raw-wrap').style.display='none');
+    _runOCR(e.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── Motor OCR ────────────────────────────────────────────────────────
+function _runOCR(imageData) {
+  var progWrap = document.getElementById('ocr-progress-wrap');
+  var progBar  = document.getElementById('ocr-progress-bar');
+  var pctText  = document.getElementById('ocr-pct-text');
+  var statText = document.getElementById('ocr-status-text');
+  if (progWrap) progWrap.style.display = 'block';
+  if (progBar)  progBar.style.width = '0%';
+
+  _loadTesseract(function() {
+    Tesseract.recognize(imageData, 'spa+eng', {
+      logger: function(m) {
+        if (!statText) return;
+        if (m.status === 'loading language traineddata') {
+          statText.textContent = 'Cargando modelo de idioma español...';
+        } else if (m.status === 'initializing api') {
+          statText.textContent = 'Inicializando motor OCR...';
+        } else if (m.status === 'recognizing text') {
+          var p = Math.round((m.progress||0)*100);
+          if (progBar) progBar.style.width = p+'%';
+          if (pctText) pctText.textContent = p+'%';
+          statText.textContent = 'Reconociendo texto... '+p+'%';
+        }
+      }
+    }).then(function(res) {
+      if (progWrap) progWrap.style.display = 'none';
+      var text = res.data.text || '';
+      var rawEl = document.getElementById('ocr-raw-text');
+      if (rawEl) rawEl.value = text;
+      var vals = _parseLabText(text);
+      _ocrCurrentValues = vals;
+      _showOCRResults(vals);
+    }).catch(function(err) {
+      if (progWrap) progWrap.style.display = 'none';
+      showToast('❌ Error OCR', 'No se pudo procesar: '+(err.message||err));
+    });
+  });
+}
+
+// ── Parser de texto de laboratorio ──────────────────────────────────
+var _OCR_LABS = [
+  { key:'age',  name:'Edad',              unit:'años',      range:'',           icon:'👤',
+    re:/(?:Edad|Age)\s*[:\s]{0,5}(\d{1,3})\s*(?:años?|a\.?|years?)?(?:\s|$)/i },
+  { key:'ast',  name:'GOT / AST',         unit:'U/L',       range:'10–40',      icon:'🔬',
+    re:/(?:GOT|AST|Transaminasa\s+(?:Glut[aá]mico\s+)?Oxalo?a?c[eé]tica|Aspartato\s+Aminotransferasa|SGOT)[^0-9\n]{0,60}(\d{1,4}(?:[.,]\d{1,2})?)/i },
+  { key:'alt',  name:'GPT / ALT',         unit:'U/L',       range:'7–56',       icon:'🔬',
+    re:/(?:GPT|ALT|Transaminasa\s+(?:Glut[aá]mico\s+)?Pir[uú]vica|Alanino?\s+Aminotransferasa|SGPT)[^0-9\n]{0,60}(\d{1,4}(?:[.,]\d{1,2})?)/i },
+  { key:'plt',  name:'Plaquetas',         unit:'×10³/µL',   range:'150–400',    icon:'🩸',
+    re:/(?:Plaquetas|Recuento\s+(?:de\s+)?Plaquetas|PLT\b|Thrombocytes|Trombocitos)[^0-9\n]{0,60}(\d{2,6}(?:[.,]\d{1,2})?)/i },
+  { key:'bili', name:'Bilirrubina Total', unit:'mg/dL',     range:'0.2–1.2',    icon:'🟡',
+    re:/(?:Bilirrubina\s+Total|Bili(?:rrubina)?\s+T(?:otal)?\.?|BT\b)[^0-9\n]{0,60}(\d{1,2}(?:[.,]\d{1,2})?)/i },
+  { key:'alb',  name:'Albúmina',          unit:'g/dL',      range:'3.5–5.0',    icon:'🧪',
+    re:/(?:Alb[uú]mina|ALB\b)\s*(?:S[eé]rica|Plasm[aá]tica)?[^0-9\n]{0,60}(\d{1,2}(?:[.,]\d{1,2})?)/i },
+  { key:'inr',  name:'INR',               unit:'',          range:'0.9–1.1',    icon:'⏱',
+    re:/(?:INR\b|I\.N\.R\.|RIN\b|Normalized\s+Ratio)[^0-9\n]{0,40}(\d{1,2}(?:[.,]\d{1,3})?)/i },
+  { key:'crea', name:'Creatinina',        unit:'mg/dL',     range:'0.5–1.2',    icon:'🧪',
+    re:/(?:Creatinina|Creatinine|CREA\b)\s*(?:S[eé]rica|Plasm[aá]tica)?[^0-9\n]{0,60}(\d{1,2}(?:[.,]\d{1,3})?)/i },
+  { key:'na',   name:'Sodio (Na⁺)',       unit:'mEq/L',     range:'136–145',    icon:'⚗️',
+    re:/(?:Sodio\b|Sodium\b|Na\+?)\s*[^0-9\n]{0,40}(1[0-9]{2}(?:[.,]\d{1,2})?)/i },
+  { key:'ggt',  name:'GGT',              unit:'U/L',       range:'9–48',       icon:'🔬',
+    re:/(?:GGT\b|Gamma[\s\-]?(?:GT\b|Glutamil(?:transferasa)?)|γ[\s\-]?GT)[^0-9\n]{0,40}(\d{1,4}(?:[.,]\d{1,2})?)/i },
+  { key:'fa',   name:'Fosfatasa Alcalina',unit:'U/L',       range:'44–147',     icon:'🔬',
+    re:/(?:Fosfatasa\s+Alcalina|FA\b|ALP\b)[^0-9\n]{0,60}(\d{1,4}(?:[.,]\d{1,2})?)/i },
+  { key:'hb',   name:'Hemoglobina',       unit:'g/dL',      range:'12–16',      icon:'🩸',
+    re:/(?:Hemoglobina|Hb\b|HGB\b)[^0-9\n]{0,40}(\d{1,2}(?:[.,]\d{1,2})?)/i }
+];
+
+// Rangos de sanidad para evitar leer números de página como valores
+var _OCR_SANE = {
+  age:  [18,  100], ast:  [5,   3000], alt:  [5,   3000],
+  plt:  [5,   1500], bili: [0.1, 50  ], alb:  [1,   6   ],
+  inr:  [0.5, 15  ], crea: [0.1, 25  ], na:   [100, 180 ],
+  ggt:  [5,   3000], fa:   [10,  3000], hb:   [4,   22  ]
+};
+
+function _parseLabText(rawText) {
+  // Normalizar texto: comas → puntos decimales, espacios múltiples
+  var t = rawText.replace(/(\d),(\d)/g, '$1.$2').replace(/[ \t]+/g, ' ');
+  var result = {};
+  _OCR_LABS.forEach(function(lab) {
+    var m = t.match(lab.re);
+    if (!m || !m[1]) return;
+    var val = parseFloat(m[1].replace(',','.'));
+    if (isNaN(val)) return;
+    // Plaquetas: si valor > 2000 probablemente está en unidades absolutas → convertir a miles
+    if (lab.key === 'plt' && val > 2000) val = Math.round(val / 1000);
+    // Rango de sanidad
+    var range = _OCR_SANE[lab.key];
+    if (range && (val < range[0] || val > range[1])) return;
+    result[lab.key] = val;
+  });
+  return result;
+}
+
+// ── Mostrar resultados editables ─────────────────────────────────────
+function _showOCRResults(vals) {
+  var el = document.getElementById('ocr-results');
+  if (!el) return;
+  var found = Object.keys(vals).length;
+
+  if (found === 0) {
+    el.style.display = 'block';
+    el.innerHTML = '<div style="background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.3);border-radius:10px;padding:16px;text-align:center;">'
+      +'<div style="font-size:1.2rem;margin-bottom:6px;">🔍</div>'
+      +'<div style="font-size:.85rem;font-weight:700;color:#fbbf24;margin-bottom:4px;">No se detectaron valores de laboratorio</div>'
+      +'<div style="font-size:.76rem;color:var(--text-dim);">Intente con una foto más nítida, sin sombras ni reflejo.<br>También puede ingresar los valores manualmente en las calculadoras.</div>'
+      +'</div>';
+    document.getElementById('ocr-raw-wrap').style.display = 'block';
+    return;
+  }
+
+  // Calcular qué calculadoras se pueden rellenar
+  var calcsFIB4  = vals.ast && vals.alt && vals.plt;
+  var calcsAPRI  = vals.ast && vals.plt;
+  var calcsChild = vals.bili || vals.alb || vals.inr;
+  var calcsMELD  = vals.bili || vals.inr || vals.crea;
+  var calcsNFS   = vals.ast && vals.alt && vals.plt && vals.alb;
+  var calcsArr   = [];
+  if (calcsFIB4)  calcsArr.push('FIB-4');
+  if (calcsAPRI)  calcsArr.push('APRI');
+  if (calcsNFS)   calcsArr.push('NFS');
+  if (calcsChild) calcsArr.push('Child-Pugh');
+  if (calcsMELD)  calcsArr.push('MELD-Na');
+
+  // Tabla editable
+  var rows = _OCR_LABS.map(function(lab) {
+    var v = vals[lab.key];
+    var detected = v != null;
+    return '<tr>'
+      +'<td class="ocr-table-td" style="padding:6px 8px;color:var(--text);">'
+        +lab.icon+' <span style="font-size:.80rem;">'+lab.name+'</span></td>'
+      +'<td style="padding:6px 8px;">'
+        +'<input type="number" id="ocr_v_'+lab.key+'" value="'+(detected?v:'')+'" '
+        +'placeholder="—" step="0.01" class="ocr-val-input'+(detected?' detected':'')+'">'
+      +'</td>'
+      +'<td style="padding:6px 8px;font-size:.70rem;color:var(--text-muted);">'+lab.unit+'</td>'
+      +'<td style="padding:6px 8px;font-size:.68rem;color:var(--text-muted);font-family:var(--font-mono);">'
+        +(lab.range||'—')+'</td>'
+      +'<td style="padding:6px 8px;text-align:center;">'
+        +(detected?'<span style="color:#34d399;font-size:.80rem;">✅</span>':'<span style="color:var(--border);font-size:.75rem;">—</span>')
+      +'</td>'
+      +'</tr>';
+  }).join('');
+
+  el.style.display = 'block';
+  el.innerHTML =
+    '<div class="card" style="padding:1rem;">'
+    // Header
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;">'
+      +'<div>'
+        +'<div style="font-size:.70rem;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:.06em;">VALORES DETECTADOS</div>'
+        +'<div style="font-size:.92rem;font-weight:800;color:var(--teal);">✅ '+found+' parámetros extraídos</div>'
+      +'</div>'
+      +'<button onclick="document.getElementById(\'ocr-raw-wrap\').style.display=document.getElementById(\'ocr-raw-wrap\').style.display===\'none\'?\'block\':\'none\'" '
+        +'style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:7px;padding:4px 12px;font-size:.70rem;font-family:var(--font-mono);cursor:pointer;">📄 Texto OCR</button>'
+    +'</div>'
+    // Alerta edición
+    +'<div style="background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:7px;padding:7px 11px;margin-bottom:10px;font-size:.74rem;color:#fbbf24;">⚠️ Verifique los valores antes de aplicar. El OCR puede cometer errores. Corrija en los campos si es necesario.</div>'
+    // Tabla
+    +'<div style="overflow-x:auto;">'
+      +'<table class="ocr-table">'
+        +'<thead><tr>'
+          +'<th>Parámetro</th><th>Valor</th><th>Unidad</th><th>Rango ref.</th><th>OCR</th>'
+        +'</tr></thead>'
+        +'<tbody>'+rows+'</tbody>'
+      +'</table>'
+    +'</div>'
+    // Calculadoras que se pueden rellenar
+    +(calcsArr.length > 0
+      ? '<div style="margin-top:10px;font-size:.70rem;color:var(--text-muted);font-family:var(--font-mono);margin-bottom:6px;">SE RELLENARÁN AUTOMÁTICAMENTE:</div>'
+        +'<div>'+calcsArr.map(function(c){ return '<span class="ocr-calc-badge">'+c+'</span>'; }).join(' ')+'</div>'
+      : '')
+    // Botones acción
+    +'<div class="ocr-apply-bar">'
+      +'<button onclick="_applyOCRValues()" style="background:var(--teal);color:#000;border:none;border-radius:8px;padding:9px 22px;font-weight:800;font-size:.84rem;font-family:var(--font-mono);cursor:pointer;">⚡ Aplicar a calculadoras</button>'
+      +'<button onclick="resetOCRView()" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:8px 16px;font-size:.76rem;font-family:var(--font-mono);cursor:pointer;">🔄 Nueva imagen</button>'
+    +'</div>'
+    +'</div>';
+}
+
+// ── Aplicar valores a las calculadoras ───────────────────────────────
+function _applyOCRValues() {
+  // Leer valores editados de la tabla
+  var vals = {};
+  _OCR_LABS.forEach(function(lab) {
+    var el = document.getElementById('ocr_v_'+lab.key);
+    if (el && el.value !== '' && !isNaN(parseFloat(el.value))) {
+      vals[lab.key] = parseFloat(el.value);
+    }
+  });
+
+  if (Object.keys(vals).length === 0) {
+    showToast('⚠️ Sin valores','Ingrese al menos un valor para aplicar.'); return;
+  }
+
+  // Mapa campo → IDs de inputs en calculadoras
+  var fieldMap = {
+    age:  ['aps_fib_age',  'aps_nfs_age'],
+    ast:  ['aps_fib_ast',  'aps_apri_ast', 'aps_nfs_ast'],
+    alt:  ['aps_fib_alt',  'aps_nfs_alt'],
+    plt:  ['aps_fib_plt',  'aps_apri_plt', 'aps_nfs_plt'],
+    bili: ['aps_cp_bili',  'aps_meld_bili'],
+    alb:  ['aps_cp_alb',   'aps_nfs_alb'],
+    inr:  ['aps_cp_inr',   'aps_meld_inr'],
+    crea: ['aps_meld_cr'],
+    na:   ['aps_meld_na']
+  };
+
+  var applied = 0;
+  Object.keys(fieldMap).forEach(function(key) {
+    if (vals[key] == null) return;
+    fieldMap[key].forEach(function(fid) {
+      var el = document.getElementById(fid);
+      if (el) { el.value = vals[key]; applied++; }
+    });
+  });
+
+  // Disparar recálculo de calculadoras
+  if (vals.ast != null || vals.alt != null || vals.plt != null) {
+    try { calcApsFIB4(); } catch(e){}
+    try { calcApsAPRI(); } catch(e){}
+    try { calcApsNFS();  } catch(e){}
+  }
+  if (vals.bili != null || vals.alb != null || vals.inr != null) {
+    try { calcApsChildPugh(); } catch(e){}
+  }
+  if (vals.bili != null || vals.inr != null || vals.crea != null || vals.na != null) {
+    try { calcApsMELD(); } catch(e){}
+  }
+
+  // Guardar en sesión y en historial de labs
+  guardarSesionAPS();
+  _saveLabRecord(vals, 'OCR');
+
+  showToast('⚡ Valores aplicados',''+applied+' campos completados automáticamente en las calculadoras.');
+
+  // Navegar a FIB-4 si se rellenaron esos datos
+  if (vals.ast != null || vals.alt != null || vals.plt != null) {
+    setTimeout(function(){
+      showView('aps-calculadoras');
+      if (typeof switchApsCalc === 'function') switchApsCalc('fib4');
+    }, 900);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// HISTORIAL DE LABORATORIOS — Evolución longitudinal
+// ══════════════════════════════════════════════════════════════════
+var _LSK_LAB_HIST = 'hsi_v3_lab_history';
+
+// Rangos normales de referencia
+var _LAB_NORM_RANGES = {
+  ast:  { lo:10,  hi:40,   unit:'U/L',       label:'AST (GOT)',          hiIsBad:true,  loIsBad:false },
+  alt:  { lo:7,   hi:56,   unit:'U/L',       label:'ALT (GPT)',          hiIsBad:true,  loIsBad:false },
+  plt:  { lo:150, hi:400,  unit:'×10³/µL',   label:'Plaquetas',          hiIsBad:false, loIsBad:true  },
+  ggt:  { lo:9,   hi:48,   unit:'U/L',       label:'GGT',               hiIsBad:true,  loIsBad:false },
+  bili: { lo:0.2, hi:1.2,  unit:'mg/dL',     label:'Bilirrubina Total', hiIsBad:true,  loIsBad:false },
+  alb:  { lo:3.5, hi:5.0,  unit:'g/dL',      label:'Albúmina',          hiIsBad:false, loIsBad:true  },
+  inr:  { lo:0.9, hi:1.2,  unit:'',          label:'INR',               hiIsBad:true,  loIsBad:false },
+  crea: { lo:0.5, hi:1.2,  unit:'mg/dL',     label:'Creatinina',        hiIsBad:true,  loIsBad:false },
+  na:   { lo:136, hi:145,  unit:'mEq/L',     label:'Sodio',             hiIsBad:false, loIsBad:true  },
+  fa:   { lo:44,  hi:147,  unit:'U/L',       label:'Fosfatasa Alc.',    hiIsBad:true,  loIsBad:false },
+  hb:   { lo:12,  hi:17,   unit:'g/dL',      label:'Hemoglobina',       hiIsBad:false, loIsBad:true  }
+};
+// Order for table rows
+var _LAB_HIST_ORDER = ['ast','alt','ggt','fa','bili','alb','inr','crea','na','plt','hb','_fib4'];
+
+// ── Tab switching ──────────────────────────────────────────────────
+function switchLabTab(tab) {
+  ['ocr','historial'].forEach(function(p) {
+    var panel = document.getElementById('labpanel-'+p);
+    var btn   = document.getElementById('labtab-'+p);
+    if (panel) panel.style.display = (p === tab) ? '' : 'none';
+    if (btn)   btn.classList.toggle('active', p === tab);
+  });
+  if (tab === 'historial') _renderLabHistory();
+}
+
+// ── Persistencia ───────────────────────────────────────────────────
+function _loadLabHistory() {
+  try { var r = localStorage.getItem(_LSK_LAB_HIST); return r ? JSON.parse(r) : []; }
+  catch(e) { return []; }
+}
+
+function _saveLabRecord(vals, source) {
+  if (!vals || Object.keys(vals).length === 0) return;
+  var history = _loadLabHistory();
+  var record  = { id: Date.now(), fecha: new Date().toISOString().slice(0,10),
+                  source: source || 'OCR', vals: {} };
+  // Copy all numeric lab values (skip 'age' as display row)
+  var labKeys = Object.keys(_LAB_NORM_RANGES);
+  labKeys.forEach(function(k) { if (vals[k] != null) record.vals[k] = vals[k]; });
+  // Auto-calculate FIB-4
+  var age = vals.age;
+  if (age && vals.ast && vals.alt && vals.plt && vals.plt > 0) {
+    record.vals._fib4 = Math.round((age * vals.ast) / (vals.plt * Math.sqrt(vals.alt)) * 100) / 100;
+  }
+  if (Object.keys(record.vals).length === 0) return; // nada útil
+  history.push(record);
+  history.sort(function(a,b){ return a.fecha.localeCompare(b.fecha); });
+  localStorage.setItem(_LSK_LAB_HIST, JSON.stringify(history));
+  return record;
+}
+
+function _deleteLabRecord(id) {
+  var h = _loadLabHistory().filter(function(r){ return r.id !== id; });
+  localStorage.setItem(_LSK_LAB_HIST, JSON.stringify(h));
+  _renderLabHistory();
+  showToast('🗑 Eliminado','Registro removido del historial.');
+}
+
+function _clearLabHistory() {
+  if (!confirm('¿Eliminar todo el historial de laboratorios? Esta acción no se puede deshacer.')) return;
+  localStorage.removeItem(_LSK_LAB_HIST);
+  _renderLabHistory();
+  showToast('🗑 Historial borrado','Se eliminaron todos los registros.');
+}
+
+// ── Color coding ────────────────────────────────────────────────────
+function _labCellClass(key, val) {
+  if (key === '_fib4') {
+    if (val == null) return '';
+    if (val < 1.30) return 'lv-normal col-val';
+    if (val < 2.67) return 'lv-leve col-val';
+    return 'lv-critico col-val';
+  }
+  var ref = _LAB_NORM_RANGES[key];
+  if (!ref || val == null) return 'col-val';
+  var hi = ref.hi, lo = ref.lo;
+  if (val >= lo && val <= hi) return 'lv-normal col-val';
+  if (val > hi) {
+    if (!ref.hiIsBad) return 'lv-leve col-val'; // alta plaquetas/Hb/Na — leve
+    var ratio = val / hi;
+    if (ratio <= 2)   return 'lv-leve col-val';
+    if (ratio <= 3)   return 'lv-alto col-val';
+    return 'lv-critico col-val';
+  }
+  // val < lo
+  if (!ref.loIsBad) return 'lv-bajo col-val'; // bajo pero no crítico (ej. AST muy bajo)
+  // low-is-bad: PLT, ALB, NA, HB
+  if (key === 'plt') {
+    if (val >= 100) return 'lv-leve col-val';
+    if (val >= 50)  return 'lv-alto col-val';
+    return 'lv-critico col-val';
+  }
+  if (key === 'alb') {
+    if (val >= 3.0) return 'lv-leve col-val';
+    if (val >= 2.5) return 'lv-alto col-val';
+    return 'lv-critico-bajo col-val';
+  }
+  if (key === 'na') {
+    if (val >= 130) return 'lv-leve col-val';
+    if (val >= 125) return 'lv-alto col-val';
+    return 'lv-critico-bajo col-val';
+  }
+  if (key === 'hb') {
+    if (val >= 10) return 'lv-leve col-val';
+    if (val >= 8)  return 'lv-alto col-val';
+    return 'lv-critico-bajo col-val';
+  }
+  return 'lv-bajo col-val';
+}
+
+function _labTrend(prev, curr) {
+  if (prev == null || curr == null) return '';
+  var pct = ((curr - prev) / (Math.abs(prev) || 1)) * 100;
+  if (Math.abs(pct) < 5) return '<span class="trend-eq">=</span>';
+  return pct > 0 ? '<span class="trend-up">↑</span>' : '<span class="trend-down">↓</span>';
+}
+
+// ── Render principal ────────────────────────────────────────────────
+function _renderLabHistory() {
+  var container = document.getElementById('lab-hist-container');
+  if (!container) return;
+  var history = _loadLabHistory();
+
+  if (history.length === 0) {
+    container.innerHTML =
+      '<div style="text-align:center;padding:36px 16px;color:var(--text-muted);font-size:.80rem;font-family:var(--font-mono);">'
+      +'<div style="font-size:2rem;margin-bottom:10px;">📋</div>'
+      +'<div style="font-weight:700;color:var(--text);margin-bottom:5px;">Sin registros</div>'
+      +'<div>Aplica un OCR o agrega un registro manual para comenzar el seguimiento longitudinal.</div>'
+      +'</div>';
+    return;
+  }
+
+  // Determinar qué filas tienen al menos un dato
+  var activeRows = _LAB_HIST_ORDER.filter(function(k) {
+    return history.some(function(r){ return r.vals[k] != null; });
+  });
+
+  var html = '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">'
+           + '<table class="lab-hist-table"><thead><tr>'
+           + '<th class="col-param" style="top:0;">Parámetro</th>';
+
+  history.forEach(function(rec, idx) {
+    var d = rec.fecha.split('-');
+    var dd = d[2]+'/'+d[1]+'/'+d[0].slice(2);
+    html += '<th style="top:0;text-align:center;">'
+          + '<div class="lab-entry-header">'
+          + '<span style="font-size:.72rem;font-weight:700;color:var(--text);">'+dd+'</span>'
+          + '<span style="font-size:.58rem;color:var(--text-muted);">'+rec.source+'</span>'
+          + '<button onclick="_deleteLabRecord('+rec.id+')" title="Eliminar este registro" '
+          + 'style="background:none;border:none;color:rgba(248,113,113,.45);font-size:.62rem;'
+          + 'cursor:pointer;padding:1px 4px;line-height:1;margin-top:1px;">✕</button>'
+          + '</div></th>';
+  });
+  html += '</tr></thead><tbody>';
+
+  activeRows.forEach(function(key) {
+    var isFib4 = key === '_fib4';
+    var ref     = _LAB_NORM_RANGES[key];
+    var label   = isFib4 ? 'FIB-4' : (ref ? ref.label : key);
+    var unit    = isFib4 ? '' : (ref ? ref.unit : '');
+    var refStr  = isFib4 ? '<1.30 bajo riesgo' : (ref ? ref.lo+'–'+ref.hi : '');
+
+    html += '<tr>';
+    html += '<td class="col-param">'
+          + (isFib4 ? '<strong style="color:var(--teal);">'+label+'</strong>'
+                    : '<span>'+label+'</span>')
+          + (unit   ? '<br><span style="font-size:.59rem;color:var(--text-muted);">'+unit+'</span>' : '')
+          + (refStr ? '<br><span style="font-size:.57rem;color:var(--border);">VN: '+refStr+'</span>' : '')
+          + '</td>';
+
+    history.forEach(function(rec, idx) {
+      var val  = rec.vals[key];
+      var prev = idx > 0 ? history[idx-1].vals[key] : null;
+      var cls  = _labCellClass(key, val);
+      var trend = _labTrend(prev, val);
+
+      if (val == null) {
+        html += '<td class="col-val lv-ausente" style="text-align:center;">—</td>';
+      } else {
+        var disp = isFib4 ? val.toFixed(2)
+                 : (Number.isInteger(val) ? val : parseFloat(val).toFixed(1));
+        html += '<td class="'+cls+'" style="text-align:center;">'
+              + trend + '<strong>' + disp + '</strong></td>';
+      }
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
+}
+
+// ── Copiar historial ───────────────────────────────────────────────
+function _copyLabHistory() {
+  var history = _loadLabHistory();
+  if (history.length === 0) { showToast('⚠️ Sin datos','El historial está vacío.'); return; }
+  var lines = ['HISTORIAL DE LABORATORIOS — HepatoShield Institucional v3.0', ''];
+  var dates = history.map(function(r){ return r.fecha; });
+  lines.push('Parámetro\t' + dates.join('\t'));
+  _LAB_HIST_ORDER.forEach(function(key) {
+    var hasAny = history.some(function(r){ return r.vals[key] != null; });
+    if (!hasAny) return;
+    var ref   = _LAB_NORM_RANGES[key];
+    var label = key === '_fib4' ? 'FIB-4' : (ref ? ref.label : key);
+    var unit  = key === '_fib4' ? '' : (ref ? ' ('+ref.unit+')' : '');
+    var row   = label + unit;
+    history.forEach(function(rec) {
+      var v = rec.vals[key];
+      var disp = v == null ? '—' : (key === '_fib4' ? v.toFixed(2) : v);
+      row += '\t' + disp;
+    });
+    lines.push(row);
+  });
+  navigator.clipboard.writeText(lines.join('\n')).then(function() {
+    showToast('📋 Copiado','Historial copiado al portapapeles (compatible con Excel).');
+  }).catch(function() { showToast('⚠️ Error','No se pudo acceder al portapapeles.'); });
+}
+
+// ── Entrada manual ─────────────────────────────────────────────────
+function _addManualLabEntry() {
+  var modal = document.getElementById('modal-manual-lab');
+  if (!modal) return;
+  modal.querySelectorAll('input.manuallab-inp').forEach(function(el){ el.value = ''; });
+  var dateEl = document.getElementById('manual-lab-date');
+  if (dateEl) dateEl.value = new Date().toISOString().slice(0,10);
+  modal.classList.add('open');
+}
+
+function _saveManualLabEntry() {
+  var modal = document.getElementById('modal-manual-lab');
+  if (!modal) return;
+  var dateEl = document.getElementById('manual-lab-date');
+  var fecha  = dateEl ? dateEl.value : new Date().toISOString().slice(0,10);
+  var vals   = {};
+  modal.querySelectorAll('input.manuallab-inp').forEach(function(el) {
+    var k = el.getAttribute('data-labkey');
+    var v = el.value.trim();
+    if (v !== '' && !isNaN(parseFloat(v))) vals[k] = parseFloat(v);
+  });
+  if (Object.keys(vals).length === 0) {
+    showToast('⚠️ Sin valores','Ingrese al menos un valor para guardar.'); return;
+  }
+  // Auto FIB-4
+  var age = vals.age;
+  if (age && vals.ast && vals.alt && vals.plt && vals.plt > 0) {
+    vals._fib4 = Math.round((age * vals.ast) / (vals.plt * Math.sqrt(vals.alt)) * 100) / 100;
+  }
+  var history = _loadLabHistory();
+  history.push({ id: Date.now(), fecha: fecha, source: 'Manual', vals: vals });
+  history.sort(function(a,b){ return a.fecha.localeCompare(b.fecha); });
+  localStorage.setItem(_LSK_LAB_HIST, JSON.stringify(history));
+  modal.classList.remove('open');
+  switchLabTab('historial');
+  showToast('✅ Guardado','Registro manual agregado al historial evolutivo.');
+}
+
+// ── VHB/VHC quick confirm desde paso 3 ─────────────────────────────────
+function _cVhbcConfirm(tieneSerologia) {
+  var banner = document.getElementById('c-vhbvhc-banner');
+  if (!banner) return;
+  if (tieneSerologia) {
+    banner.style.background = 'rgba(52,211,153,.06)';
+    banner.style.borderColor = 'rgba(52,211,153,.3)';
+    banner.innerHTML = '<span style="color:#34d399;font-size:.76rem;font-weight:700;">✓ Serología viral confirmada por médico tratante</span>';
+  } else {
+    // Agregar vhb_vhc a motivos y re-renderizar para incluir bili/ggt
+    if (_cMotivos.indexOf('vhb_vhc') < 0) _cMotivos.push('vhb_vhc');
+    banner.innerHTML = '<span style="color:#fbbf24;font-size:.76rem;font-weight:700;">📋 Serología VHB/VHC agregada a las indicaciones — solicitar HBsAg, Anti-HBs, Anti-HCV</span>';
+    banner.style.background = 'rgba(251,191,36,.06)';
+    banner.style.borderColor = 'rgba(251,191,36,.3)';
+    showToast('VHB/VHC agregado','HBsAg · Anti-HBs · Anti-HCV incluidos en indicaciones del paso 4.');
+  }
+}
+
+// ── Resumen para el paciente — lenguaje simple ──────────────────────────
+function cGenerarResumenPaciente() {
+  var pac   = _getPacienteDoc();
+  var fib4  = window._cFIB4Last;
+  var s     = JSON.parse(localStorage.getItem('hsi_settings')||'{}');
+  var inst  = s.instName  || 'Centro de Salud';
+  var dr    = s.doctorName|| 'Su médico';
+  var fecha = new Date().toLocaleDateString('es-CL', {day:'numeric',month:'long',year:'numeric'});
+
+  var motivoTexto = _cMotivos.map(function(m){
+    return {masld:'hígado graso',transaminasas:'enzimas del hígado alteradas',alcohol:'consumo de alcohol',
+            cirrosis:'enfermedad hepática crónica',vhb_vhc:'hepatitis viral',screening:'chequeo del hígado',
+            ictericia:'color amarillo en la piel o los ojos',descompensacion:'complicación hepática'}[m] || m;
+  }).join(', ');
+
+  var resultadoTexto = '';
+  var accionTexto = '';
+  if (fib4 !== null) {
+    if (fib4 < 1.3) {
+      resultadoTexto = 'El análisis de sus exámenes (índice FIB-4: '+fib4.toFixed(2)+') muestra que su hígado tiene bajo riesgo de cicatrización (fibrosis). Esta es una buena noticia.';
+      accionTexto = 'No necesita derivación urgente. Continuará su control en el consultorio cada 12 meses.';
+    } else if (fib4 <= 2.67) {
+      resultadoTexto = 'El análisis de sus exámenes (índice FIB-4: '+fib4.toFixed(2)+') muestra un resultado intermedio que necesita más estudio. Esto no significa que tenga una enfermedad grave, pero es importante evaluarlo mejor.';
+      accionTexto = 'Se solicitará una ecografía especial del hígado (FibroScan) y/o una consulta con un especialista del hígado (hepatólogo) en las próximas 4 a 8 semanas.';
+    } else {
+      resultadoTexto = 'El análisis de sus exámenes (índice FIB-4: '+fib4.toFixed(2)+') muestra que existe riesgo de cicatrización avanzada del hígado. Es importante actuar pronto.';
+      accionTexto = 'Se lo derivará a un especialista del hígado (hepatólogo) dentro de los próximos 30 días para una evaluación más detallada.';
+    }
+  } else {
+    resultadoTexto = 'Sus exámenes fueron evaluados hoy. '+(window._cMaxRisk==='green'?'No se encontraron hallazgos preocupantes.':'Se encontraron valores que requieren seguimiento.');
+    accionTexto = 'Su médico le indicará los pasos a seguir según los resultados.';
+  }
+
+  var consejos = [];
+  if (_cMotivos.indexOf('masld') >= 0) {
+    consejos.push('🥗 Dieta: reduzca azúcares, harinas refinadas y bebidas azucaradas. Prefiera frutas, verduras, legumbres y pescado.');
+    consejos.push('🚶 Actividad física: camine al menos 30 minutos al día, 5 días a la semana.');
+    consejos.push('⚖️ Peso: una reducción del 7–10% de su peso corporal puede mejorar significativamente su hígado.');
+  }
+  if (_cMotivos.indexOf('alcohol') >= 0) consejos.push('🚫 Alcohol: el consumo de alcohol daña el hígado. Le recomendamos no beber.');
+  if (consejos.length === 0) consejos.push('✅ Continúe con sus controles médicos regulares y siga una dieta equilibrada.');
+
+  var html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">'
+    +'<title>Resumen para '+pac.nombre+'</title>'
+    +'<style>body{font-family:Arial,sans-serif;max-width:680px;margin:40px auto;color:#1e293b;line-height:1.7;padding:0 20px;}'
+    +'h1{color:#0f766e;font-size:1.3rem;border-bottom:3px solid #0f766e;padding-bottom:8px;}'
+    +'h2{color:#0f766e;font-size:1rem;margin-top:24px;}'
+    +'.badge{display:inline-block;background:#f0fdf4;border:1px solid #86efac;color:#15803d;border-radius:6px;padding:3px 10px;font-size:0.85rem;font-weight:700;}'
+    +'.warn{background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px;margin:8px 0;}'
+    +'.footer{margin-top:36px;padding-top:12px;border-top:1px solid #e2e8f0;font-size:0.75rem;color:#94a3b8;}</style>'
+    +'</head><body>'
+    +'<h1>📋 Su resumen de salud hepática</h1>'
+    +'<p><strong>Paciente:</strong> '+pac.nombre+'<br>'
+    +'<strong>Fecha:</strong> '+fecha+'<br>'
+    +'<strong>Atendido en:</strong> '+inst+'</p>'
+    +'<h2>¿Por qué se realizó esta evaluación?</h2>'
+    +'<p>Hoy se evaluó su hígado debido a: <strong>'+motivoTexto+'</strong>.</p>'
+    +'<h2>¿Qué encontramos?</h2>'
+    +'<p>'+resultadoTexto+'</p>'
+    +'<h2>¿Qué sigue ahora?</h2>'
+    +'<div class="warn">'+accionTexto+'</div>'
+    +(consejos.length ? '<h2>Recomendaciones para usted</h2><ul>'+consejos.map(function(c){ return '<li>'+c+'</li>'; }).join('')+'</ul>' : '')
+    +'<h2>Preguntas importantes para su próxima visita</h2>'
+    +'<ul><li>¿Cuándo son mis próximos exámenes?</li><li>¿Debo cambiar algún medicamento?</li><li>¿Cuándo debo ver al especialista?</li></ul>'
+    +'<div class="footer">Generado por HepatoShield Institucional v3.0 · '+inst+' · '+dr+' · Uso informativo para el paciente<br>'
+    +'<em>Este documento no reemplaza la indicación médica. Consulte a su médico ante cualquier duda.</em></div>'
+    +'</body></html>';
+
+  var w = window.open('','_blank','width=720,height=900');
+  if (w) {
+    w.document.write(html);
+    w.document.close();
+    setTimeout(function(){ w.print(); }, 600);
+  }
+}
+
+// ── Reset de la vista OCR ────────────────────────────────────────────
+function resetOCRView() {
+  var previewWrap = document.getElementById('ocr-preview-wrap');
+  var previewImg  = document.getElementById('ocr-preview');
+  var resultsEl   = document.getElementById('ocr-results');
+  var rawWrap     = document.getElementById('ocr-raw-wrap');
+  var fileInput   = document.getElementById('ocr-file-input');
+  var camInput    = document.getElementById('ocr-camera-input');
+  if (previewWrap) previewWrap.style.display = 'none';
+  if (previewImg)  previewImg.src = '';
+  if (resultsEl)   { resultsEl.style.display = 'none'; resultsEl.innerHTML = ''; }
+  if (rawWrap)     rawWrap.style.display = 'none';
+  if (fileInput)   fileInput.value = '';
+  if (camInput)    camInput.value = '';
+  _ocrCurrentValues = {};
+}
+
 </script>
 
 <!-- ═══════════════════════════════════════════════════════
@@ -24093,6 +25083,85 @@ function limpiarSesionAPS() {
       <button onclick="copiarCarta()" id="btn-copiar-carta" style="background:rgba(0,212,160,0.12);border:1px solid rgba(0,212,160,0.3);color:var(--teal);border-radius:8px;padding:8px 16px;font-size:0.78rem;font-family:var(--font-mono);font-weight:700;cursor:pointer;">📋 Copiar carta</button>
       <button onclick="imprimirCarta()" style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;border-radius:8px;padding:8px 16px;font-size:0.78rem;font-family:var(--font-mono);font-weight:700;cursor:pointer;">🖨️ Imprimir</button>
       <button onclick="document.getElementById('modal-carta-der').classList.remove('open')" style="margin-left:auto;background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:8px 14px;font-size:0.78rem;font-family:var(--font-mono);cursor:pointer;">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MODAL: AGREGAR LABORATORIO MANUAL — HISTORIAL
+═══════════════════════════════════════════════════════ -->
+<div id="modal-manual-lab" role="dialog" aria-modal="true">
+  <div class="manuallab-box">
+    <div class="manuallab-header">
+      <div>
+        <div style="font-size:.66rem;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:.08em;">HISTORIAL · ENTRADA MANUAL</div>
+        <div style="font-size:.98rem;font-weight:800;color:var(--teal);">➕ Agregar Laboratorio</div>
+      </div>
+      <button onclick="document.getElementById('modal-manual-lab').classList.remove('open')" style="background:none;border:none;color:var(--text-muted);font-size:1.2rem;cursor:pointer;line-height:1;">✕</button>
+    </div>
+    <div class="manuallab-body">
+      <div style="margin-bottom:12px;">
+        <label style="font-size:.66rem;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:.05em;display:block;margin-bottom:3px;">FECHA DEL EXAMEN</label>
+        <input type="date" id="manual-lab-date" style="background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:7px 12px;font-size:.84rem;color:var(--text);font-family:var(--font-mono);width:100%;box-sizing:border-box;">
+      </div>
+      <div style="font-size:.68rem;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:.05em;margin-bottom:6px;">VALORES DE LABORATORIO</div>
+      <div class="manuallab-grid">
+        <div class="manuallab-field">
+          <label>Edad (años)</label>
+          <input type="number" class="manuallab-inp" data-labkey="age" placeholder="ej. 52" min="1" max="120">
+        </div>
+        <div class="manuallab-field">
+          <label>AST / GOT (U/L)</label>
+          <input type="number" class="manuallab-inp" data-labkey="ast" placeholder="ej. 45" min="0">
+        </div>
+        <div class="manuallab-field">
+          <label>ALT / GPT (U/L)</label>
+          <input type="number" class="manuallab-inp" data-labkey="alt" placeholder="ej. 38" min="0">
+        </div>
+        <div class="manuallab-field">
+          <label>Plaquetas (×10³/µL)</label>
+          <input type="number" class="manuallab-inp" data-labkey="plt" placeholder="ej. 210" min="0">
+        </div>
+        <div class="manuallab-field">
+          <label>GGT (U/L)</label>
+          <input type="number" class="manuallab-inp" data-labkey="ggt" placeholder="ej. 40" min="0">
+        </div>
+        <div class="manuallab-field">
+          <label>Fosfatasa Alc. (U/L)</label>
+          <input type="number" class="manuallab-inp" data-labkey="fa" placeholder="ej. 95" min="0">
+        </div>
+        <div class="manuallab-field">
+          <label>Bilirrubina Total (mg/dL)</label>
+          <input type="number" class="manuallab-inp" data-labkey="bili" placeholder="ej. 0.9" min="0" step="0.1">
+        </div>
+        <div class="manuallab-field">
+          <label>Albúmina (g/dL)</label>
+          <input type="number" class="manuallab-inp" data-labkey="alb" placeholder="ej. 4.2" min="0" step="0.1">
+        </div>
+        <div class="manuallab-field">
+          <label>INR</label>
+          <input type="number" class="manuallab-inp" data-labkey="inr" placeholder="ej. 1.1" min="0" step="0.01">
+        </div>
+        <div class="manuallab-field">
+          <label>Creatinina (mg/dL)</label>
+          <input type="number" class="manuallab-inp" data-labkey="crea" placeholder="ej. 0.9" min="0" step="0.01">
+        </div>
+        <div class="manuallab-field">
+          <label>Sodio (mEq/L)</label>
+          <input type="number" class="manuallab-inp" data-labkey="na" placeholder="ej. 140" min="0">
+        </div>
+        <div class="manuallab-field">
+          <label>Hemoglobina (g/dL)</label>
+          <input type="number" class="manuallab-inp" data-labkey="hb" placeholder="ej. 14.5" min="0" step="0.1">
+        </div>
+      </div>
+      <div style="margin-top:10px;padding:8px 12px;background:rgba(0,212,160,.06);border-radius:8px;font-size:.68rem;color:var(--text-muted);font-family:var(--font-mono);">
+        💡 FIB-4 se calcula automáticamente si ingresas Edad + AST + ALT + Plaquetas.
+      </div>
+    </div>
+    <div class="manuallab-footer">
+      <button onclick="document.getElementById('modal-manual-lab').classList.remove('open')" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:8px 16px;font-size:.78rem;font-family:var(--font-mono);cursor:pointer;">Cancelar</button>
+      <button onclick="_saveManualLabEntry()" style="background:var(--teal);color:#000;border:none;border-radius:8px;padding:8px 20px;font-size:.80rem;font-family:var(--font-mono);font-weight:800;cursor:pointer;">💾 Guardar</button>
     </div>
   </div>
 </div>
