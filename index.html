@@ -3082,14 +3082,14 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
          ondrop="this.classList.remove('drag-over');handleOCRDrop(event)">
       <div class="ocr-drop-icon">📋</div>
       <div class="ocr-drop-title">Subir informe de laboratorio</div>
-      <div class="ocr-drop-sub">JPG · PNG · WEBP · Arrastra aquí o haz click</div>
+      <div class="ocr-drop-sub">JPG · PNG · WEBP · <b>PDF</b> · Arrastra aquí o haz click</div>
       <div class="ocr-btns">
         <button class="ocr-btn ocr-btn-primary" onclick="event.stopPropagation();document.getElementById('ocr-file-input').click()">📁 Elegir archivo</button>
         <button class="ocr-btn ocr-btn-outline" onclick="event.stopPropagation();document.getElementById('ocr-camera-input').click()">📷 Usar cámara</button>
       </div>
     </div>
-    <input type="file" id="ocr-file-input"   accept="image/*"         style="display:none" onchange="handleOCRFile(this)">
-    <input type="file" id="ocr-camera-input" accept="image/*" capture="environment" style="display:none" onchange="handleOCRFile(this)">
+    <input type="file" id="ocr-file-input"   accept="image/*,application/pdf" style="display:none" onchange="handleOCRFile(this)">
+    <input type="file" id="ocr-camera-input" accept="image/*" capture="environment"  style="display:none" onchange="handleOCRFile(this)">
 
     <!-- PREVIEW -->
     <div id="ocr-preview-wrap">
@@ -3121,13 +3121,17 @@ input[type="number"]::placeholder, input[type="text"]::placeholder {
     <textarea id="ocr-raw-text" readonly></textarea>
   </div>
 
-  <!-- TIPS -->
-  <div style="margin-top:1rem;padding:10px 14px;background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2);border-radius:10px;font-size:.74rem;color:var(--text-dim);">
+  <!-- MOTOR STATUS + TIPS -->
+  <div id="ocr-engine-status" style="margin-top:.75rem;padding:9px 13px;border-radius:10px;font-size:.73rem;
+       background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);color:var(--text-dim);">
+    <span id="ocr-engine-badge" style="font-family:var(--font-mono);">🔄 Detectando motor de IA...</span>
+  </div>
+  <div style="margin-top:.6rem;padding:10px 14px;background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2);border-radius:10px;font-size:.74rem;color:var(--text-dim);">
     <strong style="color:#60a5fa;">💡 Consejos para mejor precisión:</strong><br>
-    • Foto en buena iluminación, sin sombras ni reflejos<br>
-    • Informe plano (no doblado). Si es digital: captura de pantalla directa<br>
-    • Compatible con Bupa, Integramédica, Red UC, ISP/FONASA y otros laboratorios chilenos<br>
-    • Los valores detectados son <u>editables</u> antes de aplicarlos — siempre verifique
+    • <b>Mejor opción:</b> sube el PDF del laboratorio directamente (no captura de pantalla)<br>
+    • <b>Con Ollama:</b> instala <a href="https://ollama.com" target="_blank" style="color:#a78bfa;">ollama.com</a> y ejecuta <code style="color:#a78bfa;">ollama pull llava</code> — IA local sin API key<br>
+    • Foto: buena iluminación, sin sombras ni reflejos, informe plano<br>
+    • Los valores detectados son <u>editables</u> — siempre verifique antes de aplicar
   </div>
   </div><!-- /labpanel-ocr -->
 
@@ -9461,6 +9465,29 @@ function showView(viewId) {
     // renderEduForm se llama desde _pacinfoSubTab cuando tab==='hoja'
   }, 50);
   if(viewId==='aps-hep-dx') { document.getElementById('hdx-results-aps') && (document.getElementById('hdx-results-aps').innerHTML = ''); }
+  // OCR Labs: sondear Ollama y actualizar badge
+  if(viewId==='aps-ocr') {
+    setTimeout(function() {
+      var badge = document.getElementById('ocr-engine-badge');
+      if (!badge) return;
+      _detectOllamaModel(function(model) {
+        if (model) {
+          badge.innerHTML = '⚡ <b style="color:#a78bfa;">Ollama activo</b> · ' + model
+            + ' <span style="color:#34d399;">(IA local · sin API key)</span>';
+          badge.parentElement.style.borderColor = 'rgba(167,139,250,.5)';
+          badge.parentElement.style.background  = 'rgba(167,139,250,.08)';
+        } else {
+          badge.innerHTML = '🔍 <b>Tesseract.js</b> (OCR clásico)'
+            + ' · <span style="color:var(--text-muted);">Para mayor precisión: instala '
+            + '<a href="https://ollama.com" target="_blank" style="color:#a78bfa;">Ollama</a>'
+            + ' + <code>ollama pull llava</code> · o sube el <b>PDF</b> directamente</span>';
+          badge.parentElement.style.borderColor = '';
+          badge.parentElement.style.background  = '';
+        }
+      });
+    }, 200);
+    _renderLabHistory();
+  }
   closeMobileSidebar();
   window.scrollTo(0,0);
 }
@@ -24414,9 +24441,6 @@ function _loadTesseract(cb) {
 function handleOCRFile(input) {
   var file = input.files && input.files[0];
   if (!file) return;
-  if (!file.type.match(/^image\//)) {
-    showToast('⚠️ Formato','Solo se admiten imágenes (JPG, PNG, WEBP). Para PDF use captura de pantalla.'); return;
-  }
   _processOCRFileObj(file);
 }
 function handleOCRDrop(ev) {
@@ -24428,6 +24452,19 @@ function handleOCRDrop(ev) {
 function _processOCRFileObj(file) {
   var nameEl = document.getElementById('ocr-file-name');
   if (nameEl) nameEl.textContent = file.name;
+
+  // ── PDF: extracción de texto directa (sin OCR) ──────────────────
+  var isPDF = file.type === 'application/pdf' ||
+              file.name.toLowerCase().endsWith('.pdf');
+  if (isPDF) {
+    _processPDFFile(file);
+    return;
+  }
+
+  // ── Imagen: pipeline Ollama → Tesseract ──────────────────────────
+  if (!file.type.match(/^image\//)) {
+    showToast('⚠️ Formato','Solo se admiten imágenes (JPG, PNG, WEBP) o PDF.'); return;
+  }
   var reader = new FileReader();
   reader.onload = function(e) {
     var previewWrap = document.getElementById('ocr-preview-wrap');
@@ -24439,6 +24476,165 @@ function _processOCRFileObj(file) {
     _runOCR(e.target.result);
   };
   reader.readAsDataURL(file);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// MOTOR 1: PDF.js — extracción de texto puro (labs digitales SURA, etc.)
+// 100% preciso — no hay OCR, lee el texto del PDF directamente.
+// ════════════════════════════════════════════════════════════════════
+function _processPDFFile(file) {
+  var statText = document.getElementById('ocr-status-text');
+  var progWrap = document.getElementById('ocr-progress-wrap');
+  var progBar  = document.getElementById('ocr-progress-bar');
+  if (progWrap) progWrap.style.display = 'block';
+  if (progBar)  progBar.style.width = '10%';
+  if (statText) statText.textContent = '📄 Leyendo PDF...';
+
+  // Mostrar placeholder en preview
+  var previewWrap = document.getElementById('ocr-preview-wrap');
+  var previewImg  = document.getElementById('ocr-preview');
+  if (previewWrap) previewWrap.style.display = 'block';
+  if (previewImg)  previewImg.src = '';
+
+  // Cargar PDF.js si no está presente
+  function _loadPDFjs(cb) {
+    if (window.pdfjsLib) { cb(); return; }
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload = function() {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      cb();
+    };
+    s.onerror = function() { cb(new Error('No se pudo cargar PDF.js')); };
+    document.head.appendChild(s);
+  }
+
+  _loadPDFjs(function(err) {
+    if (err) {
+      if (progWrap) progWrap.style.display = 'none';
+      showToast('❌ Error','No se pudo cargar el lector de PDF. Comprueba tu conexión.');
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var typedArray = new Uint8Array(e.target.result);
+      pdfjsLib.getDocument({ data: typedArray }).promise.then(function(pdf) {
+        if (progBar) progBar.style.width = '40%';
+        if (statText) statText.textContent = '📄 Extrayendo texto del PDF...';
+
+        // Extraer texto de todas las páginas
+        var pagePromises = [];
+        for (var i = 1; i <= pdf.numPages; i++) {
+          pagePromises.push(pdf.getPage(i).then(function(page) {
+            return page.getTextContent().then(function(tc) {
+              // Reconstruir líneas por posición Y
+              var items = tc.items.slice().sort(function(a, b) {
+                var dy = b.transform[5] - a.transform[5];
+                return Math.abs(dy) > 3 ? dy : (a.transform[4] - b.transform[4]);
+              });
+              // Agrupar en líneas (mismo Y ± 3px)
+              var lines = [], curLine = [], curY = null;
+              items.forEach(function(it) {
+                var y = Math.round(it.transform[5]);
+                if (curY === null || Math.abs(y - curY) <= 3) {
+                  curLine.push(it.str);
+                  curY = y;
+                } else {
+                  if (curLine.length) lines.push(curLine.join(' '));
+                  curLine = [it.str];
+                  curY = y;
+                }
+              });
+              if (curLine.length) lines.push(curLine.join(' '));
+              return lines.join('\n');
+            });
+          }));
+        }
+        return Promise.all(pagePromises);
+      }).then(function(pages) {
+        if (progBar) progBar.style.width = '80%';
+        var fullText = pages.join('\n\n');
+        var rawEl = document.getElementById('ocr-raw-text');
+        if (rawEl) rawEl.value = fullText;
+
+        var cleanText = _stripOCRNoise(fullText);
+        var vals = _parseLabText(cleanText);
+        _ocrCurrentValues = vals;
+
+        if (progWrap) progWrap.style.display = 'none';
+        _showOCRResults(vals, '📄 PDF');   // badge especial
+      }).catch(function(err) {
+        if (progWrap) progWrap.style.display = 'none';
+        showToast('❌ Error PDF', err.message || String(err));
+      });
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════
+// MOTOR 2: Ollama — modelo de visión local (llava, moondream, etc.)
+// Sin API key. Funciona si Ollama está instalado en localhost:11434.
+// Instalación: https://ollama.com → ollama pull llava  (o moondream)
+// ════════════════════════════════════════════════════════════════════
+var _ollamaModel = null;   // se detecta al primer intento
+var _ollamaChecked = false;
+
+function _detectOllamaModel(cb) {
+  if (_ollamaChecked) { cb(_ollamaModel); return; }
+  _ollamaChecked = true;
+  var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, 3000) : null;
+  fetch('http://localhost:11434/api/tags', ctrl ? { signal: ctrl.signal } : {})
+    .then(function(r){ clearTimeout(timer); return r.json(); })
+    .then(function(data) {
+      var visionKeys = ['llava','moondream','minicpm','bakllava','llava-phi','cogvlm'];
+      var models = (data.models || []).map(function(m){ return m.name; });
+      _ollamaModel = models.find(function(m){
+        return visionKeys.some(function(k){ return m.toLowerCase().includes(k); });
+      }) || null;
+      cb(_ollamaModel);
+    })
+    .catch(function(){ cb(null); });
+}
+
+function _runOllamaOCR(base64img, model, onSuccess, onFail) {
+  var b64 = base64img.includes(',') ? base64img.split(',')[1] : base64img;
+  var prompt =
+    'Medical laboratory report in Spanish (Colombia). ' +
+    'Extract ONLY the patient result values — do NOT include reference range numbers. ' +
+    'Return ONLY a JSON object (no explanation, no markdown) with these keys ' +
+    '(use null for values not found in the report):\n' +
+    '{"ast":null,"alt":null,"bili":null,"alb":null,"inr":null,"crea":null,' +
+    '"na":null,"ggt":null,"fa":null,"hb":null,"plt":null}\n' +
+    'ast=GOT/AST U/L, alt=GPT/ALT U/L, bili=Bilirrubina Total mg/dL, ' +
+    'alb=Albumina g/dL, inr=INR, crea=Creatinina mg/dL, na=Sodio mEq/L, ' +
+    'ggt=GGT U/L, fa=Fosfatasa Alcalina U/L, hb=Hemoglobina g/dL, ' +
+    'plt=Plaquetas (in 10^3/uL, so 250000 → 250).';
+
+  fetch('http://localhost:11434/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: model, prompt: prompt, images: [b64], stream: false })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data) {
+    var txt = data.response || '';
+    var m = txt.match(/\{[\s\S]*?\}/);
+    if (!m) throw new Error('Sin JSON en respuesta Ollama');
+    var raw = JSON.parse(m[0]);
+    var result = {};
+    Object.keys(raw).forEach(function(k) {
+      if (raw[k] === null || raw[k] === undefined) return;
+      var v = parseFloat(String(raw[k]).replace(',','.'));
+      if (isNaN(v)) return;
+      var rng = _OCR_SANE[k];
+      if (!rng || (v >= rng[0] && v <= rng[1])) result[k] = v;
+    });
+    onSuccess(result);
+  })
+  .catch(function(e){ onFail(e); });
 }
 
 // ── Preprocesado de imagen para mejorar OCR ──────────────────────────
@@ -24528,7 +24724,9 @@ function _stripOCRNoise(text) {
     .trim();
 }
 
-// ── Motor OCR ────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════
+// MOTOR 3: Tesseract.js — OCR clásico (fallback universal)
+// ════════════════════════════════════════════════════════════════════
 function _runOCR(imageData) {
   var progWrap = document.getElementById('ocr-progress-wrap');
   var progBar  = document.getElementById('ocr-progress-bar');
@@ -24536,14 +24734,42 @@ function _runOCR(imageData) {
   var statText = document.getElementById('ocr-status-text');
   if (progWrap) progWrap.style.display = 'block';
   if (progBar)  progBar.style.width = '0%';
+  if (statText) statText.textContent = 'Detectando motor disponible...';
+
+  // ── Intento 1: Ollama (modelo de visión local) ──────────────────
+  _detectOllamaModel(function(model) {
+    if (model) {
+      if (statText) statText.textContent = '⚡ Ollama · ' + model + ' · Analizando...';
+      if (progBar)  progBar.style.width = '30%';
+      _runOllamaOCR(imageData, model,
+        function(vals) {   // éxito
+          if (progWrap) progWrap.style.display = 'none';
+          _ocrCurrentValues = vals;
+          _showOCRResults(vals, '⚡ Ollama · ' + model);
+        },
+        function() {       // fallo → caer en Tesseract
+          _runTesseractOCR(imageData, progWrap, progBar, pctText, statText);
+        }
+      );
+    } else {
+      // ── Intento 2: Tesseract (fallback) ──────────────────────
+      _runTesseractOCR(imageData, progWrap, progBar, pctText, statText);
+    }
+  });
+}
+
+function _runTesseractOCR(imageData, progWrap, progBar, pctText, statText) {
+  if (!progWrap) progWrap = document.getElementById('ocr-progress-wrap');
+  if (!progBar)  progBar  = document.getElementById('ocr-progress-bar');
+  if (!pctText)  pctText  = document.getElementById('ocr-pct-text');
+  if (!statText) statText = document.getElementById('ocr-status-text');
+  if (progWrap) progWrap.style.display = 'block';
+  if (progBar)  progBar.style.width = '0%';
   if (statText) statText.textContent = 'Preparando imagen...';
 
-  // Paso 1: preprocesar imagen (escala + contraste)
   _preprocessForOCR(imageData, function(processedData) {
     _loadTesseract(function() {
       Tesseract.recognize(processedData, 'spa+eng', {
-        // PSM 3 = automático (mejor para documentos multi-columna como labs médicos)
-        // PSM 6 fuerza bloque único y confunde tablas, perdiendo puntos decimales
         tessedit_pageseg_mode: '3',
         logger: function(m) {
           if (!statText) return;
@@ -24561,14 +24787,12 @@ function _runOCR(imageData) {
       }).then(function(res) {
         if (progWrap) progWrap.style.display = 'none';
         var rawText = res.data.text || '';
-        // Guardar texto original para visualización
         var rawEl = document.getElementById('ocr-raw-text');
         if (rawEl) rawEl.value = rawText;
-        // Limpiar ruido antes de parsear
         var cleanText = _stripOCRNoise(rawText);
         var vals = _parseLabText(cleanText);
         _ocrCurrentValues = vals;
-        _showOCRResults(vals);
+        _showOCRResults(vals, '🔍 Tesseract');
       }).catch(function(err) {
         if (progWrap) progWrap.style.display = 'none';
         showToast('❌ Error OCR', 'No se pudo procesar: '+(err.message||err));
@@ -24669,17 +24893,26 @@ function _parseLabText(rawText) {
 }
 
 // ── Mostrar resultados editables ─────────────────────────────────────
-function _showOCRResults(vals) {
+function _showOCRResults(vals, engineBadge) {
   var el = document.getElementById('ocr-results');
   if (!el) return;
   var found = Object.keys(vals).length;
+  // engineBadge: '📄 PDF', '⚡ Ollama · llava', '🔍 Tesseract', etc.
+  var eng = engineBadge || '🔍 Tesseract';
+  var isPDF  = eng.includes('PDF');
+  var isOllama = eng.includes('Ollama');
 
   if (found === 0) {
     el.style.display = 'block';
+    var extraHint = isPDF
+      ? 'El PDF no contiene texto extraíble. Intente con la imagen escaneada.'
+      : isOllama
+        ? 'Ollama no encontró valores. Intente con mejor iluminación.'
+        : 'Intente con una foto más nítida, sin sombras ni reflejo.';
     el.innerHTML = '<div style="background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.3);border-radius:10px;padding:16px;text-align:center;">'
       +'<div style="font-size:1.2rem;margin-bottom:6px;">🔍</div>'
       +'<div style="font-size:.85rem;font-weight:700;color:#fbbf24;margin-bottom:4px;">No se detectaron valores de laboratorio</div>'
-      +'<div style="font-size:.76rem;color:var(--text-dim);">Intente con una foto más nítida, sin sombras ni reflejo.<br>También puede ingresar los valores manualmente en las calculadoras.</div>'
+      +'<div style="font-size:.76rem;color:var(--text-dim);">'+extraHint+'<br>También puede ingresar los valores manualmente en las calculadoras.</div>'
       +'</div>';
     document.getElementById('ocr-raw-wrap').style.display = 'block';
     return;
@@ -24755,12 +24988,16 @@ function _showOCRResults(vals) {
       +'<div>'
         +'<div style="font-size:.70rem;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:.06em;">VALORES DETECTADOS</div>'
         +'<div style="font-size:.92rem;font-weight:800;color:var(--teal);">✅ '+found+' parámetros extraídos</div>'
+        +'<div style="font-size:.68rem;margin-top:2px;color:'+(isPDF?'#34d399':isOllama?'#a78bfa':'var(--text-muted)')+';font-family:var(--font-mono);">Motor: '+eng+'</div>'
       +'</div>'
-      +'<button onclick="document.getElementById(\'ocr-raw-wrap\').style.display=document.getElementById(\'ocr-raw-wrap\').style.display===\'none\'?\'block\':\'none\'" '
-        +'style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:7px;padding:4px 12px;font-size:.70rem;font-family:var(--font-mono);cursor:pointer;">📄 Texto OCR</button>'
+      +(isPDF ? '' :
+        '<button onclick="document.getElementById(\'ocr-raw-wrap\').style.display=document.getElementById(\'ocr-raw-wrap\').style.display===\'none\'?\'block\':\'none\'" '
+        +'style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:7px;padding:4px 12px;font-size:.70rem;font-family:var(--font-mono);cursor:pointer;">📄 Texto OCR</button>')
     +'</div>'
     // Alerta edición
-    +'<div style="background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:7px;padding:7px 11px;margin-bottom:10px;font-size:.74rem;color:#fbbf24;">⚠️ Verifique los valores antes de aplicar. El OCR puede cometer errores. Corrija en los campos si es necesario.</div>'
+    +(isPDF
+      ? '<div style="background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.3);border-radius:7px;padding:7px 11px;margin-bottom:10px;font-size:.74rem;color:#34d399;">✅ Texto extraído directamente del PDF — alta precisión. Verifique los valores antes de aplicar.</div>'
+      : '<div style="background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:7px;padding:7px 11px;margin-bottom:10px;font-size:.74rem;color:#fbbf24;">⚠️ Verifique los valores antes de aplicar. El OCR puede cometer errores. Corrija en los campos si es necesario.</div>')
     // Tabla
     +'<div style="overflow-x:auto;">'
       +'<table class="ocr-table">'
