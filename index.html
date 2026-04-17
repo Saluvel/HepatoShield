@@ -24441,6 +24441,85 @@ function _processOCRFileObj(file) {
   reader.readAsDataURL(file);
 }
 
+// ── Preprocesado de imagen para mejorar OCR ──────────────────────────
+// Escala 3×, aumenta contraste y convierte a escala de grises.
+// Esto mejora drásticamente la precisión de Tesseract en exámenes escaneados.
+function _preprocessForOCR(imageData, callback) {
+  var img = new Image();
+  img.onload = function() {
+    try {
+      var SCALE = Math.min(3, Math.max(2, 1800 / Math.max(img.width, img.height)));
+      var w = Math.round(img.width  * SCALE);
+      var h = Math.round(img.height * SCALE);
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      // Fondo blanco para evitar transparencias
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+      // Aumentar contraste y convertir a escala de grises
+      var imgD = ctx.getImageData(0, 0, w, h);
+      var px = imgD.data;
+      for (var i = 0; i < px.length; i += 4) {
+        var g = 0.299*px[i] + 0.587*px[i+1] + 0.114*px[i+2];
+        // Aumento de contraste con punto medio 160 (favorece texto oscuro sobre fondo claro)
+        g = g > 160 ? Math.min(255, 255 - (255-g)*0.4) : Math.max(0, g * 0.55);
+        px[i] = px[i+1] = px[i+2] = g;
+      }
+      ctx.putImageData(imgD, 0, 0);
+      callback(canvas.toDataURL('image/png'));
+    } catch(e) {
+      // Si canvas falla (ej. CORS), usar imagen original
+      callback(imageData);
+    }
+  };
+  img.onerror = function() { callback(imageData); };
+  img.src = imageData;
+}
+
+// ── Limpieza de texto OCR antes de parsear ───────────────────────────
+// Elimina rangos de referencia sin tocar líneas de datos reales.
+function _stripOCRNoise(text) {
+  // Palabras clave que indican que la LÍNEA ENTERA es un rango de referencia,
+  // no una línea de datos del paciente.
+  var RE_JUNK_LINE = /^(?:NEONATO|RECIEN\s*NACIDO|RN\b|PREMATURO|PEDIATR|VALORES\s+DE\s+REFERENCIA|METODO|PROCESS|PROCESO\s+T[EÉ]CNICO|RESPONSABLE|REG\.|DIAGNOSTICO|FIRMA|SELLO|>?\s*\d+\s*(?:[—\-]\s*\d+\s*)?A[NÑ]O|NINO[SA]?\s+(?:\d|DE\s+\d|[-—])|NIN[OA]S?\s+(?:\d|DE\s+\d)|ADULTOS?\s*[<>]|MAYOR(?:ES)?\s+DE\s+\d|MENOR(?:ES)?\s+DE\s+\d)/i;
+
+  var lines = text.split('\n');
+  var out = lines.map(function(line) {
+    var t = line.trim();
+    if (!t) return line;
+
+    // 1. Eliminar líneas que son puro ruido de referencia
+    if (RE_JUNK_LINE.test(t)) return '';
+
+    // 2. Eliminar líneas "M: Hasta 32" o "H: 14 - 35" (solo rango sin parámetro)
+    if (/^[MH]:\s+(?:Hasta\s+)?\d/i.test(t)) return '';
+
+    // 3. Eliminar líneas que son solo números + unidad (ej: "0.10  0.39  mg/dL")
+    if (/^\s*[\d\.,]+(?:\s+[\d\.,<>≤≥=\-]+)+\s*(?:mg\/dL|g\/dL|U\/L|mEq\/L|%|mmol|umol)?\s*$/i.test(t) && t.length < 60) return '';
+
+    // 4. Limpiar el FINAL de líneas de datos que traen rangos de referencia pegados
+    //    Ej: "TRANSAMINASA (GOT-AST)  14.0  M: Hasta 32  H: Hasta 40  U/L"
+    line = line
+      // Quitar "M: Hasta XX  H: Hasta XX" al final de línea de datos
+      .replace(/\s+[MH]:\s+(?:Hasta\s+)?\d+(?:(?:\s+[MH]:\s+(?:Hasta\s+)?\d+)|\s+[\d\s\-]+)*/gi, '')
+      // Quitar rangos inline tipo "0.86  < 1.2"  → dejar sólo "0.86"
+      .replace(/(\d+[.,]\d+)\s+(?:[<>]=?\s*\d+[.,]?\d*\s*)+/g, '$1 ')
+      // Quitar timestamps incrustados "02/11/2022 04:30 AM"
+      .replace(/\d{2}\/\d{2}\/\d{4}(?:\s+\d{2}:\d{2}(?:\s*(?:AM|PM))?)?/gi, '')
+      // Quitar "Validado: ..." que quede en la línea
+      .replace(/\s*Validado[:\s]+.*/gi, '');
+
+    return line;
+  });
+
+  return out.join('\n')
+    .replace(/REG\.\s*[\d\-]+/gi, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 // ── Motor OCR ────────────────────────────────────────────────────────
 function _runOCR(imageData) {
   var progWrap = document.getElementById('ocr-progress-wrap');
@@ -24449,33 +24528,43 @@ function _runOCR(imageData) {
   var statText = document.getElementById('ocr-status-text');
   if (progWrap) progWrap.style.display = 'block';
   if (progBar)  progBar.style.width = '0%';
+  if (statText) statText.textContent = 'Preparando imagen...';
 
-  _loadTesseract(function() {
-    Tesseract.recognize(imageData, 'spa+eng', {
-      logger: function(m) {
-        if (!statText) return;
-        if (m.status === 'loading language traineddata') {
-          statText.textContent = 'Cargando modelo de idioma español...';
-        } else if (m.status === 'initializing api') {
-          statText.textContent = 'Inicializando motor OCR...';
-        } else if (m.status === 'recognizing text') {
-          var p = Math.round((m.progress||0)*100);
-          if (progBar) progBar.style.width = p+'%';
-          if (pctText) pctText.textContent = p+'%';
-          statText.textContent = 'Reconociendo texto... '+p+'%';
+  // Paso 1: preprocesar imagen (escala + contraste)
+  _preprocessForOCR(imageData, function(processedData) {
+    _loadTesseract(function() {
+      Tesseract.recognize(processedData, 'spa+eng', {
+        // PSM 6 = bloque único de texto — mejor para tablas médicas lineales
+        // PSM 3 (default) confunde columnas; PSM 6 fuerza lectura izquierda→derecha
+        tessedit_pageseg_mode: '6',
+        logger: function(m) {
+          if (!statText) return;
+          if (m.status === 'loading language traineddata') {
+            statText.textContent = 'Cargando modelo de idioma...';
+          } else if (m.status === 'initializing api') {
+            statText.textContent = 'Inicializando motor OCR...';
+          } else if (m.status === 'recognizing text') {
+            var p = Math.round((m.progress||0)*100);
+            if (progBar) progBar.style.width = p+'%';
+            if (pctText) pctText.textContent = p+'%';
+            statText.textContent = 'Reconociendo texto... '+p+'%';
+          }
         }
-      }
-    }).then(function(res) {
-      if (progWrap) progWrap.style.display = 'none';
-      var text = res.data.text || '';
-      var rawEl = document.getElementById('ocr-raw-text');
-      if (rawEl) rawEl.value = text;
-      var vals = _parseLabText(text);
-      _ocrCurrentValues = vals;
-      _showOCRResults(vals);
-    }).catch(function(err) {
-      if (progWrap) progWrap.style.display = 'none';
-      showToast('❌ Error OCR', 'No se pudo procesar: '+(err.message||err));
+      }).then(function(res) {
+        if (progWrap) progWrap.style.display = 'none';
+        var rawText = res.data.text || '';
+        // Guardar texto original para visualización
+        var rawEl = document.getElementById('ocr-raw-text');
+        if (rawEl) rawEl.value = rawText;
+        // Limpiar ruido antes de parsear
+        var cleanText = _stripOCRNoise(rawText);
+        var vals = _parseLabText(cleanText);
+        _ocrCurrentValues = vals;
+        _showOCRResults(vals);
+      }).catch(function(err) {
+        if (progWrap) progWrap.style.display = 'none';
+        showToast('❌ Error OCR', 'No se pudo procesar: '+(err.message||err));
+      });
     });
   });
 }
