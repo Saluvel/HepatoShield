@@ -24818,23 +24818,34 @@ function _parseLabByBBox(ocrResult) {
     line.text = line.words.map(function(w){ return w.text; }).join(' ');
   });
 
+  // Ancho máximo de imagen (para calcular límite de distancia relativo)
+  var imgW = 0;
+  words.forEach(function(w){ if (w.bbox.x1 > imgW) imgW = w.bbox.x1; });
+  if (imgW < 50) return {};
+
   // ── Paso 2: para cada fila, detectar parámetro y leer valor ────
   var result = {};
 
   lines.forEach(function(line) {
+    // ── Guardia: si la línea coincide con MÁS DE UN parámetro es un encabezado ──
+    // Ej: "TRANSAMINASAS (GOT-AST y GPT-ALT)" tiene GOT + GPT → es sección, no dato
+    var lineMatchCount = 0;
+    Object.keys(_LAB_KW).forEach(function(k) {
+      if (_LAB_KW[k].some(function(p){ return p.test(line.text); })) lineMatchCount++;
+    });
+    if (lineMatchCount >= 2) return; // encabezado de sección → saltar
+
     Object.keys(_LAB_KW).forEach(function(key) {
       if (result[key] !== undefined) return; // ya encontrado
 
       var patterns = _LAB_KW[key];
-      // La fila debe contener al menos uno de los patrones del parámetro
       if (!patterns.some(function(p){ return p.test(line.text); })) return;
 
-      // Excluir encabezados de sección que no son filas de datos
-      // Ej: "BILIRRUBINA TOTAL Y DIRECTA" — tiene "Y" o "E" entre palabras clave
-      if (key === 'bili' && /(?:Y\s+Directa|Y\s+Direct)/i.test(line.text)) return;
-      if (key === 'bili' && !/\d/.test(line.text)) return; // si no hay números, es sólo cabecera
+      // Excluir encabezados bili: "BILIRRUBINA TOTAL Y DIRECTA" sin números
+      if (key === 'bili' && /Y\s+Direc/i.test(line.text)) return;
+      if (key === 'bili' && !/\d/.test(line.text)) return;
 
-      // Encontrar la palabra que dio match al patrón → su bbox.x1 es el límite derecho del label
+      // Encontrar la palabra keyword → su x1 es el límite derecho del label
       var labelRightX = 0;
       line.words.forEach(function(w) {
         if (patterns.some(function(p){ return p.test(w.text); })) {
@@ -24842,18 +24853,19 @@ function _parseLabByBBox(ocrResult) {
         }
       });
 
-      // Avanzar labelRightX a través de palabras NO numéricas que siguen al label
-      // (el nombre del parámetro puede tener múltiples palabras: "Fosfatasa Alcalina")
-      // IMPORTANTE: detenerse en la PRIMERA palabra numérica — esa es el valor.
+      // Extender labelRightX por palabras de texto que siguen (ej: "Alcalina" en "Fosfatasa Alcalina")
+      // PARAR en la primera palabra numérica — esa es el valor
       var hitNumber = false;
       line.words.forEach(function(w) {
         if (hitNumber) return;
         if (w.bbox.x0 <= labelRightX) return;
-        if (/\d/.test(w.text)) { hitNumber = true; return; } // ← parar aquí
-        labelRightX = w.bbox.x1; // todavía es parte del label
+        if (/\d/.test(w.text)) { hitNumber = true; return; }
+        labelRightX = w.bbox.x1;
       });
 
-      // ── Paso 3: tomar el PRIMER número a la derecha del label ──
+      // ── Tomar el PRIMER número válido a la derecha del label ──
+      // No se necesita límite de distancia: el multi-param guard elimina encabezados
+      // y el sanity range filtra valores absurdos. El primer número real es siempre el resultado.
       var numCandidates = line.words.filter(function(w) {
         return w.bbox.x0 > labelRightX && /^\d/.test(w.text);
       });
@@ -24863,13 +24875,9 @@ function _parseLabByBBox(ocrResult) {
         var raw = numCandidates[i].text.replace(',', '.').replace(/[^0-9.]/g, '');
         var v = parseFloat(raw);
         if (isNaN(v) || v === 0) continue;
-
-        // Ajuste especial plaquetas: si >2000 probablemente en miles absolutas
         if (key === 'plt' && v > 2000) v = Math.round(v / 1000);
-
         var rng = _OCR_SANE[key];
-        if (rng && (v < rng[0] || v > rng[1])) continue; // fuera de rango sano
-
+        if (rng && (v < rng[0] || v > rng[1])) continue;
         result[key] = v;
         break;
       }
@@ -24892,12 +24900,11 @@ function _runTesseractOCR(imageData, progWrap, progBar, pctText, statText) {
   _preprocessForOCR(imageData, function(processedData) {
     _loadTesseract(function() {
 
-      // ── PSM 11: texto disperso — máxima cobertura de palabras, sin asumir layout ──
-      // Ideal para el parser espacial porque devuelve bbox de TODAS las palabras.
+      // ── PSM 3: auto-layout — bboxes de palabras fiables, respeta estructura de página ──
       if (statText) statText.textContent = 'Leyendo imagen...';
 
       Tesseract.recognize(processedData, 'spa+eng', {
-        tessedit_pageseg_mode: '11',   // sparse text: ignora columnas, lee todo
+        tessedit_pageseg_mode: '3',    // auto: detecta columnas, bboxes de palabras precisos
         logger: function(m) {
           if (m.status === 'recognizing text') {
             var p = Math.round((m.progress||0) * 80) + 10;
