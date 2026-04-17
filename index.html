@@ -24639,28 +24639,30 @@ function _runOllamaOCR(base64img, model, onSuccess, onFail) {
 
 // ── Preprocesado de imagen para mejorar OCR ──────────────────────────
 // Escala 2× + grayscale suave. NO usar contraste agresivo: destruye puntos decimales.
-function _preprocessForOCR(imageData, callback) {
+// cropFraction (0-1): si se especifica, recorta al N% izquierdo — elimina columna de rangos.
+function _preprocessForOCR(imageData, callback, cropFraction) {
   var img = new Image();
   img.onload = function() {
     try {
-      // Escalar hasta máx 2400px en el lado mayor (2× suele ser suficiente)
       var maxSide = Math.max(img.width, img.height);
       var SCALE = maxSide < 1200 ? 2.0 : (maxSide < 2000 ? 1.5 : 1.0);
-      var w = Math.round(img.width  * SCALE);
-      var h = Math.round(img.height * SCALE);
+      var wFull = Math.round(img.width  * SCALE);
+      var h     = Math.round(img.height * SCALE);
+      // Recorte opcional: elimina la columna derecha (rangos de referencia)
+      var w = cropFraction ? Math.round(wFull * cropFraction) : wFull;
       var canvas = document.createElement('canvas');
       canvas.width = w; canvas.height = h;
       var ctx = canvas.getContext('2d');
       ctx.fillStyle = '#fff';
       ctx.fillRect(0, 0, w, h);
-      ctx.drawImage(img, 0, 0, w, h);
+      // drawImage con recorte: tomar sólo el lado izquierdo de la imagen fuente
+      ctx.drawImage(img, 0, 0, img.width * (w / wFull), img.height, 0, 0, w, h);
       // Conversión a escala de grises suave — preserva puntos decimales pequeños
       var imgD = ctx.getImageData(0, 0, w, h);
       var px = imgD.data;
       for (var i = 0; i < px.length; i += 4) {
-        // Luminancia perceptual sin umbral duro
         var g = Math.round(0.299*px[i] + 0.587*px[i+1] + 0.114*px[i+2]);
-        // Leve aumento de contraste lineal (factor 1.15) sin clipear
+        // Leve contraste lineal 1.15× sin clipear — preserva decimales
         g = Math.min(255, Math.max(0, 128 + (g - 128) * 1.15));
         px[i] = px[i+1] = px[i+2] = g;
       }
@@ -24758,44 +24760,185 @@ function _runOCR(imageData) {
   });
 }
 
+// ════════════════════════════════════════════════════════════════════
+// _parseLabByBBox — parser ESPACIAL usando posición (x,y) de cada palabra
+// ─────────────────────────────────────────────────────────────────────
+// Problema que resuelve: Tesseract mezcla el TEXTO de columnas distintas,
+// pero las posiciones bbox (x0,y0,x1,y1) de cada palabra son siempre exactas.
+// Estrategia:
+//   1. Agrupa palabras en filas por coordenada Y
+//   2. En cada fila busca el nombre del parámetro (p.ej. "GOT", "Bilirrubina Total")
+//   3. El resultado es el PRIMER número a la DERECHA del nombre del parámetro
+//      en esa misma fila → nunca puede confundirse con la columna de rangos,
+//      porque los rangos están más a la derecha.
+// ════════════════════════════════════════════════════════════════════
+var _LAB_KW = {
+  ast:  [/\bGOT\b/i, /\bAST\b/i, /Oxalo/i, /SGOT\b/i],
+  alt:  [/\bGPT\b/i, /\bALT\b/i, /Pir[uú]v/i, /SGPT\b/i],
+  bili: [/Bilirrubina.*Total/i, /Bili.*Tot/i, /\bBT\b/],
+  alb:  [/Alb[uú]mina/i, /\bALB\b/i],
+  inr:  [/\bINR\b/i, /\bRIN\b/i, /Normalized.*Ratio/i],
+  crea: [/Creatinina/i, /Creatinine/i, /\bCREA\b/i],
+  na:   [/\bSodio\b/i, /\bSodium\b/i],
+  ggt:  [/\bGGT\b/i, /Gamma.*GT/i],
+  fa:   [/Fosfatasa.*Alc/i, /\bALP\b/i, /\bALKP\b/i],
+  hb:   [/Hemoglobina/i, /\bHGB\b/i, /\bHb\b/],
+  plt:  [/Plaquetas/i, /\bPLT\b/i, /Trombocito/i]
+};
+
+function _parseLabByBBox(ocrResult) {
+  var words = (ocrResult.data && ocrResult.data.words) || [];
+  // Keep only words with decent confidence and non-empty text
+  words = words.filter(function(w){
+    return w.text && w.text.trim().length > 0 && w.confidence > 25;
+  });
+  if (words.length < 4) return {};
+
+  // ── Paso 1: agrupar palabras en filas (líneas) por posición Y ──
+  var lines = [];
+  words.forEach(function(w) {
+    var cy = (w.bbox.y0 + w.bbox.y1) / 2;
+    // Buscar fila existente a ≤12px
+    var found = null;
+    for (var i = 0; i < lines.length; i++) {
+      if (Math.abs(lines[i].cy - cy) <= 12) { found = lines[i]; break; }
+    }
+    if (!found) { found = { cy: cy, words: [] }; lines.push(found); }
+    found.words.push(w);
+    // Actualizar cy como promedio corriente
+    found.cy = found.words.reduce(function(s,ww){
+      return s + (ww.bbox.y0 + ww.bbox.y1)/2;
+    }, 0) / found.words.length;
+  });
+
+  // Ordenar filas arriba→abajo; palabras dentro de cada fila izq→der
+  lines.sort(function(a,b){ return a.cy - b.cy; });
+  lines.forEach(function(line){
+    line.words.sort(function(a,b){ return a.bbox.x0 - b.bbox.x0; });
+    line.text = line.words.map(function(w){ return w.text; }).join(' ');
+  });
+
+  // ── Paso 2: para cada fila, detectar parámetro y leer valor ────
+  var result = {};
+
+  lines.forEach(function(line) {
+    Object.keys(_LAB_KW).forEach(function(key) {
+      if (result[key] !== undefined) return; // ya encontrado
+
+      var patterns = _LAB_KW[key];
+      // La fila debe contener al menos uno de los patrones del parámetro
+      if (!patterns.some(function(p){ return p.test(line.text); })) return;
+
+      // Excluir encabezados de sección que no son filas de datos
+      // Ej: "BILIRRUBINA TOTAL Y DIRECTA" — tiene "Y" o "E" entre palabras clave
+      if (key === 'bili' && /(?:Y\s+Directa|Y\s+Direct)/i.test(line.text)) return;
+      if (key === 'bili' && !/\d/.test(line.text)) return; // si no hay números, es sólo cabecera
+
+      // Encontrar la palabra que dio match al patrón → su bbox.x1 es el límite derecho del label
+      var labelRightX = 0;
+      line.words.forEach(function(w) {
+        if (patterns.some(function(p){ return p.test(w.text); })) {
+          if (w.bbox.x1 > labelRightX) labelRightX = w.bbox.x1;
+        }
+      });
+
+      // Avanzar labelRightX a través de palabras NO numéricas que siguen al label
+      // (el nombre del parámetro puede tener múltiples palabras: "Fosfatasa Alcalina")
+      // IMPORTANTE: detenerse en la PRIMERA palabra numérica — esa es el valor.
+      var hitNumber = false;
+      line.words.forEach(function(w) {
+        if (hitNumber) return;
+        if (w.bbox.x0 <= labelRightX) return;
+        if (/\d/.test(w.text)) { hitNumber = true; return; } // ← parar aquí
+        labelRightX = w.bbox.x1; // todavía es parte del label
+      });
+
+      // ── Paso 3: tomar el PRIMER número a la derecha del label ──
+      var numCandidates = line.words.filter(function(w) {
+        return w.bbox.x0 > labelRightX && /^\d/.test(w.text);
+      });
+      numCandidates.sort(function(a,b){ return a.bbox.x0 - b.bbox.x0; });
+
+      for (var i = 0; i < numCandidates.length; i++) {
+        var raw = numCandidates[i].text.replace(',', '.').replace(/[^0-9.]/g, '');
+        var v = parseFloat(raw);
+        if (isNaN(v) || v === 0) continue;
+
+        // Ajuste especial plaquetas: si >2000 probablemente en miles absolutas
+        if (key === 'plt' && v > 2000) v = Math.round(v / 1000);
+
+        var rng = _OCR_SANE[key];
+        if (rng && (v < rng[0] || v > rng[1])) continue; // fuera de rango sano
+
+        result[key] = v;
+        break;
+      }
+    });
+  });
+
+  return result;
+}
+
+// ════════════════════════════════════════════════════════════════════
 function _runTesseractOCR(imageData, progWrap, progBar, pctText, statText) {
   if (!progWrap) progWrap = document.getElementById('ocr-progress-wrap');
   if (!progBar)  progBar  = document.getElementById('ocr-progress-bar');
   if (!pctText)  pctText  = document.getElementById('ocr-pct-text');
   if (!statText) statText = document.getElementById('ocr-status-text');
   if (progWrap) progWrap.style.display = 'block';
-  if (progBar)  progBar.style.width = '0%';
+  if (progBar)  progBar.style.width = '5%';
   if (statText) statText.textContent = 'Preparando imagen...';
 
   _preprocessForOCR(imageData, function(processedData) {
     _loadTesseract(function() {
+
+      // ── PSM 11: texto disperso — máxima cobertura de palabras, sin asumir layout ──
+      // Ideal para el parser espacial porque devuelve bbox de TODAS las palabras.
+      if (statText) statText.textContent = 'Leyendo imagen...';
+
       Tesseract.recognize(processedData, 'spa+eng', {
-        tessedit_pageseg_mode: '3',
+        tessedit_pageseg_mode: '11',   // sparse text: ignora columnas, lee todo
         logger: function(m) {
-          if (!statText) return;
-          if (m.status === 'loading language traineddata') {
-            statText.textContent = 'Cargando modelo de idioma...';
-          } else if (m.status === 'initializing api') {
-            statText.textContent = 'Inicializando motor OCR...';
-          } else if (m.status === 'recognizing text') {
-            var p = Math.round((m.progress||0)*100);
-            if (progBar) progBar.style.width = p+'%';
-            if (pctText) pctText.textContent = p+'%';
-            statText.textContent = 'Reconociendo texto... '+p+'%';
+          if (m.status === 'recognizing text') {
+            var p = Math.round((m.progress||0) * 80) + 10;
+            if (progBar)  progBar.style.width = p + '%';
+            if (pctText)  pctText.textContent = p + '%';
+            if (statText) statText.textContent = 'Analizando... ' + p + '%';
           }
         }
       }).then(function(res) {
         if (progWrap) progWrap.style.display = 'none';
+
         var rawText = res.data.text || '';
         var rawEl = document.getElementById('ocr-raw-text');
         if (rawEl) rawEl.value = rawText;
-        var cleanText = _stripOCRNoise(rawText);
-        var vals = _parseLabText(cleanText);
-        _ocrCurrentValues = vals;
-        _showOCRResults(vals, '🔍 Tesseract');
+
+        // ── Estrategia 1 (principal): parser espacial por bounding box ──
+        var bboxVals = _parseLabByBBox(res);
+        var bboxCount = Object.keys(bboxVals).length;
+
+        // ── Estrategia 2 (complemento): parser de texto clásico ──
+        var textVals = _parseLabText(_stripOCRNoise(rawText));
+
+        // ── Fusión: bbox tiene prioridad; texto rellena lo que bbox no encontró ──
+        // Si bbox encontró ≥1 parámetro, confiar en él para todos sus resultados.
+        // Si bbox encontró 0, confiar en texto.
+        var merged = {};
+        if (bboxCount > 0) {
+          // Llenar primero con texto (como base), luego sobreescribir con bbox
+          Object.keys(textVals).forEach(function(k){ merged[k] = textVals[k]; });
+          Object.keys(bboxVals).forEach(function(k){ merged[k] = bboxVals[k]; });
+        } else {
+          merged = textVals;
+        }
+
+        _ocrCurrentValues = merged;
+        var engine = bboxCount > 0 ? '🔬 Tesseract · Espacial' : '🔍 Tesseract · Texto';
+        _showOCRResults(merged, engine);
+
       }).catch(function(err) {
         if (progWrap) progWrap.style.display = 'none';
-        showToast('❌ Error OCR', 'No se pudo procesar: '+(err.message||err));
+        showToast('❌ Error OCR', 'No se pudo procesar: ' + (err.message || err));
       });
     });
   });
